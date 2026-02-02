@@ -556,7 +556,7 @@ $AuthUserCopyWith<$Res> get user {
 /// @nodoc
 mixin _$AuthUser {
 
-@JsonKey(name: '_id') String get id; String get username; String get email; String get mobileNumber; String? get avatar;
+@JsonKey(name: '_id') String get id; String get username; String get email; String? get mobileNumber; String? get avatar;
 /// Create a copy of AuthUser
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -589,7 +589,7 @@ abstract mixin class $AuthUserCopyWith<$Res>  {
   factory $AuthUserCopyWith(AuthUser value, $Res Function(AuthUser) _then) = _$AuthUserCopyWithImpl;
 @useResult
 $Res call({
-@JsonKey(name: '_id') String id, String username, String email, String mobileNumber, String? avatar
+@JsonKey(name: '_id') String id, String username, String email, String? mobileNumber, String? avatar
 });
 
 
@@ -606,13 +606,13 @@ class _$AuthUserCopyWithImpl<$Res>
 
 /// Create a copy of AuthUser
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? username = null,Object? email = null,Object? mobileNumber = null,Object? avatar = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? username = null,Object? email = null,Object? mobileNumber = freezed,Object? avatar = freezed,}) {
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,username: null == username ? _self.username : username // ignore: cast_nullable_to_non_nullable
 as String,email: null == email ? _self.email : email // ignore: cast_nullable_to_non_nullable
-as String,mobileNumber: null == mobileNumber ? _self.mobileNumber : mobileNumber // ignore: cast_nullable_to_non_nullable
-as String,avatar: freezed == avatar ? _self.avatar : avatar // ignore: cast_nullable_to_non_nullable
+as String,mobileNumber: freezed == mobileNumber ? _self.mobileNumber : mobileNumber // ignore: cast_nullable_to_non_nullable
+as String?,avatar: freezed == avatar ? _self.avatar : avatar // ignore: cast_nullable_to_non_nullable
 as String?,
   ));
 }
@@ -695,7 +695,7 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function(@JsonKey(name: '_id')  String id,  String username,  String email,  String mobileNumber,  String? avatar)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function(@JsonKey(name: '_id')  String id,  String username,  String email,  String? mobileNumber,  String? avatar)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _AuthUser() when $default != null:
 return $default(_that.id,_that.username,_that.email,_that.mobileNumber,_that.avatar);case _:
@@ -716,7 +716,7 @@ return $default(_that.id,_that.username,_that.email,_that.mobileNumber,_that.ava
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function(@JsonKey(name: '_id')  String id,  String username,  String email,  String mobileNumber,  String? avatar)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function(@JsonKey(name: '_id')  String id,  String username,  String email,  String? mobileNumber,  String? avatar)  $default,) {final _that = this;
 switch (_that) {
 case _AuthUser():
 return $default(_that.id,_that.username,_that.email,_that.mobileNumber,_that.avatar);}
@@ -733,7 +733,7 @@ return $default(_that.id,_that.username,_that.email,_that.mobileNumber,_that.ava
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function(@JsonKey(name: '_id')  String id,  String username,  String email,  String mobileNumber,  String? avatar)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function(@JsonKey(name: '_id')  String id,  String username,  String email,  String? mobileNumber,  String? avatar)?  $default,) {final _that = this;
 switch (_that) {
 case _AuthUser() when $default != null:
 return $default(_that.id,_that.username,_that.email,_that.mobileNumber,_that.avatar);case _:
@@ -748,13 +748,13 @@ return $default(_that.id,_that.username,_that.email,_that.mobileNumber,_that.ava
 @JsonSerializable()
 
 class _AuthUser implements AuthUser {
-  const _AuthUser({@JsonKey(name: '_id') required this.id, required this.username, required this.email, required this.mobileNumber, this.avatar});
+  const _AuthUser({@JsonKey(name: '_id') required this.id, required this.username, required this.email, this.mobileNumber, this.avatar});
   factory _AuthUser.fromJson(Map<String, dynamic> json) => _$AuthUserFromJson(json);
 
 @override@JsonKey(name: '_id') final  String id;
 @override final  String username;
 @override final  String email;
-@override final  String mobileNumber;
+@override final  String? mobileNumber;
 @override final  String? avatar;
 
 /// Create a copy of AuthUser
@@ -790,7 +790,7 @@ abstract mixin class _$AuthUserCopyWith<$Res> implements $AuthUserCopyWith<$Res>
   factory _$AuthUserCopyWith(_AuthUser value, $Res Function(_AuthUser) _then) = __$AuthUserCopyWithImpl;
 @override @useResult
 $Res call({
-@JsonKey(name: '_id') String id, String username, String email, String mobileNumber, String? avatar
+@JsonKey(name: '_id') String id, String username, String email, String? mobileNumber, String? avatar
 });
 
 
@@ -807,13 +807,13 @@ class __$AuthUserCopyWithImpl<$Res>
 
 /// Create a copy of AuthUser
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? username = null,Object? email = null,Object? mobileNumber = null,Object? avatar = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? username = null,Object? email = null,Object? mobileNumber = freezed,Object? avatar = freezed,}) {
   return _then(_AuthUser(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,username: null == username ? _self.username : username // ignore: cast_nullable_to_non_nullable
 as String,email: null == email ? _self.email : email // ignore: cast_nullable_to_non_nullable
-as String,mobileNumber: null == mobileNumber ? _self.mobileNumber : mobileNumber // ignore: cast_nullable_to_non_nullable
-as String,avatar: freezed == avatar ? _self.avatar : avatar // ignore: cast_nullable_to_non_nullable
+as String,mobileNumber: freezed == mobileNumber ? _self.mobileNumber : mobileNumber // ignore: cast_nullable_to_non_nullable
+as String?,avatar: freezed == avatar ? _self.avatar : avatar // ignore: cast_nullable_to_non_nullable
 as String?,
   ));
 }

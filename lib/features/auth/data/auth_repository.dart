@@ -1,3 +1,5 @@
+import 'dart:developer' as dev;
+
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -65,15 +67,32 @@ class AuthRepository {
   /// Login with Google OAuth
   Future<AuthResponse> googleLogin(String idToken) async {
     try {
+      dev.log('🌐 Sending Google ID token to server...');
+      dev.log('   Endpoint: ${ApiEndpoints.googleAuth}');
+      dev.log('   idToken: ${idToken.substring(0, 50)}...');
+
       final response = await _dio.post(
         ApiEndpoints.googleAuth,
         data: {'idToken': idToken},
       );
 
+      dev.log('📥 Server response received:');
+      dev.log('   Status: ${response.statusCode}');
+      dev.log('   Data: ${response.data}');
+
       final authResponse = AuthResponse.fromJson(response.data['data']);
+      dev.log('✅ Auth response parsed successfully');
+      dev.log('   User: ${authResponse.user.email}');
+
       await _saveTokens(authResponse.tokens);
+      dev.log('💾 Tokens saved to secure storage');
+
       return authResponse;
     } on DioException catch (e) {
+      dev.log('❌ Server error during Google login:');
+      dev.log('   Status: ${e.response?.statusCode}');
+      dev.log('   Response: ${e.response?.data}');
+      dev.log('   Message: ${e.message}');
       throw e.error ?? e;
     }
   }

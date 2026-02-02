@@ -274,7 +274,7 @@ class PlaceholderMainScreen extends ConsumerWidget {
                       children: [
                         _InfoRow(label: 'Email', value: user.email),
                         const Divider(),
-                        _InfoRow(label: 'Mobile', value: user.mobileNumber),
+                        _InfoRow(label: 'Mobile', value: user.mobileNumber ?? "No mobile number"),
                       ],
                     ),
                   ),

@@ -35,7 +35,7 @@ _AuthUser _$AuthUserFromJson(Map<String, dynamic> json) => _AuthUser(
   id: json['_id'] as String,
   username: json['username'] as String,
   email: json['email'] as String,
-  mobileNumber: json['mobileNumber'] as String,
+  mobileNumber: json['mobileNumber'] as String?,
   avatar: json['avatar'] as String?,
 );
 

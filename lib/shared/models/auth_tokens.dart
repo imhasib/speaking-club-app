@@ -44,7 +44,7 @@ sealed class AuthUser with _$AuthUser {
     required String id,
     required String username,
     required String email,
-    required String mobileNumber,
+    String? mobileNumber,
     String? avatar,
   }) = _AuthUser;
 

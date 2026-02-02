@@ -181,6 +181,10 @@ class AuthRepository {
       _secureStorage.delete(key: AppConstants.accessTokenKey),
       _secureStorage.delete(key: AppConstants.refreshTokenKey),
       _secureStorage.delete(key: AppConstants.userDataKey),
+      // Clear welcome seen flag so user sees welcome screen after logout
+      _secureStorage.delete(key: AppConstants.welcomeSeenKey),
+      // Mark onboarding complete so returning users skip it and see welcome screen
+      _secureStorage.write(key: AppConstants.onboardingCompleteKey, value: 'true'),
     ]);
   }
 

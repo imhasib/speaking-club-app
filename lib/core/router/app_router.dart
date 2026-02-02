@@ -80,12 +80,18 @@ class AppRouter {
               return FutureBuilder<({bool showOnboarding, bool showWelcome})>(
                 future: _checkInitialScreenStatus(ref),
                 builder: (context, snapshot) {
-                  final status = snapshot.data;
-                  final showOnboarding = status?.showOnboarding ?? true;
-                  final showWelcome = status?.showWelcome ?? true;
+                  // Show loading while checking storage
+                  if (!snapshot.hasData) {
+                    return const Scaffold(
+                      body: Center(
+                        child: CircularProgressIndicator(),
+                      ),
+                    );
+                  }
+                  final status = snapshot.data!;
                   return AuthWrapper(
-                    showOnboarding: showOnboarding,
-                    showWelcome: showWelcome,
+                    showOnboarding: status.showOnboarding,
+                    showWelcome: status.showWelcome,
                     onAuthSuccess: () {
                       context.go(Routes.home);
                     },

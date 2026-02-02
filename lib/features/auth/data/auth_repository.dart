@@ -1,0 +1,181 @@
+import 'package:dio/dio.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+
+import '../../../core/constants/api_endpoints.dart';
+import '../../../core/constants/app_constants.dart';
+import '../../../core/errors/app_exception.dart';
+import '../../../shared/models/auth_tokens.dart';
+import '../../../shared/models/user.dart';
+import '../../../shared/providers/core_providers.dart';
+
+/// Auth repository provider
+final authRepositoryProvider = Provider<AuthRepository>((ref) {
+  final apiClient = ref.watch(apiClientProvider);
+  final secureStorage = ref.watch(secureStorageProvider);
+  return AuthRepository(
+    dio: apiClient.dio,
+    secureStorage: secureStorage,
+  );
+});
+
+/// Repository for authentication operations
+class AuthRepository {
+  final Dio _dio;
+  final FlutterSecureStorage _secureStorage;
+
+  AuthRepository({
+    required Dio dio,
+    required FlutterSecureStorage secureStorage,
+  })  : _dio = dio,
+        _secureStorage = secureStorage;
+
+  /// Register a new user with email and password
+  Future<AuthResponse> register(RegisterRequest request) async {
+    try {
+      final response = await _dio.post(
+        ApiEndpoints.register,
+        data: request.toJson(),
+      );
+
+      final authResponse = AuthResponse.fromJson(response.data['data']);
+      await _saveTokens(authResponse.tokens);
+      return authResponse;
+    } on DioException catch (e) {
+      throw e.error ?? e;
+    }
+  }
+
+  /// Login with email and password
+  Future<AuthResponse> login(LoginRequest request) async {
+    try {
+      final response = await _dio.post(
+        ApiEndpoints.login,
+        data: request.toJson(),
+      );
+
+      final authResponse = AuthResponse.fromJson(response.data['data']);
+      await _saveTokens(authResponse.tokens);
+      return authResponse;
+    } on DioException catch (e) {
+      throw e.error ?? e;
+    }
+  }
+
+  /// Login with Google OAuth
+  Future<AuthResponse> googleLogin(String idToken) async {
+    try {
+      final response = await _dio.post(
+        ApiEndpoints.googleAuth,
+        data: {'idToken': idToken},
+      );
+
+      final authResponse = AuthResponse.fromJson(response.data['data']);
+      await _saveTokens(authResponse.tokens);
+      return authResponse;
+    } on DioException catch (e) {
+      throw e.error ?? e;
+    }
+  }
+
+  /// Refresh access token
+  Future<AuthTokens> refreshToken() async {
+    try {
+      final refreshToken = await _secureStorage.read(
+        key: AppConstants.refreshTokenKey,
+      );
+
+      if (refreshToken == null) {
+        throw const AuthException(
+          message: 'No refresh token available',
+          code: 'NO_REFRESH_TOKEN',
+        );
+      }
+
+      final response = await _dio.post(
+        ApiEndpoints.refreshToken,
+        data: {'refreshToken': refreshToken},
+      );
+
+      final tokens = AuthTokens.fromJson(response.data['data']);
+      await _saveTokens(tokens);
+      return tokens;
+    } on DioException catch (e) {
+      throw e.error ?? e;
+    }
+  }
+
+  /// Logout current user
+  Future<void> logout() async {
+    try {
+      await _dio.post(ApiEndpoints.logout);
+    } catch (_) {
+      // Ignore logout API errors
+    } finally {
+      await clearTokens();
+    }
+  }
+
+  /// Get current user profile
+  Future<User> getCurrentUser() async {
+    try {
+      final response = await _dio.get(ApiEndpoints.me);
+      return User.fromJson(response.data['data']);
+    } on DioException catch (e) {
+      throw e.error ?? e;
+    }
+  }
+
+  /// Check if user is authenticated
+  Future<bool> isAuthenticated() async {
+    final token = await _secureStorage.read(key: AppConstants.accessTokenKey);
+    return token != null;
+  }
+
+  /// Get stored access token
+  Future<String?> getAccessToken() async {
+    return _secureStorage.read(key: AppConstants.accessTokenKey);
+  }
+
+  /// Get stored refresh token
+  Future<String?> getRefreshToken() async {
+    return _secureStorage.read(key: AppConstants.refreshTokenKey);
+  }
+
+  /// Save tokens to secure storage
+  Future<void> _saveTokens(AuthTokens tokens) async {
+    await Future.wait([
+      _secureStorage.write(
+        key: AppConstants.accessTokenKey,
+        value: tokens.accessToken,
+      ),
+      _secureStorage.write(
+        key: AppConstants.refreshTokenKey,
+        value: tokens.refreshToken,
+      ),
+    ]);
+  }
+
+  /// Clear stored tokens
+  Future<void> clearTokens() async {
+    await Future.wait([
+      _secureStorage.delete(key: AppConstants.accessTokenKey),
+      _secureStorage.delete(key: AppConstants.refreshTokenKey),
+      _secureStorage.delete(key: AppConstants.userDataKey),
+    ]);
+  }
+
+  /// Check username availability
+  Future<bool> checkUsernameAvailability(String username) async {
+    try {
+      final response = await _dio.get(
+        '/users/check-username',
+        queryParameters: {'username': username},
+      );
+      return response.data['data']['available'] ?? false;
+    } catch (_) {
+      // If endpoint doesn't exist, assume available
+      return true;
+    }
+  }
+}

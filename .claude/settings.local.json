@@ -1,0 +1,27 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(flutter create:*)",
+      "Bash(/mnt/c/dev/flutter/bin/flutter create:*)",
+      "Bash(\"/mnt/c/Program Files Ext/flutter/bin/flutter\" create --project-name spoken_club --org com.spokenclub /mnt/e/org-karigor/spoken-club/spoken-club-app)",
+      "Bash(flutter.bat create:*)",
+      "Bash(cmd.exe /c \"flutter create --project-name spoken_club --org com.spokenclub E:\\\\org-karigor\\\\spoken-club\\\\spoken-club-app\")",
+      "Bash(flutter pub get:*)",
+      "Bash(flutter.bat pub get:*)",
+      "Bash(cmd.exe /c \"flutter pub get\")",
+      "Bash(cmd.exe /c:*)",
+      "Bash(find:*)",
+      "Bash(flutter analyze:*)",
+      "Bash(flutter.bat analyze:*)",
+      "WebSearch",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:pub.dev)",
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "WebFetch(domain:isaacadariku.medium.com)",
+      "Bash(dart run build_runner build:*)",
+      "Bash(flutter pub run build_runner build:*)",
+      "Bash(\"/mnt/c/Program Files Ext/flutter/bin/dart\" run build_runner build --delete-conflicting-outputs)",
+      "Bash(\"/mnt/c/Program Files Ext/flutter/bin/dart.bat\" run build_runner build --delete-conflicting-outputs)"
+    ]
+  }
+}

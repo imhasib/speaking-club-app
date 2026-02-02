@@ -18,19 +18,29 @@ sealed class AuthTokens with _$AuthTokens {
 /// Authentication response containing user and tokens
 @freezed
 sealed class AuthResponse with _$AuthResponse {
+  const AuthResponse._();
+
   const factory AuthResponse({
-    required AuthTokens tokens,
+    required String accessToken,
+    required String refreshToken,
     required AuthUser user,
   }) = _AuthResponse;
 
   factory AuthResponse.fromJson(Map<String, dynamic> json) =>
       _$AuthResponseFromJson(json);
+
+  /// Helper to get tokens as AuthTokens object
+  AuthTokens get tokens => AuthTokens(
+    accessToken: accessToken,
+    refreshToken: refreshToken,
+  );
 }
 
 /// User data returned in auth responses
 @freezed
 sealed class AuthUser with _$AuthUser {
   const factory AuthUser({
+    @JsonKey(name: '_id')
     required String id,
     required String username,
     required String email,

@@ -290,7 +290,7 @@ as DateTime,
 /// @nodoc
 mixin _$RegisterRequest {
 
- String get username; String get email; String get mobileNumber; String get password; String? get avatar;
+ String get username; String get email; String get mobileNumber; String get password;@JsonKey(includeIfNull: false) String? get avatar;
 /// Create a copy of RegisterRequest
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -323,7 +323,7 @@ abstract mixin class $RegisterRequestCopyWith<$Res>  {
   factory $RegisterRequestCopyWith(RegisterRequest value, $Res Function(RegisterRequest) _then) = _$RegisterRequestCopyWithImpl;
 @useResult
 $Res call({
- String username, String email, String mobileNumber, String password, String? avatar
+ String username, String email, String mobileNumber, String password,@JsonKey(includeIfNull: false) String? avatar
 });
 
 
@@ -429,7 +429,7 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String username,  String email,  String mobileNumber,  String password,  String? avatar)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String username,  String email,  String mobileNumber,  String password, @JsonKey(includeIfNull: false)  String? avatar)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _RegisterRequest() when $default != null:
 return $default(_that.username,_that.email,_that.mobileNumber,_that.password,_that.avatar);case _:
@@ -450,7 +450,7 @@ return $default(_that.username,_that.email,_that.mobileNumber,_that.password,_th
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String username,  String email,  String mobileNumber,  String password,  String? avatar)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String username,  String email,  String mobileNumber,  String password, @JsonKey(includeIfNull: false)  String? avatar)  $default,) {final _that = this;
 switch (_that) {
 case _RegisterRequest():
 return $default(_that.username,_that.email,_that.mobileNumber,_that.password,_that.avatar);}
@@ -467,7 +467,7 @@ return $default(_that.username,_that.email,_that.mobileNumber,_that.password,_th
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String username,  String email,  String mobileNumber,  String password,  String? avatar)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String username,  String email,  String mobileNumber,  String password, @JsonKey(includeIfNull: false)  String? avatar)?  $default,) {final _that = this;
 switch (_that) {
 case _RegisterRequest() when $default != null:
 return $default(_that.username,_that.email,_that.mobileNumber,_that.password,_that.avatar);case _:
@@ -479,17 +479,17 @@ return $default(_that.username,_that.email,_that.mobileNumber,_that.password,_th
 }
 
 /// @nodoc
+@JsonSerializable()
 
-@JsonSerializable(includeIfNull: false)
 class _RegisterRequest implements RegisterRequest {
-  const _RegisterRequest({required this.username, required this.email, required this.mobileNumber, required this.password, this.avatar});
+  const _RegisterRequest({required this.username, required this.email, required this.mobileNumber, required this.password, @JsonKey(includeIfNull: false) this.avatar});
   factory _RegisterRequest.fromJson(Map<String, dynamic> json) => _$RegisterRequestFromJson(json);
 
 @override final  String username;
 @override final  String email;
 @override final  String mobileNumber;
 @override final  String password;
-@override final  String? avatar;
+@override@JsonKey(includeIfNull: false) final  String? avatar;
 
 /// Create a copy of RegisterRequest
 /// with the given fields replaced by the non-null parameter values.
@@ -524,7 +524,7 @@ abstract mixin class _$RegisterRequestCopyWith<$Res> implements $RegisterRequest
   factory _$RegisterRequestCopyWith(_RegisterRequest value, $Res Function(_RegisterRequest) _then) = __$RegisterRequestCopyWithImpl;
 @override @useResult
 $Res call({
- String username, String email, String mobileNumber, String password, String? avatar
+ String username, String email, String mobileNumber, String password,@JsonKey(includeIfNull: false) String? avatar
 });
 
 

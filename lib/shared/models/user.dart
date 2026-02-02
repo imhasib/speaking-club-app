@@ -21,13 +21,13 @@ sealed class User with _$User {
 
 /// Request model for user registration
 @Freezed(toJson: true)
-@JsonSerializable(includeIfNull: false)
 sealed class RegisterRequest with _$RegisterRequest {
   const factory RegisterRequest({
     required String username,
     required String email,
     required String mobileNumber,
     required String password,
+    @JsonKey(includeIfNull: false)
     String? avatar,
   }) = _RegisterRequest;
 

@@ -132,7 +132,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                 ),
                 const SizedBox(height: AppSpacing.sm),
                 Text(
-                  'Join Spoken Club and connect with people',
+                  'Join Speaking Club and connect with people',
                   style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                         color: colorScheme.onSurfaceVariant,
                       ),

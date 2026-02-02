@@ -1,10 +1,10 @@
-# Spoken Club - Development Progress
+# Speaking Club - Development Progress
 
 **Last Updated:** January 31, 2026
 
 ## Overview
 
-This document tracks the implementation progress of the Spoken Club mobile app based on the PRD (`prd.md`).
+This document tracks the implementation progress of the Speaking Club mobile app based on the PRD (`prd.md`).
 
 ---
 

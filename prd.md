@@ -1,5 +1,5 @@
 # Product Requirements Document (PRD)
-## Spoken Club - Mobile Voice & Video Calling App
+## Speaking Club - Mobile Voice & Video Calling App
 
 **Version:** 1.0
 **Date:** January 29, 2026
@@ -10,7 +10,7 @@
 
 ## 1. Project Overview
 
-Spoken Club is a mobile application that enables users to connect with others through real-time audio and video calls. The app supports both direct calls to specific users and random matching with available users, similar to platforms like Omegle but with a focus on voice/video communication.
+Speaking Club is a mobile application that enables users to connect with others through real-time audio and video calls. The app supports both direct calls to specific users and random matching with available users, similar to platforms like Omegle but with a focus on voice/video communication.
 
 ### Key Differentiators
 - **Dual Connection Modes**: Users can either select specific people from an online list or get randomly matched with waiting users
@@ -774,7 +774,7 @@ enum UserStatus {
 
 #### Home Screen (Online Users)
 - **Top App Bar**:
-  - Title: "Spoken Club"
+  - Title: "Speaking Club"
   - Actions: Profile icon, Settings icon
   - Status indicator: Green dot with "Online" text
 - **Body**:
@@ -1146,14 +1146,14 @@ const registerSchema = Joi.object({
 ### 13.1 App Stores
 
 #### Google Play Store (Android)
-- **Package Name**: `com.spokenclub.app`
+- **Package Name**: `com.Speakingclub.app`
 - **Min SDK**: 23 (Android 6.0)
 - **Target SDK**: Latest (Android 14+)
 - **Permissions**: Camera, Microphone, Internet, Notifications
 - **Release Type**: Internal Testing → Closed Beta → Open Beta → Production
 
 #### Apple App Store (iOS)
-- **Bundle ID**: `com.spokenclub.app`
+- **Bundle ID**: `com.Speakingclub.app`
 - **Min iOS**: 12.0
 - **Capabilities**: Camera, Microphone, Background Modes (VOIP)
 - **TestFlight**: Beta testing with 100 users
@@ -1167,7 +1167,7 @@ const registerSchema = Joi.object({
 - **Server**: AWS EC2 / DigitalOcean / Railway
 - **Database**: MongoDB Atlas (managed)
 - **Redis**: Redis Cloud / AWS ElastiCache
-- **Domain**: `api.spokenclub.com` (HTTPS with Let's Encrypt)
+- **Domain**: `api.Speakingclub.com` (HTTPS with Let's Encrypt)
 - **Monitoring**: PM2 process manager, CloudWatch logs
 - **CI/CD**: GitHub Actions for automated deployment
 

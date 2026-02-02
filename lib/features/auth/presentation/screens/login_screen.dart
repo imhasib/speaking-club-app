@@ -103,7 +103,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 ),
                 const SizedBox(height: AppSpacing.sm),
                 Text(
-                  'Sign in to continue to Spoken Club',
+                  'Sign in to continue to Speaking Club',
                   style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                         color: colorScheme.onSurfaceVariant,
                       ),

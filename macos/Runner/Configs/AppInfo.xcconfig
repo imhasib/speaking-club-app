@@ -5,10 +5,10 @@
 // 'flutter create' template.
 
 // The application's name. By default this is also the title of the Flutter window.
-PRODUCT_NAME = spoken_club
+PRODUCT_NAME = Speaking_club
 
 // The application's bundle identifier
-PRODUCT_BUNDLE_IDENTIFIER = com.spokenclub.spokenClub
+PRODUCT_BUNDLE_IDENTIFIER = com.Speakingclub.SpeakingClub
 
 // The copyright displayed in application information
-PRODUCT_COPYRIGHT = Copyright © 2026 com.spokenclub. All rights reserved.
+PRODUCT_COPYRIGHT = Copyright © 2026 com.Speakingclub. All rights reserved.

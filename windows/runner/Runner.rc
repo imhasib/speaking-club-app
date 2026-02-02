@@ -89,13 +89,13 @@ BEGIN
     BEGIN
         BLOCK "040904e4"
         BEGIN
-            VALUE "CompanyName", "com.spokenclub" "\0"
-            VALUE "FileDescription", "spoken_club" "\0"
+            VALUE "CompanyName", "com.Speakingclub" "\0"
+            VALUE "FileDescription", "Speaking_club" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
-            VALUE "InternalName", "spoken_club" "\0"
-            VALUE "LegalCopyright", "Copyright (C) 2026 com.spokenclub. All rights reserved." "\0"
-            VALUE "OriginalFilename", "spoken_club.exe" "\0"
-            VALUE "ProductName", "spoken_club" "\0"
+            VALUE "InternalName", "Speaking_club" "\0"
+            VALUE "LegalCopyright", "Copyright (C) 2026 com.Speakingclub. All rights reserved." "\0"
+            VALUE "OriginalFilename", "Speaking_club.exe" "\0"
+            VALUE "ProductName", "Speaking_club" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
         END
     END

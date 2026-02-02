@@ -73,7 +73,7 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
               ),
               const SizedBox(height: AppSpacing.lg),
               Text(
-                'Spoken Club',
+                'Speaking Club',
                 style: Theme.of(context).textTheme.headlineLarge?.copyWith(
                       fontWeight: FontWeight.bold,
                       color: colorScheme.primary,

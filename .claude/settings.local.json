@@ -3,9 +3,9 @@
     "allow": [
       "Bash(flutter create:*)",
       "Bash(/mnt/c/dev/flutter/bin/flutter create:*)",
-      "Bash(\"/mnt/c/Program Files Ext/flutter/bin/flutter\" create --project-name spoken_club --org com.spokenclub /mnt/e/org-karigor/spoken-club/spoken-club-app)",
+      "Bash(\"/mnt/c/Program Files Ext/flutter/bin/flutter\" create --project-name Speaking_club --org com.Speakingclub /mnt/e/org-karigor/Speaking-club/Speaking-club-app)",
       "Bash(flutter.bat create:*)",
-      "Bash(cmd.exe /c \"flutter create --project-name spoken_club --org com.spokenclub E:\\\\org-karigor\\\\spoken-club\\\\spoken-club-app\")",
+      "Bash(cmd.exe /c \"flutter create --project-name Speaking_club --org com.Speakingclub E:\\\\org-karigor\\\\Speaking-club\\\\Speaking-club-app\")",
       "Bash(flutter pub get:*)",
       "Bash(flutter.bat pub get:*)",
       "Bash(cmd.exe /c \"flutter pub get\")",

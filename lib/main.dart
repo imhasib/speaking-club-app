@@ -25,21 +25,21 @@ void main() async {
 
   runApp(
     const ProviderScope(
-      child: SpokenClubApp(),
+      child: SpeakingClubApp(),
     ),
   );
 }
 
 /// Main application widget
-class SpokenClubApp extends ConsumerWidget {
-  const SpokenClubApp({super.key});
+class SpeakingClubApp extends ConsumerWidget {
+  const SpeakingClubApp({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final router = ref.watch(appRouterProvider);
 
     return MaterialApp.router(
-      title: 'Spoken Club',
+      title: 'Speaking Club',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.light,
       darkTheme: AppTheme.dark,

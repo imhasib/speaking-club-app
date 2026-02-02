@@ -1,4 +1,4 @@
-/// API endpoint constants for the Spoken Club app
+/// API endpoint constants for the Speaking Club app
 class ApiEndpoints {
   ApiEndpoints._();
 

@@ -154,7 +154,7 @@ class SplashScreen extends ConsumerWidget {
             ),
             const SizedBox(height: 24),
             Text(
-              'Spoken Club',
+              'Speaking Club',
               style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                     fontWeight: FontWeight.bold,
                     color: colorScheme.primary,
@@ -181,7 +181,7 @@ class PlaceholderMainScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Spoken Club'),
+        title: const Text('Speaking Club'),
         actions: [
           IconButton(
             icon: const Icon(Icons.logout),

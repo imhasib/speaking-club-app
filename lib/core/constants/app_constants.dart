@@ -3,7 +3,7 @@ class AppConstants {
   AppConstants._();
 
   // App info
-  static const String appName = 'Spoken Club';
+  static const String appName = 'Speaking Club';
   static const String appVersion = '1.0.0';
 
   // Validation

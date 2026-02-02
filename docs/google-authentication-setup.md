@@ -1,6 +1,6 @@
 # Google Authentication Configuration Guide
 
-This document outlines the steps to configure Google Sign-In for the Spoken Club app.
+This document outlines the steps to configure Google Sign-In for the Speaking Club app.
 
 ## Prerequisites
 
@@ -20,7 +20,7 @@ This document outlines the steps to configure Google Sign-In for the Spoken Club
 1. Navigate to **APIs & Services** → **OAuth consent screen**
 2. Select **External** user type (or Internal for organization-only)
 3. Fill in the required fields:
-   - App name: `Spoken Club`
+   - App name: `Speaking Club`
    - User support email: Your email
    - Developer contact email: Your email
 4. Add scopes:
@@ -38,8 +38,8 @@ This document outlines the steps to configure Google Sign-In for the Spoken Club
 2. Click **Create Credentials** → **OAuth client ID**
 3. Select **Android** as application type
 4. Enter:
-   - Name: `Spoken Club Android`
-   - Package name: `com.karigor.spokenclub`
+   - Name: `Speaking Club Android`
+   - Package name: `com.karigor.Speakingclub`
    - SHA-1 certificate fingerprint (see below)
 5. Click "Create"
 
@@ -61,8 +61,8 @@ keytool -list -v -keystore <path-to-release-keystore> -alias <alias-name>
 2. Click **Create Credentials** → **OAuth client ID**
 3. Select **iOS** as application type
 4. Enter:
-   - Name: `Spoken Club iOS`
-   - Bundle ID: `com.karigor.spokenclub`
+   - Name: `Speaking Club iOS`
+   - Bundle ID: `com.karigor.Speakingclub`
 5. Click "Create"
 6. Download the generated `.plist` file
 
@@ -72,7 +72,7 @@ keytool -list -v -keystore <path-to-release-keystore> -alias <alias-name>
 2. Click **Create Credentials** → **OAuth client ID**
 3. Select **Web application** as application type
 4. Enter:
-   - Name: `Spoken Club Web`
+   - Name: `Speaking Club Web`
    - Authorized JavaScript origins: Your web app URL
    - Authorized redirect URIs: Your callback URL
 5. Click "Create"
@@ -101,10 +101,10 @@ Ensure the application ID matches your Google Cloud configuration:
 
 ```kotlin
 android {
-    namespace = "com.karigor.spokenclub"
+    namespace = "com.karigor.Speakingclub"
 
     defaultConfig {
-        applicationId = "com.karigor.spokenclub"
+        applicationId = "com.karigor.Speakingclub"
         // ...
     }
 }
@@ -142,7 +142,7 @@ Replace `YOUR_IOS_CLIENT_ID` with the client ID from your iOS OAuth credential (
 
 ### Update Bundle Identifier
 
-Ensure the bundle identifier in Xcode matches `com.karigor.spokenclub`.
+Ensure the bundle identifier in Xcode matches `com.karigor.Speakingclub`.
 
 ## Step 7: Backend Configuration
 

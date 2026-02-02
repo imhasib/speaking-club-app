@@ -209,7 +209,7 @@ class ErrorInterceptor extends Interceptor {
 
         if (data is Map<String, dynamic>) {
           message = data['message'] ?? message;
-          code = data['code'];
+          code = data['code']?.toString();
         }
 
         if (statusCode == 401) {

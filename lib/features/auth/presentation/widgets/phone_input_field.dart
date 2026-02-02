@@ -26,7 +26,7 @@ class PhoneInputField extends StatefulWidget {
     this.textInputAction = TextInputAction.next,
     this.enabled = true,
     this.focusNode,
-    this.initialCountryCode = 'US',
+    this.initialCountryCode = 'BD',
   });
 
   @override
@@ -34,7 +34,7 @@ class PhoneInputField extends StatefulWidget {
 }
 
 class _PhoneInputFieldState extends State<PhoneInputField> {
-  String _countryCode = '+1';
+  String _countryCode = '+880';
 
   @override
   Widget build(BuildContext context) {

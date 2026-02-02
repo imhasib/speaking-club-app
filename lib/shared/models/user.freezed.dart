@@ -479,8 +479,8 @@ return $default(_that.username,_that.email,_that.mobileNumber,_that.password,_th
 }
 
 /// @nodoc
-@JsonSerializable()
 
+@JsonSerializable(includeIfNull: false)
 class _RegisterRequest implements RegisterRequest {
   const _RegisterRequest({required this.username, required this.email, required this.mobileNumber, required this.password, this.avatar});
   factory _RegisterRequest.fromJson(Map<String, dynamic> json) => _$RegisterRequestFromJson(json);

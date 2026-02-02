@@ -8,12 +8,18 @@ import 'welcome_screen.dart';
 /// Authentication flow wrapper that manages navigation between auth screens
 class AuthWrapper extends StatefulWidget {
   final bool showOnboarding;
+  final bool showWelcome;
   final VoidCallback onAuthSuccess;
+  final VoidCallback? onWelcomeSeen;
+  final VoidCallback? onOnboardingComplete;
 
   const AuthWrapper({
     super.key,
     required this.showOnboarding,
+    required this.showWelcome,
     required this.onAuthSuccess,
+    this.onWelcomeSeen,
+    this.onOnboardingComplete,
   });
 
   @override
@@ -26,14 +32,28 @@ class _AuthWrapperState extends State<AuthWrapper> {
   @override
   void initState() {
     super.initState();
-    _currentScreen =
-        widget.showOnboarding ? _AuthScreen.onboarding : _AuthScreen.welcome;
+    _currentScreen = _determineInitialScreen();
+  }
+
+  _AuthScreen _determineInitialScreen() {
+    if (widget.showOnboarding) {
+      return _AuthScreen.onboarding;
+    } else if (widget.showWelcome) {
+      return _AuthScreen.welcome;
+    } else {
+      return _AuthScreen.login;
+    }
   }
 
   void _navigateTo(_AuthScreen screen) {
     setState(() {
       _currentScreen = screen;
     });
+  }
+
+  void _markWelcomeSeenAndNavigate(_AuthScreen screen) {
+    widget.onWelcomeSeen?.call();
+    _navigateTo(screen);
   }
 
   @override
@@ -55,14 +75,18 @@ class _AuthWrapperState extends State<AuthWrapper> {
       case _AuthScreen.onboarding:
         return OnboardingScreen(
           key: const ValueKey('onboarding'),
-          onComplete: () => _navigateTo(_AuthScreen.welcome),
+          onComplete: () {
+            widget.onOnboardingComplete?.call();
+            _navigateTo(_AuthScreen.welcome);
+          },
         );
 
       case _AuthScreen.welcome:
         return WelcomeScreen(
           key: const ValueKey('welcome'),
-          onLoginTap: () => _navigateTo(_AuthScreen.login),
-          onRegisterTap: () => _navigateTo(_AuthScreen.register),
+          onLoginTap: () => _markWelcomeSeenAndNavigate(_AuthScreen.login),
+          onRegisterTap: () =>
+              _markWelcomeSeenAndNavigate(_AuthScreen.register),
           onSuccess: widget.onAuthSuccess,
         );
 

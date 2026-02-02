@@ -7,24 +7,28 @@ import '../../shared/providers/core_providers.dart';
 import '../constants/app_constants.dart';
 import 'routes.dart';
 
-/// App router provider
+/// App router provider - creates router once and uses refresh for updates
 final appRouterProvider = Provider<GoRouter>((ref) {
-  final authState = ref.watch(authProvider);
-  return AppRouter.createRouter(ref, authState);
+  // Don't watch authProvider here - that would recreate the router on every change
+  // Instead, read auth state in redirect callback
+  return AppRouter.createRouter(ref);
 });
 
 /// App router configuration
 class AppRouter {
   AppRouter._();
 
-  static GoRouter createRouter(Ref ref, AuthState authState) {
+  static GoRouter createRouter(Ref ref) {
     return GoRouter(
       initialLocation: Routes.splash,
       debugLogDiagnostics: true,
       refreshListenable: GoRouterRefreshStream(ref),
       redirect: (context, state) async {
+        // Read auth state here (not watched, just current value)
+        final authState = ref.read(authProvider);
         final isAuthenticated = authState.isAuthenticated;
         final isLoading = authState is AuthStateInitial;
+        final isError = authState is AuthStateError;
         final currentPath = state.uri.path;
 
         // Show splash while checking auth
@@ -45,6 +49,11 @@ class AppRouter {
         // If authenticated and on auth route, go to home
         if (isAuthenticated && isAuthRoute) {
           return Routes.home;
+        }
+
+        // Don't redirect on error - let the user see the error on current screen
+        if (isError && isAuthRoute) {
+          return null;
         }
 
         // If not authenticated and not on auth route, go to auth
@@ -68,14 +77,23 @@ class AppRouter {
           name: Routes.authName,
           builder: (context, state) => Consumer(
             builder: (context, ref, child) {
-              return FutureBuilder<bool>(
-                future: _checkOnboardingStatus(ref),
+              return FutureBuilder<({bool showOnboarding, bool showWelcome})>(
+                future: _checkInitialScreenStatus(ref),
                 builder: (context, snapshot) {
-                  final showOnboarding = snapshot.data ?? true;
+                  final status = snapshot.data;
+                  final showOnboarding = status?.showOnboarding ?? true;
+                  final showWelcome = status?.showWelcome ?? true;
                   return AuthWrapper(
                     showOnboarding: showOnboarding,
+                    showWelcome: showWelcome,
                     onAuthSuccess: () {
                       context.go(Routes.home);
+                    },
+                    onOnboardingComplete: () {
+                      _markOnboardingComplete(ref);
+                    },
+                    onWelcomeSeen: () {
+                      _markWelcomeSeen(ref);
                     },
                   );
                 },
@@ -116,10 +134,28 @@ class AppRouter {
     );
   }
 
-  static Future<bool> _checkOnboardingStatus(WidgetRef ref) async {
+  static Future<({bool showOnboarding, bool showWelcome})>
+      _checkInitialScreenStatus(WidgetRef ref) async {
     final storage = ref.read(secureStorageProvider);
-    final completed = await storage.read(key: AppConstants.onboardingCompleteKey);
-    return completed != 'true';
+    final onboardingComplete =
+        await storage.read(key: AppConstants.onboardingCompleteKey);
+    final welcomeSeen = await storage.read(key: AppConstants.welcomeSeenKey);
+    return (
+      showOnboarding: onboardingComplete != 'true',
+      showWelcome: welcomeSeen != 'true',
+    );
+  }
+
+  static Future<void> _markOnboardingComplete(WidgetRef ref) async {
+    final storage = ref.read(secureStorageProvider);
+    await storage.write(key: AppConstants.onboardingCompleteKey, value: 'true');
+  }
+
+  static Future<void> _markWelcomeSeen(WidgetRef ref) async {
+    final storage = ref.read(secureStorageProvider);
+    await storage.write(key: AppConstants.welcomeSeenKey, value: 'true');
+    // Also mark onboarding as complete when welcome is seen
+    await storage.write(key: AppConstants.onboardingCompleteKey, value: 'true');
   }
 }
 
@@ -127,7 +163,20 @@ class AppRouter {
 class GoRouterRefreshStream extends ChangeNotifier {
   GoRouterRefreshStream(this._ref) {
     _ref.listen(authProvider, (previous, next) {
-      notifyListeners();
+      // Only refresh router when authentication status actually changes
+      // Don't refresh on error or loading states to preserve navigation state
+      final wasAuthenticated = previous?.isAuthenticated ?? false;
+      final isAuthenticated = next.isAuthenticated;
+      final wasInitial = previous is AuthStateInitial || previous == null;
+      final isInitial = next is AuthStateInitial;
+
+      // Refresh only when:
+      // 1. Moving from initial state to a resolved state
+      // 2. Authentication status changes (logged in <-> logged out)
+      if ((wasInitial && !isInitial) ||
+          (wasAuthenticated != isAuthenticated)) {
+        notifyListeners();
+      }
     });
   }
 

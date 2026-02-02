@@ -10,7 +10,7 @@ part of 'env.dart';
 // ignore_for_file: type=lint
 // generated_from: .env
 final class _Env {
-  static const String apiBaseUrl = 'http://143.110.186.178:3010';
+  static const String apiBaseUrl = 'http://143.110.186.178:3010/api';
 
   static const String socketUrl = 'http://143.110.186.178:3010';
 

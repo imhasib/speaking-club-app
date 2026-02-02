@@ -41,7 +41,7 @@ Map<String, dynamic> _$RegisterRequestToJson(_RegisterRequest instance) =>
       'email': instance.email,
       'mobileNumber': instance.mobileNumber,
       'password': instance.password,
-      'avatar': instance.avatar,
+      'avatar': ?instance.avatar,
     };
 
 _LoginRequest _$LoginRequestFromJson(Map<String, dynamic> json) =>

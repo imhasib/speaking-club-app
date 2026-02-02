@@ -35,4 +35,5 @@ class AppConstants {
   static const String refreshTokenKey = 'refresh_token';
   static const String userDataKey = 'user_data';
   static const String onboardingCompleteKey = 'onboarding_complete';
+  static const String welcomeSeenKey = 'welcome_seen';
 }

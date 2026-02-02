@@ -39,7 +39,7 @@ This document outlines the steps to configure Google Sign-In for the Speaking Cl
 3. Select **Android** as application type
 4. Enter:
    - Name: `Speaking Club Android`
-   - Package name: `com.karigor.Speakingclub`
+   - Package name: `com.karigor.speakingclub`
    - SHA-1 certificate fingerprint (see below)
 5. Click "Create"
 
@@ -62,7 +62,7 @@ keytool -list -v -keystore <path-to-release-keystore> -alias <alias-name>
 3. Select **iOS** as application type
 4. Enter:
    - Name: `Speaking Club iOS`
-   - Bundle ID: `com.karigor.Speakingclub`
+   - Bundle ID: `com.karigor.speakingclub`
 5. Click "Create"
 6. Download the generated `.plist` file
 
@@ -101,10 +101,10 @@ Ensure the application ID matches your Google Cloud configuration:
 
 ```kotlin
 android {
-    namespace = "com.karigor.Speakingclub"
+    namespace = "com.karigor.speakingclub"
 
     defaultConfig {
-        applicationId = "com.karigor.Speakingclub"
+        applicationId = "com.karigor.speakingclub"
         // ...
     }
 }
@@ -142,7 +142,7 @@ Replace `YOUR_IOS_CLIENT_ID` with the client ID from your iOS OAuth credential (
 
 ### Update Bundle Identifier
 
-Ensure the bundle identifier in Xcode matches `com.karigor.Speakingclub`.
+Ensure the bundle identifier in Xcode matches `com.karigor.speakingclub`.
 
 ## Step 7: Backend Configuration
 

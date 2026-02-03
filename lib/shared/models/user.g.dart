@@ -7,17 +7,17 @@ part of 'user.dart';
 // **************************************************************************
 
 _User _$UserFromJson(Map<String, dynamic> json) => _User(
-  id: json['id'] as String,
+  id: json['_id'] as String,
   username: json['username'] as String,
   email: json['email'] as String,
-  mobileNumber: json['mobileNumber'] as String,
+  mobileNumber: json['mobileNumber'] as String?,
   avatar: json['avatar'] as String?,
   createdAt: DateTime.parse(json['createdAt'] as String),
   updatedAt: DateTime.parse(json['updatedAt'] as String),
 );
 
 Map<String, dynamic> _$UserToJson(_User instance) => <String, dynamic>{
-  'id': instance.id,
+  '_id': instance.id,
   'username': instance.username,
   'email': instance.email,
   'mobileNumber': instance.mobileNumber,
@@ -58,6 +58,7 @@ _UpdateProfileRequest _$UpdateProfileRequestFromJson(
 ) => _UpdateProfileRequest(
   username: json['username'] as String?,
   avatar: json['avatar'] as String?,
+  mobileNumber: json['mobileNumber'] as String?,
 );
 
 Map<String, dynamic> _$UpdateProfileRequestToJson(
@@ -65,4 +66,5 @@ Map<String, dynamic> _$UpdateProfileRequestToJson(
 ) => <String, dynamic>{
   'username': instance.username,
   'avatar': instance.avatar,
+  'mobileNumber': instance.mobileNumber,
 };

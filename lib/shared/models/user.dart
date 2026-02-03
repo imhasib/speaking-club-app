@@ -7,10 +7,10 @@ part 'user.g.dart';
 @freezed
 sealed class User with _$User {
   const factory User({
-    required String id,
+    @JsonKey(name: '_id') required String id,
     required String username,
     required String email,
-    required String mobileNumber,
+    String? mobileNumber,
     String? avatar,
     required DateTime createdAt,
     required DateTime updatedAt,
@@ -53,6 +53,7 @@ sealed class UpdateProfileRequest with _$UpdateProfileRequest {
   const factory UpdateProfileRequest({
     String? username,
     String? avatar,
+    String? mobileNumber,
   }) = _UpdateProfileRequest;
 
   factory UpdateProfileRequest.fromJson(Map<String, dynamic> json) =>

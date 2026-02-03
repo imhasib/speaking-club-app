@@ -3,8 +3,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../features/auth/auth.dart';
+import '../../features/history/presentation/screens/history_screen.dart';
+import '../../features/home/presentation/screens/home_screen.dart';
+import '../../features/profile/presentation/screens/profile_screen.dart';
 import '../../shared/providers/core_providers.dart';
 import '../constants/app_constants.dart';
+import 'main_scaffold.dart';
 import 'routes.dart';
 
 /// App router provider - creates router once and uses refresh for updates
@@ -46,6 +50,11 @@ class AppRouter {
             currentPath == Routes.login ||
             currentPath == Routes.register;
 
+        // Protected routes (require authentication)
+        final isProtectedRoute = currentPath == Routes.home ||
+            currentPath == Routes.history ||
+            currentPath == Routes.profile;
+
         // If authenticated and on auth route, go to home
         if (isAuthenticated && isAuthRoute) {
           return Routes.home;
@@ -56,8 +65,13 @@ class AppRouter {
           return null;
         }
 
-        // If not authenticated and not on auth route, go to auth
-        if (!isAuthenticated && !isAuthRoute) {
+        // If not authenticated and on protected route, go to auth
+        if (!isAuthenticated && isProtectedRoute) {
+          return Routes.auth;
+        }
+
+        // If not authenticated and not on auth route or protected route, go to auth
+        if (!isAuthenticated && !isAuthRoute && !isProtectedRoute) {
           return Routes.auth;
         }
 
@@ -108,11 +122,43 @@ class AppRouter {
           ),
         ),
 
-        // Main app routes (placeholder for now)
-        GoRoute(
-          path: Routes.home,
-          name: Routes.homeName,
-          builder: (context, state) => const PlaceholderMainScreen(),
+        // Main app routes with bottom navigation
+        StatefulShellRoute.indexedStack(
+          builder: (context, state, navigationShell) {
+            return MainScaffold(navigationShell: navigationShell);
+          },
+          branches: [
+            // Home branch
+            StatefulShellBranch(
+              routes: [
+                GoRoute(
+                  path: Routes.home,
+                  name: Routes.homeName,
+                  builder: (context, state) => const HomeScreen(),
+                ),
+              ],
+            ),
+            // History branch
+            StatefulShellBranch(
+              routes: [
+                GoRoute(
+                  path: Routes.history,
+                  name: Routes.historyName,
+                  builder: (context, state) => const HistoryScreen(),
+                ),
+              ],
+            ),
+            // Profile branch
+            StatefulShellBranch(
+              routes: [
+                GoRoute(
+                  path: Routes.profile,
+                  name: Routes.profileName,
+                  builder: (context, state) => const ProfileScreen(),
+                ),
+              ],
+            ),
+          ],
         ),
       ],
       errorBuilder: (context, state) => Scaffold(

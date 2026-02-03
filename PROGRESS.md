@@ -1,6 +1,6 @@
 # Speaking Club - Development Progress
 
-**Last Updated:** January 31, 2026
+**Last Updated:** February 3, 2026
 
 ## Overview
 
@@ -120,31 +120,51 @@ This document tracks the implementation progress of the Speaking Club mobile app
 
 ---
 
-## Phase 3: Profile & Navigation 🔄 PENDING
+## Phase 3: Profile & Navigation ✅ COMPLETE
 
-### Task #9: User Profile Screen
-- **Status:** Pending
+### Task #9: User Profile Screen ✅
+- **Status:** Completed
 - **Blocked By:** Task #7 (completed)
-- **Requirements:**
-  - Display user info (username, email, mobile, avatar)
-  - Edit username inline
-  - Logout functionality
+- **Files Created:**
+  - `lib/features/profile/data/user_repository.dart`
+  - `lib/features/profile/presentation/providers/profile_provider.dart`
+  - `lib/features/profile/presentation/screens/profile_screen.dart`
+- **Features:**
+  - Display user info (username, email, mobile, avatar, member since)
+  - Edit username inline with validation
+  - Refresh profile from server
+  - Logout functionality with confirmation dialog
+  - Error handling and retry
 
-### Task #10: Avatar Upload
-- **Status:** Pending
-- **Blocked By:** Task #9
-- **Requirements:**
-  - Camera/gallery picker
-  - Image cropping
-  - Upload to server
+### Task #10: Avatar Upload ✅
+- **Status:** Completed
+- **Blocked By:** Task #9 (completed)
+- **Files Created:**
+  - `lib/features/profile/presentation/widgets/avatar_picker.dart`
+- **Features:**
+  - Camera/gallery picker with bottom sheet
+  - Image cropping with square aspect ratio
+  - Upload to server (uses `POST /api/users/me/avatar`)
+  - Loading state during upload
+  - Error handling with user feedback
 
-### Task #20: Bottom Navigation
-- **Status:** Pending
+### Task #20: Bottom Navigation ✅
+- **Status:** Completed
 - **Blocked By:** Task #1, #22 (completed)
-- **Requirements:**
-  - Home, History, Profile tabs
-  - GoRouter shell route
-  - State preservation
+- **Files Created:**
+  - `lib/core/router/main_scaffold.dart`
+  - `lib/features/home/presentation/screens/home_screen.dart`
+  - `lib/features/home/home.dart`
+  - `lib/features/history/presentation/screens/history_screen.dart`
+  - `lib/features/history/history.dart`
+  - `lib/features/profile/profile.dart`
+- **Features:**
+  - Material 3 NavigationBar with 3 tabs
+  - StatefulShellRoute with state preservation
+  - Home tab (placeholder for online users)
+  - History tab (placeholder for call history)
+  - Profile tab (fully functional)
+  - Proper route handling and navigation
 
 ---
 
@@ -434,9 +454,9 @@ flutter analyze
 |-------|-------|-----------|--------|
 | Phase 1: Foundation | 4 | 4 | ✅ Complete |
 | Phase 2: Authentication | 5 | 5 | ✅ Complete |
-| Phase 3: Profile & Navigation | 3 | 0 | 🔄 Pending |
+| Phase 3: Profile & Navigation | 3 | 3 | ✅ Complete |
 | Phase 4: Real-time & Presence | 3 | 0 | 🔄 Pending |
 | Phase 5: Calling Features | 5 | 0 | 🔄 Pending |
 | Phase 6: History & Notifications | 2 | 0 | 🔄 Pending |
 | Phase 7: Polish & Testing | 5 | 0 | 🔄 Pending |
-| **Total** | **27** | **9** | **33%** |
+| **Total** | **27** | **12** | **44%** |

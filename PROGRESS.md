@@ -1,6 +1,6 @@
 # Speaking Club - Development Progress
 
-**Last Updated:** February 3, 2026
+**Last Updated:** February 3, 2026 (Phase 4 Complete)
 
 ## Overview
 
@@ -168,30 +168,50 @@ This document tracks the implementation progress of the Speaking Club mobile app
 
 ---
 
-## Phase 4: Real-time & Presence 🔄 PENDING
+## Phase 4: Real-time & Presence ✅ COMPLETE
 
-### Task #11: WebSocket Connection
-- **Status:** Pending
-- **Requirements:**
-  - Socket.io client setup
-  - JWT authentication
-  - Auto-reconnect
+### Task #11: WebSocket Connection ✅
+- **Status:** Completed
+- **Files Created:**
+  - `lib/features/realtime/data/socket_service.dart`
+- **Features:**
+  - Socket.io client setup with URL from environment config
+  - JWT authentication via `auth: { token }` option
+  - Auto-reconnect with configurable attempts and delay
+  - Connection state management (disconnected, connecting, connected, reconnecting, error)
+  - Event constants for all socket events
 
-### Task #12: Presence Management
-- **Status:** Pending
-- **Blocked By:** Task #11
-- **Requirements:**
-  - Online/offline toggle
-  - App lifecycle handling
-  - Status state management
+### Task #12: Presence Management ✅
+- **Status:** Completed
+- **Blocked By:** Task #11 (completed)
+- **Files Created:**
+  - `lib/features/realtime/domain/presence_state.dart`
+  - `lib/features/realtime/presentation/providers/presence_provider.dart`
+  - `lib/features/realtime/realtime.dart`
+- **Features:**
+  - Online/offline toggle via `user:go-online` and `user:go-offline` events
+  - App lifecycle handling (auto offline on background, auto online on resume)
+  - Status state management with Riverpod Notifier
+  - Stream subscriptions for real-time updates
+  - Error handling and propagation
 
-### Task #13: Online Users List
-- **Status:** Pending
-- **Blocked By:** Task #12, #20
-- **Requirements:**
-  - Real-time user list
-  - Status badges
-  - Pull-to-refresh
+### Task #13: Online Users List ✅
+- **Status:** Completed
+- **Blocked By:** Task #12, #20 (completed)
+- **Files Created:**
+  - `lib/features/home/presentation/widgets/online_user_card.dart`
+  - `lib/features/home/presentation/widgets/status_toggle.dart`
+- **Files Updated:**
+  - `lib/features/home/presentation/screens/home_screen.dart`
+  - `lib/features/home/home.dart`
+- **Features:**
+  - Real-time user list via `online:users-list` event
+  - Status badges with colors (green=online, yellow=waiting, blue=in call, gray=offline)
+  - Pull-to-refresh functionality
+  - Grid layout (2 columns) with user cards
+  - Status toggle in app bar
+  - Find Match button with matchmaking join/leave
+  - Empty state and disconnected state handling
 
 ---
 
@@ -322,6 +342,7 @@ lib/
 │   │   └── api_response.dart
 │   ├── router/
 │   │   ├── app_router.dart
+│   │   ├── main_scaffold.dart
 │   │   └── routes.dart
 │   ├── theme/
 │   │   ├── app_colors.dart
@@ -333,26 +354,59 @@ lib/
 │   │   └── validators.dart
 │   └── core.dart
 ├── features/
-│   └── auth/
+│   ├── auth/
+│   │   ├── data/
+│   │   │   ├── auth_repository.dart
+│   │   │   └── google_auth_service.dart
+│   │   ├── domain/
+│   │   │   └── auth_state.dart
+│   │   ├── presentation/
+│   │   │   ├── providers/
+│   │   │   │   └── auth_provider.dart
+│   │   │   ├── screens/
+│   │   │   │   ├── auth_wrapper.dart
+│   │   │   │   ├── login_screen.dart
+│   │   │   │   ├── onboarding_screen.dart
+│   │   │   │   ├── register_screen.dart
+│   │   │   │   └── welcome_screen.dart
+│   │   │   └── widgets/
+│   │   │       ├── auth_text_field.dart
+│   │   │       ├── phone_input_field.dart
+│   │   │       └── social_auth_button.dart
+│   │   └── auth.dart
+│   ├── history/
+│   │   ├── presentation/
+│   │   │   └── screens/
+│   │   │       └── history_screen.dart
+│   │   └── history.dart
+│   ├── home/
+│   │   ├── presentation/
+│   │   │   ├── screens/
+│   │   │   │   └── home_screen.dart
+│   │   │   └── widgets/
+│   │   │       ├── online_user_card.dart
+│   │   │       └── status_toggle.dart
+│   │   └── home.dart
+│   ├── profile/
+│   │   ├── data/
+│   │   │   └── user_repository.dart
+│   │   ├── presentation/
+│   │   │   ├── providers/
+│   │   │   │   └── profile_provider.dart
+│   │   │   ├── screens/
+│   │   │   │   └── profile_screen.dart
+│   │   │   └── widgets/
+│   │   │       └── avatar_picker.dart
+│   │   └── profile.dart
+│   └── realtime/
 │       ├── data/
-│       │   ├── auth_repository.dart
-│       │   └── google_auth_service.dart
+│       │   └── socket_service.dart
 │       ├── domain/
-│       │   └── auth_state.dart
+│       │   └── presence_state.dart
 │       ├── presentation/
-│       │   ├── providers/
-│       │   │   └── auth_provider.dart
-│       │   ├── screens/
-│       │   │   ├── auth_wrapper.dart
-│       │   │   ├── login_screen.dart
-│       │   │   ├── onboarding_screen.dart
-│       │   │   ├── register_screen.dart
-│       │   │   └── welcome_screen.dart
-│       │   └── widgets/
-│       │       ├── auth_text_field.dart
-│       │       ├── phone_input_field.dart
-│       │       └── social_auth_button.dart
-│       └── auth.dart
+│       │   └── providers/
+│       │       └── presence_provider.dart
+│       └── realtime.dart
 ├── shared/
 │   ├── models/
 │   │   ├── auth_tokens.dart
@@ -455,8 +509,8 @@ flutter analyze
 | Phase 1: Foundation | 4 | 4 | ✅ Complete |
 | Phase 2: Authentication | 5 | 5 | ✅ Complete |
 | Phase 3: Profile & Navigation | 3 | 3 | ✅ Complete |
-| Phase 4: Real-time & Presence | 3 | 0 | 🔄 Pending |
+| Phase 4: Real-time & Presence | 3 | 3 | ✅ Complete |
 | Phase 5: Calling Features | 5 | 0 | 🔄 Pending |
 | Phase 6: History & Notifications | 2 | 0 | 🔄 Pending |
 | Phase 7: Polish & Testing | 5 | 0 | 🔄 Pending |
-| **Total** | **27** | **12** | **44%** |
+| **Total** | **27** | **15** | **56%** |

@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$OnlineUser {
 
- String get id; String get username; String? get avatar; UserStatus get status;
+ String get id; String get username; String? get avatar;@UserStatusConverter() UserStatus get status;
 /// Create a copy of OnlineUser
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -48,7 +48,7 @@ abstract mixin class $OnlineUserCopyWith<$Res>  {
   factory $OnlineUserCopyWith(OnlineUser value, $Res Function(OnlineUser) _then) = _$OnlineUserCopyWithImpl;
 @useResult
 $Res call({
- String id, String username, String? avatar, UserStatus status
+ String id, String username, String? avatar,@UserStatusConverter() UserStatus status
 });
 
 
@@ -153,7 +153,7 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String username,  String? avatar,  UserStatus status)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String username,  String? avatar, @UserStatusConverter()  UserStatus status)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _OnlineUser() when $default != null:
 return $default(_that.id,_that.username,_that.avatar,_that.status);case _:
@@ -174,7 +174,7 @@ return $default(_that.id,_that.username,_that.avatar,_that.status);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String username,  String? avatar,  UserStatus status)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String username,  String? avatar, @UserStatusConverter()  UserStatus status)  $default,) {final _that = this;
 switch (_that) {
 case _OnlineUser():
 return $default(_that.id,_that.username,_that.avatar,_that.status);}
@@ -191,7 +191,7 @@ return $default(_that.id,_that.username,_that.avatar,_that.status);}
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String username,  String? avatar,  UserStatus status)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String username,  String? avatar, @UserStatusConverter()  UserStatus status)?  $default,) {final _that = this;
 switch (_that) {
 case _OnlineUser() when $default != null:
 return $default(_that.id,_that.username,_that.avatar,_that.status);case _:
@@ -206,13 +206,13 @@ return $default(_that.id,_that.username,_that.avatar,_that.status);case _:
 @JsonSerializable()
 
 class _OnlineUser implements OnlineUser {
-  const _OnlineUser({required this.id, required this.username, this.avatar, required this.status});
+  const _OnlineUser({required this.id, required this.username, this.avatar, @UserStatusConverter() required this.status});
   factory _OnlineUser.fromJson(Map<String, dynamic> json) => _$OnlineUserFromJson(json);
 
 @override final  String id;
 @override final  String username;
 @override final  String? avatar;
-@override final  UserStatus status;
+@override@UserStatusConverter() final  UserStatus status;
 
 /// Create a copy of OnlineUser
 /// with the given fields replaced by the non-null parameter values.
@@ -247,7 +247,7 @@ abstract mixin class _$OnlineUserCopyWith<$Res> implements $OnlineUserCopyWith<$
   factory _$OnlineUserCopyWith(_OnlineUser value, $Res Function(_OnlineUser) _then) = __$OnlineUserCopyWithImpl;
 @override @useResult
 $Res call({
- String id, String username, String? avatar, UserStatus status
+ String id, String username, String? avatar,@UserStatusConverter() UserStatus status
 });
 
 
@@ -281,7 +281,7 @@ as UserStatus,
 /// @nodoc
 mixin _$UserStatusChange {
 
- String get userId; UserStatus get status;
+ String get userId;@UserStatusConverter() UserStatus get status;
 /// Create a copy of UserStatusChange
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -314,7 +314,7 @@ abstract mixin class $UserStatusChangeCopyWith<$Res>  {
   factory $UserStatusChangeCopyWith(UserStatusChange value, $Res Function(UserStatusChange) _then) = _$UserStatusChangeCopyWithImpl;
 @useResult
 $Res call({
- String userId, UserStatus status
+ String userId,@UserStatusConverter() UserStatus status
 });
 
 
@@ -417,7 +417,7 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String userId,  UserStatus status)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String userId, @UserStatusConverter()  UserStatus status)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _UserStatusChange() when $default != null:
 return $default(_that.userId,_that.status);case _:
@@ -438,7 +438,7 @@ return $default(_that.userId,_that.status);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String userId,  UserStatus status)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String userId, @UserStatusConverter()  UserStatus status)  $default,) {final _that = this;
 switch (_that) {
 case _UserStatusChange():
 return $default(_that.userId,_that.status);}
@@ -455,7 +455,7 @@ return $default(_that.userId,_that.status);}
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String userId,  UserStatus status)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String userId, @UserStatusConverter()  UserStatus status)?  $default,) {final _that = this;
 switch (_that) {
 case _UserStatusChange() when $default != null:
 return $default(_that.userId,_that.status);case _:
@@ -470,11 +470,11 @@ return $default(_that.userId,_that.status);case _:
 @JsonSerializable()
 
 class _UserStatusChange implements UserStatusChange {
-  const _UserStatusChange({required this.userId, required this.status});
+  const _UserStatusChange({required this.userId, @UserStatusConverter() required this.status});
   factory _UserStatusChange.fromJson(Map<String, dynamic> json) => _$UserStatusChangeFromJson(json);
 
 @override final  String userId;
-@override final  UserStatus status;
+@override@UserStatusConverter() final  UserStatus status;
 
 /// Create a copy of UserStatusChange
 /// with the given fields replaced by the non-null parameter values.
@@ -509,7 +509,7 @@ abstract mixin class _$UserStatusChangeCopyWith<$Res> implements $UserStatusChan
   factory _$UserStatusChangeCopyWith(_UserStatusChange value, $Res Function(_UserStatusChange) _then) = __$UserStatusChangeCopyWithImpl;
 @override @useResult
 $Res call({
- String userId, UserStatus status
+ String userId,@UserStatusConverter() UserStatus status
 });
 
 

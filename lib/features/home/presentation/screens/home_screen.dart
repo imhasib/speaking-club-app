@@ -5,6 +5,8 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/router/routes.dart';
 import '../../../../shared/models/call.dart';
 import '../../../../shared/models/online_user.dart';
+import '../../../auth/domain/auth_state.dart';
+import '../../../auth/presentation/providers/auth_provider.dart';
 import '../../../call/call.dart';
 import '../../../realtime/data/socket_service.dart';
 import '../../../realtime/domain/presence_state.dart';
@@ -130,6 +132,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
     final presenceState = ref.watch(presenceProvider);
+    final authState = ref.watch(authProvider);
+    final currentUserId = authState.user?.id;
 
     // Show error snackbar if there's an error
     ref.listen<PresenceState>(presenceProvider, (previous, next) {
@@ -173,7 +177,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       ),
       body: RefreshIndicator(
         onRefresh: _handleRefresh,
-        child: _buildBody(context, presenceState, colorScheme, textTheme),
+        child: _buildBody(context, presenceState, colorScheme, textTheme, currentUserId),
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: _handleFindMatch,
@@ -195,6 +199,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     presenceState,
     ColorScheme colorScheme,
     TextTheme textTheme,
+    String? currentUserId,
   ) {
     // Loading state
     if (presenceState.isLoading) {
@@ -224,13 +229,18 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       );
     }
 
-    // Empty state - no online users
-    if (presenceState.onlineUsers.isEmpty) {
+    // Filter out the current user from the online users list
+    final otherOnlineUsers = presenceState.onlineUsers
+        .where((user) => user.id != currentUserId)
+        .toList();
+
+    // Empty state - no other online users
+    if (otherOnlineUsers.isEmpty) {
       return _buildEmptyState(context, colorScheme, textTheme);
     }
 
     // Online users grid
-    return _buildOnlineUsersGrid(context, presenceState.onlineUsers);
+    return _buildOnlineUsersGrid(context, otherOnlineUsers);
   }
 
   Widget _buildDisconnectedState(

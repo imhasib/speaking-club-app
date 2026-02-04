@@ -15,11 +15,14 @@ class UserStatusConverter implements JsonConverter<UserStatus, String> {
       case 'WAITING':
         return UserStatus.waiting;
       case 'IN_CALL':
+      case 'CALLING':
+      case 'RINGING':
         return UserStatus.inCall;
       case 'OFFLINE':
         return UserStatus.offline;
       default:
-        return UserStatus.offline;
+        // Default to online for unknown statuses to prevent accidental removal
+        return UserStatus.online;
     }
   }
 

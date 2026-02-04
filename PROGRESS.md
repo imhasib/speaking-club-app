@@ -1,6 +1,6 @@
 # Speaking Club - Development Progress
 
-**Last Updated:** February 3, 2026 (Phase 5 Complete)
+**Last Updated:** February 4, 2026 (Phase 6 - Call History Complete)
 
 ## Overview
 
@@ -294,23 +294,38 @@ This document tracks the implementation progress of the Speaking Club mobile app
 
 ---
 
-## Phase 6: History & Notifications 🔄 PENDING
+## Phase 6: History & Notifications 🔄 PARTIAL
 
-### Task #19: Call History
-- **Status:** Pending
-- **Blocked By:** Task #20
-- **Requirements:**
-  - Paginated list
-  - Call details
-  - Date grouping
+### Task #19: Call History ✅
+- **Status:** Completed
+- **Blocked By:** Task #20 (completed)
+- **Files Created:**
+  - `lib/features/history/data/call_history_repository.dart` - Repository with pagination support
+  - `lib/features/history/domain/call_history_state.dart` - State with date grouping logic
+  - `lib/features/history/presentation/providers/call_history_provider.dart` - Riverpod notifier
+  - `lib/features/history/presentation/widgets/call_history_item.dart` - Call item and date header widgets
+- **Files Updated:**
+  - `lib/features/history/presentation/screens/history_screen.dart` - Full implementation
+  - `lib/features/history/history.dart` - Updated barrel exports
+- **Features:**
+  - Paginated list with infinite scroll (20 items per page)
+  - Date grouping (Today, Yesterday, This Week, Older)
+  - Call status indicators (completed, missed, cancelled)
+  - Call type badges (Random, Direct)
+  - Relative time formatting
+  - Call details bottom sheet with full info
+  - Pull-to-refresh functionality
+  - Loading and error states
+  - Empty state handling
 
 ### Task #21: Push Notifications
-- **Status:** Pending
-- **Blocked By:** Task #18
+- **Status:** Pending (Deferred)
+- **Blocked By:** Task #18 (completed)
 - **Requirements:**
   - FCM integration
   - Incoming call notifications
   - Background handling
+- **Notes:** Implementation deferred to a future update
 
 ---
 
@@ -408,9 +423,17 @@ lib/
 │   │   │       └── social_auth_button.dart
 │   │   └── auth.dart
 │   ├── history/
+│   │   ├── data/
+│   │   │   └── call_history_repository.dart
+│   │   ├── domain/
+│   │   │   └── call_history_state.dart
 │   │   ├── presentation/
-│   │   │   └── screens/
-│   │   │       └── history_screen.dart
+│   │   │   ├── providers/
+│   │   │   │   └── call_history_provider.dart
+│   │   │   ├── screens/
+│   │   │   │   └── history_screen.dart
+│   │   │   └── widgets/
+│   │   │       └── call_history_item.dart
 │   │   └── history.dart
 │   ├── home/
 │   │   ├── presentation/
@@ -543,6 +566,6 @@ flutter analyze
 | Phase 3: Profile & Navigation | 3 | 3 | ✅ Complete |
 | Phase 4: Real-time & Presence | 3 | 3 | ✅ Complete |
 | Phase 5: Calling Features | 5 | 5 | ✅ Complete |
-| Phase 6: History & Notifications | 2 | 0 | 🔄 Pending |
+| Phase 6: History & Notifications | 2 | 1 | 🔄 Partial |
 | Phase 7: Polish & Testing | 5 | 0 | 🔄 Pending |
-| **Total** | **27** | **20** | **74%** |
+| **Total** | **27** | **21** | **78%** |

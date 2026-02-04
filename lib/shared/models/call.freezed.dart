@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$Call {
 
- String get id; List<CallParticipant> get participants; CallParticipant get initiatedBy; DateTime get startedAt; DateTime? get endedAt; CallStatus get status; int? get duration; CallType get type;
+@JsonKey(name: '_id') String get id; List<CallParticipant> get participants; CallParticipant get initiatedBy; DateTime get startedAt; DateTime? get endedAt; CallStatus get status; int? get duration;@JsonKey(name: 'callType') CallType get type;
 /// Create a copy of Call
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -48,7 +48,7 @@ abstract mixin class $CallCopyWith<$Res>  {
   factory $CallCopyWith(Call value, $Res Function(Call) _then) = _$CallCopyWithImpl;
 @useResult
 $Res call({
- String id, List<CallParticipant> participants, CallParticipant initiatedBy, DateTime startedAt, DateTime? endedAt, CallStatus status, int? duration, CallType type
+@JsonKey(name: '_id') String id, List<CallParticipant> participants, CallParticipant initiatedBy, DateTime startedAt, DateTime? endedAt, CallStatus status, int? duration,@JsonKey(name: 'callType') CallType type
 });
 
 
@@ -166,7 +166,7 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  List<CallParticipant> participants,  CallParticipant initiatedBy,  DateTime startedAt,  DateTime? endedAt,  CallStatus status,  int? duration,  CallType type)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function(@JsonKey(name: '_id')  String id,  List<CallParticipant> participants,  CallParticipant initiatedBy,  DateTime startedAt,  DateTime? endedAt,  CallStatus status,  int? duration, @JsonKey(name: 'callType')  CallType type)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _Call() when $default != null:
 return $default(_that.id,_that.participants,_that.initiatedBy,_that.startedAt,_that.endedAt,_that.status,_that.duration,_that.type);case _:
@@ -187,7 +187,7 @@ return $default(_that.id,_that.participants,_that.initiatedBy,_that.startedAt,_t
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  List<CallParticipant> participants,  CallParticipant initiatedBy,  DateTime startedAt,  DateTime? endedAt,  CallStatus status,  int? duration,  CallType type)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function(@JsonKey(name: '_id')  String id,  List<CallParticipant> participants,  CallParticipant initiatedBy,  DateTime startedAt,  DateTime? endedAt,  CallStatus status,  int? duration, @JsonKey(name: 'callType')  CallType type)  $default,) {final _that = this;
 switch (_that) {
 case _Call():
 return $default(_that.id,_that.participants,_that.initiatedBy,_that.startedAt,_that.endedAt,_that.status,_that.duration,_that.type);}
@@ -204,7 +204,7 @@ return $default(_that.id,_that.participants,_that.initiatedBy,_that.startedAt,_t
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  List<CallParticipant> participants,  CallParticipant initiatedBy,  DateTime startedAt,  DateTime? endedAt,  CallStatus status,  int? duration,  CallType type)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function(@JsonKey(name: '_id')  String id,  List<CallParticipant> participants,  CallParticipant initiatedBy,  DateTime startedAt,  DateTime? endedAt,  CallStatus status,  int? duration, @JsonKey(name: 'callType')  CallType type)?  $default,) {final _that = this;
 switch (_that) {
 case _Call() when $default != null:
 return $default(_that.id,_that.participants,_that.initiatedBy,_that.startedAt,_that.endedAt,_that.status,_that.duration,_that.type);case _:
@@ -219,10 +219,10 @@ return $default(_that.id,_that.participants,_that.initiatedBy,_that.startedAt,_t
 @JsonSerializable()
 
 class _Call extends Call {
-  const _Call({required this.id, required final  List<CallParticipant> participants, required this.initiatedBy, required this.startedAt, this.endedAt, required this.status, this.duration, this.type = CallType.random}): _participants = participants,super._();
+  const _Call({@JsonKey(name: '_id') required this.id, required final  List<CallParticipant> participants, required this.initiatedBy, required this.startedAt, this.endedAt, required this.status, this.duration, @JsonKey(name: 'callType') this.type = CallType.random}): _participants = participants,super._();
   factory _Call.fromJson(Map<String, dynamic> json) => _$CallFromJson(json);
 
-@override final  String id;
+@override@JsonKey(name: '_id') final  String id;
  final  List<CallParticipant> _participants;
 @override List<CallParticipant> get participants {
   if (_participants is EqualUnmodifiableListView) return _participants;
@@ -235,7 +235,7 @@ class _Call extends Call {
 @override final  DateTime? endedAt;
 @override final  CallStatus status;
 @override final  int? duration;
-@override@JsonKey() final  CallType type;
+@override@JsonKey(name: 'callType') final  CallType type;
 
 /// Create a copy of Call
 /// with the given fields replaced by the non-null parameter values.
@@ -270,7 +270,7 @@ abstract mixin class _$CallCopyWith<$Res> implements $CallCopyWith<$Res> {
   factory _$CallCopyWith(_Call value, $Res Function(_Call) _then) = __$CallCopyWithImpl;
 @override @useResult
 $Res call({
- String id, List<CallParticipant> participants, CallParticipant initiatedBy, DateTime startedAt, DateTime? endedAt, CallStatus status, int? duration, CallType type
+@JsonKey(name: '_id') String id, List<CallParticipant> participants, CallParticipant initiatedBy, DateTime startedAt, DateTime? endedAt, CallStatus status, int? duration,@JsonKey(name: 'callType') CallType type
 });
 
 
@@ -317,7 +317,7 @@ $CallParticipantCopyWith<$Res> get initiatedBy {
 /// @nodoc
 mixin _$CallParticipant {
 
- String get id; String get username; String? get avatar;
+@JsonKey(name: '_id') String get id; String get username; String? get avatar;
 /// Create a copy of CallParticipant
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -350,7 +350,7 @@ abstract mixin class $CallParticipantCopyWith<$Res>  {
   factory $CallParticipantCopyWith(CallParticipant value, $Res Function(CallParticipant) _then) = _$CallParticipantCopyWithImpl;
 @useResult
 $Res call({
- String id, String username, String? avatar
+@JsonKey(name: '_id') String id, String username, String? avatar
 });
 
 
@@ -454,7 +454,7 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String username,  String? avatar)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function(@JsonKey(name: '_id')  String id,  String username,  String? avatar)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _CallParticipant() when $default != null:
 return $default(_that.id,_that.username,_that.avatar);case _:
@@ -475,7 +475,7 @@ return $default(_that.id,_that.username,_that.avatar);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String username,  String? avatar)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function(@JsonKey(name: '_id')  String id,  String username,  String? avatar)  $default,) {final _that = this;
 switch (_that) {
 case _CallParticipant():
 return $default(_that.id,_that.username,_that.avatar);}
@@ -492,7 +492,7 @@ return $default(_that.id,_that.username,_that.avatar);}
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String username,  String? avatar)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function(@JsonKey(name: '_id')  String id,  String username,  String? avatar)?  $default,) {final _that = this;
 switch (_that) {
 case _CallParticipant() when $default != null:
 return $default(_that.id,_that.username,_that.avatar);case _:
@@ -507,10 +507,10 @@ return $default(_that.id,_that.username,_that.avatar);case _:
 @JsonSerializable()
 
 class _CallParticipant implements CallParticipant {
-  const _CallParticipant({required this.id, required this.username, this.avatar});
+  const _CallParticipant({@JsonKey(name: '_id') required this.id, required this.username, this.avatar});
   factory _CallParticipant.fromJson(Map<String, dynamic> json) => _$CallParticipantFromJson(json);
 
-@override final  String id;
+@override@JsonKey(name: '_id') final  String id;
 @override final  String username;
 @override final  String? avatar;
 
@@ -547,7 +547,7 @@ abstract mixin class _$CallParticipantCopyWith<$Res> implements $CallParticipant
   factory _$CallParticipantCopyWith(_CallParticipant value, $Res Function(_CallParticipant) _then) = __$CallParticipantCopyWithImpl;
 @override @useResult
 $Res call({
- String id, String username, String? avatar
+@JsonKey(name: '_id') String id, String username, String? avatar
 });
 
 

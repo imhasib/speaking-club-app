@@ -12,21 +12,26 @@ enum CallStatus {
   @JsonValue('missed')
   missed,
   @JsonValue('cancelled')
-  cancelled;
+  cancelled,
+  @JsonValue('rejected')
+  rejected;
 
   bool get isCompleted => this == CallStatus.completed;
   bool get isMissed => this == CallStatus.missed;
   bool get isCancelled => this == CallStatus.cancelled;
+  bool get isRejected => this == CallStatus.rejected;
 }
 
 /// Call type enum
 enum CallType {
   @JsonValue('random')
   random,
+  @JsonValue('matchmaking')
+  matchmaking,
   @JsonValue('direct')
   direct;
 
-  bool get isRandom => this == CallType.random;
+  bool get isRandom => this == CallType.random || this == CallType.matchmaking;
   bool get isDirect => this == CallType.direct;
 }
 
@@ -36,14 +41,14 @@ sealed class Call with _$Call {
   const Call._();
 
   const factory Call({
-    required String id,
+    @JsonKey(name: '_id') required String id,
     required List<CallParticipant> participants,
     required CallParticipant initiatedBy,
     required DateTime startedAt,
     DateTime? endedAt,
     required CallStatus status,
     int? duration,
-    @Default(CallType.random) CallType type,
+    @JsonKey(name: 'callType') @Default(CallType.random) CallType type,
   }) = _Call;
 
   factory Call.fromJson(Map<String, dynamic> json) => _$CallFromJson(json);
@@ -78,7 +83,7 @@ sealed class Call with _$Call {
 @freezed
 sealed class CallParticipant with _$CallParticipant {
   const factory CallParticipant({
-    required String id,
+    @JsonKey(name: '_id') required String id,
     required String username,
     String? avatar,
   }) = _CallParticipant;

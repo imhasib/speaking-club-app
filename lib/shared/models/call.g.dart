@@ -7,7 +7,7 @@ part of 'call.dart';
 // **************************************************************************
 
 _Call _$CallFromJson(Map<String, dynamic> json) => _Call(
-  id: json['id'] as String,
+  id: json['_id'] as String,
   participants: (json['participants'] as List<dynamic>)
       .map((e) => CallParticipant.fromJson(e as Map<String, dynamic>))
       .toList(),
@@ -20,41 +20,45 @@ _Call _$CallFromJson(Map<String, dynamic> json) => _Call(
       : DateTime.parse(json['endedAt'] as String),
   status: $enumDecode(_$CallStatusEnumMap, json['status']),
   duration: (json['duration'] as num?)?.toInt(),
-  type: $enumDecodeNullable(_$CallTypeEnumMap, json['type']) ?? CallType.random,
+  type:
+      $enumDecodeNullable(_$CallTypeEnumMap, json['callType']) ??
+      CallType.random,
 );
 
 Map<String, dynamic> _$CallToJson(_Call instance) => <String, dynamic>{
-  'id': instance.id,
+  '_id': instance.id,
   'participants': instance.participants,
   'initiatedBy': instance.initiatedBy,
   'startedAt': instance.startedAt.toIso8601String(),
   'endedAt': instance.endedAt?.toIso8601String(),
   'status': _$CallStatusEnumMap[instance.status]!,
   'duration': instance.duration,
-  'type': _$CallTypeEnumMap[instance.type]!,
+  'callType': _$CallTypeEnumMap[instance.type]!,
 };
 
 const _$CallStatusEnumMap = {
   CallStatus.completed: 'completed',
   CallStatus.missed: 'missed',
   CallStatus.cancelled: 'cancelled',
+  CallStatus.rejected: 'rejected',
 };
 
 const _$CallTypeEnumMap = {
   CallType.random: 'random',
+  CallType.matchmaking: 'matchmaking',
   CallType.direct: 'direct',
 };
 
 _CallParticipant _$CallParticipantFromJson(Map<String, dynamic> json) =>
     _CallParticipant(
-      id: json['id'] as String,
+      id: json['_id'] as String,
       username: json['username'] as String,
       avatar: json['avatar'] as String?,
     );
 
 Map<String, dynamic> _$CallParticipantToJson(_CallParticipant instance) =>
     <String, dynamic>{
-      'id': instance.id,
+      '_id': instance.id,
       'username': instance.username,
       'avatar': instance.avatar,
     };

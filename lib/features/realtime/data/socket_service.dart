@@ -415,7 +415,7 @@ class SocketService {
       return;
     }
     dev.log('📤 Emitting call:initiate to $targetUserId');
-    _socket!.emit(SocketEvents.callInitiate, {'targetUserId': targetUserId});
+    _socket!.emit(SocketEvents.callInitiate, {'recipientId': targetUserId});
   }
 
   /// Accept an incoming call

@@ -36,9 +36,13 @@ class _WaitingScreenState extends ConsumerState<WaitingScreen>
       ),
     );
 
-    // Join queue on screen load
+    // Join queue on screen load only for random matchmaking (not direct calls)
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.read(matchmakingProvider.notifier).joinQueue();
+      final callState = ref.read(callProvider);
+      // Don't join matchmaking queue if we're already initiating a direct call
+      if (!callState.isInitiating) {
+        ref.read(matchmakingProvider.notifier).joinQueue();
+      }
     });
   }
 
@@ -49,7 +53,14 @@ class _WaitingScreenState extends ConsumerState<WaitingScreen>
   }
 
   void _onCancel() {
-    ref.read(matchmakingProvider.notifier).leaveQueue();
+    final callState = ref.read(callProvider);
+    if (callState.isInitiating) {
+      // Cancel direct call
+      ref.read(callProvider.notifier).cancelCall();
+    } else {
+      // Leave matchmaking queue
+      ref.read(matchmakingProvider.notifier).leaveQueue();
+    }
     if (context.canPop()) {
       context.pop();
     } else {
@@ -60,12 +71,27 @@ class _WaitingScreenState extends ConsumerState<WaitingScreen>
   @override
   Widget build(BuildContext context) {
     final matchmakingState = ref.watch(matchmakingProvider);
+    final callState = ref.watch(callProvider);
+    final isDirectCall = callState.isInitiating;
 
     // Navigate to call screen when matched and connecting
     ref.listen(callProvider, (previous, next) {
       if (next.phase == CallPhase.connecting ||
           next.phase == CallPhase.connected) {
         context.go(Routes.call);
+      }
+      // Handle direct call rejection/cancellation - go back if call becomes idle
+      if (previous?.isInitiating == true && next.isIdle) {
+        if (next.error != null) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(next.error!)),
+          );
+        }
+        if (context.canPop()) {
+          context.pop();
+        } else {
+          context.go(Routes.home);
+        }
       }
     });
 
@@ -126,8 +152,8 @@ class _WaitingScreenState extends ConsumerState<WaitingScreen>
                             shape: BoxShape.circle,
                             color: AppColors.primary.withOpacity(0.25),
                           ),
-                          child: const Icon(
-                            Icons.person_search,
+                          child: Icon(
+                            isDirectCall ? Icons.call : Icons.person_search,
                             size: 50,
                             color: AppColors.primary,
                           ),
@@ -141,7 +167,9 @@ class _WaitingScreenState extends ConsumerState<WaitingScreen>
               const SizedBox(height: 40),
 
               Text(
-                'Finding someone to talk to...',
+                isDirectCall
+                    ? 'Calling ${callState.peerInfo?.username ?? 'user'}...'
+                    : 'Finding someone to talk to...',
                 style: Theme.of(context).textTheme.titleLarge?.copyWith(
                       fontWeight: FontWeight.w500,
                     ),
@@ -149,35 +177,36 @@ class _WaitingScreenState extends ConsumerState<WaitingScreen>
 
               const SizedBox(height: 16),
 
-              // Waiting time
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 8,
+              // Waiting time (only for matchmaking)
+              if (!isDirectCall)
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 8,
+                  ),
+                  decoration: BoxDecoration(
+                    color: AppColors.primary.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(
+                        Icons.timer_outlined,
+                        size: 20,
+                        color: AppColors.primary,
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        matchmakingState.formattedWaitTime,
+                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                              color: AppColors.primary,
+                              fontWeight: FontWeight.w600,
+                            ),
+                      ),
+                    ],
+                  ),
                 ),
-                decoration: BoxDecoration(
-                  color: AppColors.primary.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Icon(
-                      Icons.timer_outlined,
-                      size: 20,
-                      color: AppColors.primary,
-                    ),
-                    const SizedBox(width: 8),
-                    Text(
-                      matchmakingState.formattedWaitTime,
-                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                            color: AppColors.primary,
-                            fontWeight: FontWeight.w600,
-                          ),
-                    ),
-                  ],
-                ),
-              ),
 
               const Spacer(),
 

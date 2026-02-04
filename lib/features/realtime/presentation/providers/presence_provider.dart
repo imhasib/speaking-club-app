@@ -41,6 +41,7 @@ class PresenceNotifier extends Notifier<PresenceState> {
   PresenceLifecycleObserver? _lifecycleObserver;
 
   bool _wasOnlineBeforeBackground = false;
+  bool _hasConnectedOnce = false;
 
   @override
   PresenceState build() {
@@ -74,15 +75,19 @@ class PresenceNotifier extends Notifier<PresenceState> {
           connectionState: connectionState,
           isLoading: false,
         );
+
+        // Auto go online on initial connection or when returning from background
+        if (!_hasConnectedOnce) {
+          // First time connecting after login - go online by default
+          _hasConnectedOnce = true;
+          goOnline();
+        } else if (_wasOnlineBeforeBackground) {
+          // Reconnecting after being in background while online
+          goOnline();
+          _wasOnlineBeforeBackground = false;
+        }
       } else {
         state = state.copyWith(connectionState: connectionState);
-      }
-
-      // If we just connected and user was previously online, auto go online
-      if (connectionState == SocketConnectionState.connected &&
-          _wasOnlineBeforeBackground) {
-        goOnline();
-        _wasOnlineBeforeBackground = false;
       }
     });
 
@@ -130,6 +135,7 @@ class PresenceNotifier extends Notifier<PresenceState> {
   void disconnect() {
     dev.log('🔌 Disconnecting from socket server...');
     _socketService.disconnect();
+    _hasConnectedOnce = false; // Reset so next login will auto go online
     state = state.copyWith(
       userStatus: UserStatus.offline,
       onlineUsers: [],

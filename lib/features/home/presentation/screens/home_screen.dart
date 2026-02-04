@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
+import '../../../../core/router/routes.dart';
+import '../../../../shared/models/call.dart';
 import '../../../../shared/models/online_user.dart';
+import '../../../call/call.dart';
 import '../../../realtime/data/socket_service.dart';
 import '../../../realtime/domain/presence_state.dart';
 import '../../../realtime/presentation/providers/presence_provider.dart';
@@ -50,7 +54,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 
   void _handleFindMatch() {
-    final presenceNotifier = ref.read(presenceProvider.notifier);
     final state = ref.read(presenceProvider);
 
     if (!state.isConnected) {
@@ -72,25 +75,44 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     }
 
     if (state.isWaiting) {
-      // Cancel matchmaking
-      presenceNotifier.leaveMatchmaking();
+      // Cancel matchmaking - leave queue via matchmaking provider
+      ref.read(matchmakingProvider.notifier).leaveQueue();
     } else {
-      // Join matchmaking
-      presenceNotifier.joinMatchmaking();
-      // TODO: Navigate to waiting screen in Phase 5
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Searching for a match...'),
-        ),
-      );
+      // Navigate to waiting screen (which will join the queue)
+      context.push(Routes.waiting);
     }
   }
 
   void _handleUserTap(OnlineUser user) {
-    // TODO: Show user profile card with call option in Phase 5
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Direct calling ${user.username} will be available in Phase 5'),
+    // Show confirmation dialog for direct calling
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Call ${user.username}?'),
+        content: const Text('Start a video call with this user?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            onPressed: () {
+              Navigator.pop(context);
+              // Initiate direct call
+              ref.read(callProvider.notifier).initiateCall(
+                user.id,
+                PeerInfo(
+                  id: user.id,
+                  username: user.username,
+                  avatar: user.avatar,
+                ),
+              );
+              // Navigate to waiting screen for outgoing call
+              context.push(Routes.waiting);
+            },
+            child: const Text('Call'),
+          ),
+        ],
       ),
     );
   }
@@ -127,6 +149,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             ),
           ),
         );
+      }
+    });
+
+    // Listen for incoming calls to navigate to incoming call screen
+    ref.listen<CallState>(callProvider, (previous, next) {
+      if (next.phase == CallPhase.incoming &&
+          previous?.phase != CallPhase.incoming) {
+        context.push(Routes.incomingCall);
       }
     });
 

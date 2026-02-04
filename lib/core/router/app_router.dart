@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../features/auth/auth.dart';
+import '../../features/call/call.dart';
 import '../../features/history/presentation/screens/history_screen.dart';
 import '../../features/home/presentation/screens/home_screen.dart';
 import '../../features/profile/presentation/screens/profile_screen.dart';
@@ -53,7 +54,10 @@ class AppRouter {
         // Protected routes (require authentication)
         final isProtectedRoute = currentPath == Routes.home ||
             currentPath == Routes.history ||
-            currentPath == Routes.profile;
+            currentPath == Routes.profile ||
+            currentPath == Routes.waiting ||
+            currentPath == Routes.call ||
+            currentPath == Routes.incomingCall;
 
         // If authenticated and on auth route, go to home
         if (isAuthenticated && isAuthRoute) {
@@ -120,6 +124,23 @@ class AppRouter {
               );
             },
           ),
+        ),
+
+        // Call routes (full-screen, outside bottom navigation)
+        GoRoute(
+          path: Routes.waiting,
+          name: Routes.waitingName,
+          builder: (context, state) => const WaitingScreen(),
+        ),
+        GoRoute(
+          path: Routes.call,
+          name: Routes.callName,
+          builder: (context, state) => const CallScreen(),
+        ),
+        GoRoute(
+          path: Routes.incomingCall,
+          name: Routes.incomingCallName,
+          builder: (context, state) => const IncomingCallScreen(),
         ),
 
         // Main app routes with bottom navigation

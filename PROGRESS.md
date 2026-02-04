@@ -1,6 +1,6 @@
 # Speaking Club - Development Progress
 
-**Last Updated:** February 3, 2026 (Phase 4 Complete)
+**Last Updated:** February 3, 2026 (Phase 5 Complete)
 
 ## Overview
 
@@ -215,49 +215,82 @@ This document tracks the implementation progress of the Speaking Club mobile app
 
 ---
 
-## Phase 5: Calling Features 🔄 PENDING
+## Phase 5: Calling Features ✅ COMPLETE
 
-### Task #14: Random Matching
-- **Status:** Pending
-- **Blocked By:** Task #13
-- **Requirements:**
-  - Matchmaking queue
-  - Waiting screen
-  - Match handling
+### Task #14: Random Matching ✅
+- **Status:** Completed
+- **Blocked By:** Task #13 (completed)
+- **Files Created:**
+  - `lib/features/call/domain/matchmaking_state.dart`
+  - `lib/features/call/presentation/providers/matchmaking_provider.dart`
+  - `lib/features/call/presentation/screens/waiting_screen.dart`
+- **Features:**
+  - Matchmaking queue with join/leave
+  - Waiting screen with animated search indicator
+  - Waiting time counter
+  - Match handling via socket events
 
-### Task #15: WebRTC Signaling
-- **Status:** Pending
-- **Blocked By:** Task #11
-- **Requirements:**
-  - Peer connection setup
-  - Offer/answer exchange
+### Task #15: WebRTC Signaling ✅
+- **Status:** Completed
+- **Blocked By:** Task #11 (completed)
+- **Files Created:**
+  - `lib/features/call/data/webrtc_service.dart`
+  - `lib/features/call/domain/call_state.dart`
+  - `lib/features/call/presentation/providers/call_provider.dart`
+- **Files Updated:**
+  - `lib/shared/models/call.dart` - Added RTCOfferSignal, RTCAnswerSignal, RTCIceSignal, CallAccepted, CallRejected, CallCancelled, CallEnded
+  - `lib/features/realtime/data/socket_service.dart` - Added call event streams and emit methods
+- **Features:**
+  - RTCPeerConnection setup with STUN servers
+  - Offer/answer exchange via socket
   - ICE candidate handling
+  - Connection state management
 
-### Task #16: Call Screen UI
-- **Status:** Pending
-- **Blocked By:** Task #15
-- **Requirements:**
-  - Remote video display
-  - Local video PiP
+### Task #16: Call Screen UI ✅
+- **Status:** Completed
+- **Blocked By:** Task #15 (completed)
+- **Files Created:**
+  - `lib/features/call/presentation/screens/call_screen.dart`
+  - `lib/features/call/presentation/widgets/video_view.dart`
+  - `lib/features/call/presentation/widgets/call_timer.dart`
+  - `lib/features/call/presentation/widgets/peer_info_card.dart`
+- **Features:**
+  - Full-screen remote video display
+  - PIP local video view (draggable swap)
   - Call duration timer
+  - Peer info display (avatar, username)
+  - Auto-hide controls
+  - Reconnecting overlay
 
-### Task #17: In-Call Controls
-- **Status:** Pending
-- **Blocked By:** Task #16
-- **Requirements:**
-  - Mute/unmute
-  - Video on/off
-  - Speaker toggle
-  - Camera switch
-  - End call
+### Task #17: In-Call Controls ✅
+- **Status:** Completed
+- **Blocked By:** Task #16 (completed)
+- **Files Created:**
+  - `lib/features/call/presentation/widgets/call_controls.dart`
+- **Features:**
+  - Mute/unmute microphone
+  - Enable/disable camera
+  - Toggle speaker/earpiece
+  - Switch camera (front/back)
+  - End call button
 
-### Task #18: Direct Calling
-- **Status:** Pending
-- **Blocked By:** Task #17, #14
-- **Requirements:**
-  - Call initiation
-  - Incoming call screen
-  - Accept/reject handling
+### Task #18: Direct Calling ✅
+- **Status:** Completed
+- **Blocked By:** Task #17, #14 (completed)
+- **Files Created:**
+  - `lib/features/call/presentation/screens/incoming_call_screen.dart`
+- **Files Updated:**
+  - `lib/features/home/presentation/screens/home_screen.dart` - Direct call initiation
+  - `lib/core/router/app_router.dart` - Call routes
+- **Features:**
+  - Call initiation from user card
+  - Incoming call screen with caller info
+  - Accept/reject call handling
+  - Call cancellation handling
+
+### Additional Phase 5 Files:
+- `lib/features/call/call.dart` - Barrel export file
+- `docs/phase5-calling-features.md` - Implementation documentation
 
 ---
 
@@ -497,7 +530,6 @@ flutter analyze
 ### Backend Requirements (Not Yet Implemented)
 - `POST /api/users/me/avatar` - Avatar upload endpoint
 - `POST /api/users/me/fcm-token` - FCM token endpoint
-- Direct call socket events (call:initiate, call:incoming, call:accept, call:reject)
 - Push notification service
 
 ---
@@ -510,7 +542,7 @@ flutter analyze
 | Phase 2: Authentication | 5 | 5 | ✅ Complete |
 | Phase 3: Profile & Navigation | 3 | 3 | ✅ Complete |
 | Phase 4: Real-time & Presence | 3 | 3 | ✅ Complete |
-| Phase 5: Calling Features | 5 | 0 | 🔄 Pending |
+| Phase 5: Calling Features | 5 | 5 | ✅ Complete |
 | Phase 6: History & Notifications | 2 | 0 | 🔄 Pending |
 | Phase 7: Polish & Testing | 5 | 0 | 🔄 Pending |
-| **Total** | **27** | **15** | **56%** |
+| **Total** | **27** | **20** | **74%** |

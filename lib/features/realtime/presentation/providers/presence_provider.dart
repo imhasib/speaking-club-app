@@ -159,17 +159,13 @@ class PresenceNotifier extends Notifier<PresenceState> {
     }
   }
 
-  /// Join matchmaking queue
-  void joinMatchmaking() {
-    dev.log('🎯 Joining matchmaking queue...');
-    _socketService.joinMatchmaking();
+  /// Update presence to waiting (called by matchmaking provider after joining queue)
+  void setWaiting() {
     state = state.copyWith(userStatus: UserStatus.waiting);
   }
 
-  /// Leave matchmaking queue
-  void leaveMatchmaking() {
-    dev.log('🚪 Leaving matchmaking queue...');
-    _socketService.leaveMatchmaking();
+  /// Update presence back to online (called by matchmaking provider after leaving queue)
+  void setOnlineAfterMatchmaking() {
     state = state.copyWith(userStatus: UserStatus.online);
   }
 

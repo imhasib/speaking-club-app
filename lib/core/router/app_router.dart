@@ -8,6 +8,7 @@ import '../../features/history/presentation/screens/history_screen.dart';
 import '../../features/home/presentation/screens/home_screen.dart';
 import '../../features/profile/presentation/screens/profile_screen.dart';
 import '../../shared/providers/core_providers.dart';
+import '../../shared/widgets/animations/page_transitions.dart';
 import '../constants/app_constants.dart';
 import 'main_scaffold.dart';
 import 'routes.dart';
@@ -130,17 +131,35 @@ class AppRouter {
         GoRoute(
           path: Routes.waiting,
           name: Routes.waitingName,
-          builder: (context, state) => const WaitingScreen(),
+          pageBuilder: (context, state) => buildPageWithTransition(
+            context: context,
+            state: state,
+            child: const WaitingScreen(),
+            type: PageTransitionType.slideUp,
+            duration: const Duration(milliseconds: 300),
+          ),
         ),
         GoRoute(
           path: Routes.call,
           name: Routes.callName,
-          builder: (context, state) => const CallScreen(),
+          pageBuilder: (context, state) => buildPageWithTransition(
+            context: context,
+            state: state,
+            child: const CallScreen(),
+            type: PageTransitionType.fadeScale,
+            duration: const Duration(milliseconds: 400),
+          ),
         ),
         GoRoute(
           path: Routes.incomingCall,
           name: Routes.incomingCallName,
-          builder: (context, state) => const IncomingCallScreen(),
+          pageBuilder: (context, state) => buildPageWithTransition(
+            context: context,
+            state: state,
+            child: const IncomingCallScreen(),
+            type: PageTransitionType.slideUp,
+            duration: const Duration(milliseconds: 300),
+          ),
         ),
 
         // Main app routes with bottom navigation

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../shared/models/call.dart';
+import '../../../../shared/widgets/animations/animations.dart';
 import '../../../auth/domain/auth_state.dart';
 import '../../../auth/presentation/providers/auth_provider.dart';
 import '../../domain/call_history_state.dart';
@@ -99,11 +100,9 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
     TextTheme textTheme,
     String currentUserId,
   ) {
-    // Initial loading state
+    // Initial loading state - show shimmer
     if (state.isLoading && state.calls.isEmpty) {
-      return const Center(
-        child: CircularProgressIndicator(),
-      );
+      return const ShimmerCallHistoryList(itemCount: 10);
     }
 
     // Empty state
@@ -124,36 +123,11 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
     return ListView(
       physics: const AlwaysScrollableScrollPhysics(),
       children: [
-        SizedBox(height: MediaQuery.of(context).size.height * 0.25),
-        Center(
-          child: Padding(
-            padding: const EdgeInsets.all(24.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(
-                  Icons.history,
-                  size: 80,
-                  color: colorScheme.primary.withOpacity(0.5),
-                ),
-                const SizedBox(height: 24),
-                Text(
-                  'No call history yet',
-                  style: textTheme.titleLarge?.copyWith(
-                    color: colorScheme.onSurfaceVariant,
-                  ),
-                ),
-                const SizedBox(height: 12),
-                Text(
-                  'Make your first call to see history here',
-                  style: textTheme.bodyMedium?.copyWith(
-                    color: colorScheme.onSurfaceVariant.withOpacity(0.7),
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-              ],
-            ),
-          ),
+        SizedBox(height: MediaQuery.of(context).size.height * 0.15),
+        const AnimatedEmptyState(
+          icon: Icons.history,
+          title: 'No call history yet',
+          subtitle: 'Make your first call to see history here',
         ),
       ],
     );
@@ -163,44 +137,15 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
     return ListView(
       physics: const AlwaysScrollableScrollPhysics(),
       children: [
-        SizedBox(height: MediaQuery.of(context).size.height * 0.25),
-        Center(
-          child: Padding(
-            padding: const EdgeInsets.all(24.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(
-                  Icons.error_outline,
-                  size: 80,
-                  color: colorScheme.error.withOpacity(0.5),
-                ),
-                const SizedBox(height: 24),
-                Text(
-                  'Failed to load history',
-                  style: textTheme.titleLarge?.copyWith(
-                    color: colorScheme.onSurfaceVariant,
-                  ),
-                ),
-                const SizedBox(height: 12),
-                Text(
-                  'Pull down to try again',
-                  style: textTheme.bodyMedium?.copyWith(
-                    color: colorScheme.onSurfaceVariant.withOpacity(0.7),
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 24),
-                FilledButton.icon(
-                  onPressed: () {
-                    ref.read(callHistoryProvider.notifier).loadCallHistory();
-                  },
-                  icon: const Icon(Icons.refresh),
-                  label: const Text('Retry'),
-                ),
-              ],
-            ),
-          ),
+        SizedBox(height: MediaQuery.of(context).size.height * 0.15),
+        AnimatedEmptyState(
+          icon: Icons.error_outline,
+          title: 'Failed to load history',
+          subtitle: 'Pull down to try again',
+          actionLabel: 'Retry',
+          onAction: () {
+            ref.read(callHistoryProvider.notifier).loadCallHistory();
+          },
         ),
       ],
     );

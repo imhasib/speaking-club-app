@@ -22,7 +22,11 @@
       "Bash(flutter pub run build_runner build:*)",
       "Bash(\"/mnt/c/Program Files Ext/flutter/bin/dart\" run build_runner build --delete-conflicting-outputs)",
       "Bash(\"/mnt/c/Program Files Ext/flutter/bin/dart.bat\" run build_runner build --delete-conflicting-outputs)",
-      "Bash(findstr:*)"
+      "Bash(findstr:*)",
+      "Bash(flutter build:*)",
+      "Bash(git add:*)",
+      "Bash(git commit -m \"$\\(cat <<''EOF''\nImplement Phase 6: Call History feature with pagination and date grouping\n\n- Add CallHistoryRepository with paginated API support\n- Add CallHistoryState with Freezed for state management\n- Add CallHistoryProvider \\(Riverpod\\) for loading, pagination, and refresh\n- Add CallHistoryItem widget with status icons and call type badges\n- Update HistoryScreen with infinite scroll, date grouping \\(Today, Yesterday, This Week, Older\\), and call details bottom sheet\n- Update Call model with proper JSON mappings \\(_id, callType\\) and add ''rejected'' and ''matchmaking'' enum values\n- Update barrel exports in history.dart\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>\nEOF\n\\)\")",
+      "Bash(flutter test:*)"
     ]
   }
 }

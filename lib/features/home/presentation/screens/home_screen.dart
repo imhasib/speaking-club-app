@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/router/routes.dart';
 import '../../../../shared/models/call.dart';
 import '../../../../shared/models/online_user.dart';
+import '../../../../shared/widgets/animations/animations.dart';
 import '../../../auth/domain/auth_state.dart';
 import '../../../auth/presentation/providers/auth_provider.dart';
 import '../../../call/call.dart';
@@ -201,11 +202,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     TextTheme textTheme,
     String? currentUserId,
   ) {
-    // Loading state
+    // Loading state - show shimmer
     if (presenceState.isLoading) {
-      return const Center(
-        child: CircularProgressIndicator(),
-      );
+      return const ShimmerUserGrid(itemCount: 6);
     }
 
     // Error or disconnected state
@@ -248,41 +247,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     ColorScheme colorScheme,
     TextTheme textTheme,
   ) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(24.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              Icons.cloud_off,
-              size: 80,
-              color: colorScheme.onSurfaceVariant.withOpacity(0.5),
-            ),
-            const SizedBox(height: 24),
-            Text(
-              'Not connected',
-              style: textTheme.titleLarge?.copyWith(
-                color: colorScheme.onSurfaceVariant,
-              ),
-            ),
-            const SizedBox(height: 12),
-            Text(
-              'Tap to connect to the server',
-              style: textTheme.bodyMedium?.copyWith(
-                color: colorScheme.onSurfaceVariant.withOpacity(0.7),
-              ),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 24),
-            FilledButton.icon(
-              onPressed: _connectAndGoOnline,
-              icon: const Icon(Icons.refresh),
-              label: const Text('Connect'),
-            ),
-          ],
-        ),
-      ),
+    return AnimatedEmptyState(
+      icon: Icons.cloud_off,
+      title: 'Not connected',
+      subtitle: 'Tap to connect to the server',
+      actionLabel: 'Connect',
+      onAction: _connectAndGoOnline,
     );
   }
 
@@ -294,36 +264,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     return ListView(
       physics: const AlwaysScrollableScrollPhysics(),
       children: [
-        SizedBox(height: MediaQuery.of(context).size.height * 0.25),
-        Center(
-          child: Padding(
-            padding: const EdgeInsets.all(24.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(
-                  Icons.people_outline,
-                  size: 80,
-                  color: colorScheme.primary.withOpacity(0.5),
-                ),
-                const SizedBox(height: 24),
-                Text(
-                  'No users online right now',
-                  style: textTheme.titleLarge?.copyWith(
-                    color: colorScheme.onSurfaceVariant,
-                  ),
-                ),
-                const SizedBox(height: 12),
-                Text(
-                  'Pull down to refresh or tap "Find Match" to start random matching',
-                  style: textTheme.bodyMedium?.copyWith(
-                    color: colorScheme.onSurfaceVariant.withOpacity(0.7),
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-              ],
-            ),
-          ),
+        SizedBox(height: MediaQuery.of(context).size.height * 0.15),
+        const AnimatedEmptyState(
+          icon: Icons.people_outline,
+          title: 'No users online right now',
+          subtitle: 'Pull down to refresh or tap "Find Match" to start random matching',
         ),
       ],
     );
@@ -342,9 +287,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       itemCount: users.length,
       itemBuilder: (context, index) {
         final user = users[index];
-        return OnlineUserCard(
-          user: user,
-          onTap: user.status.isAvailable ? () => _handleUserTap(user) : null,
+        return StaggeredListItem(
+          index: index,
+          child: ScaleOnTap(
+            onTap: user.status.isAvailable ? () => _handleUserTap(user) : null,
+            child: OnlineUserCard(
+              user: user,
+              onTap: user.status.isAvailable ? () => _handleUserTap(user) : null,
+            ),
+          ),
         );
       },
     );

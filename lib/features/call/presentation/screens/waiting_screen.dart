@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../core/router/routes.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../shared/widgets/animations/animations.dart';
 import '../../domain/call_state.dart';
 import '../providers/call_provider.dart';
 import '../providers/matchmaking_provider.dart';
@@ -131,37 +132,37 @@ class _WaitingScreenState extends ConsumerState<WaitingScreen>
 
               const Spacer(),
 
-              // Animated search indicator
-              AnimatedBuilder(
-                animation: _pulseAnimation,
-                builder: (context, child) {
-                  return Transform.scale(
-                    scale: _pulseAnimation.value,
-                    child: Container(
-                      width: 140,
-                      height: 140,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: AppColors.primary.withOpacity(0.15),
-                      ),
-                      child: Center(
+              // Animated search indicator with radar effect
+              Stack(
+                alignment: Alignment.center,
+                children: [
+                  SearchingIndicator(
+                    size: 160,
+                    color: AppColors.primary,
+                    duration: const Duration(milliseconds: 2000),
+                  ),
+                  AnimatedBuilder(
+                    animation: _pulseAnimation,
+                    builder: (context, child) {
+                      return Transform.scale(
+                        scale: _pulseAnimation.value,
                         child: Container(
-                          width: 100,
-                          height: 100,
+                          width: 80,
+                          height: 80,
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
-                            color: AppColors.primary.withOpacity(0.25),
+                            color: AppColors.primary.withOpacity(0.2),
                           ),
                           child: Icon(
                             isDirectCall ? Icons.call : Icons.person_search,
-                            size: 50,
+                            size: 40,
                             color: AppColors.primary,
                           ),
                         ),
-                      ),
-                    ),
-                  );
-                },
+                      );
+                    },
+                  ),
+                ],
               ),
 
               const SizedBox(height: 40),

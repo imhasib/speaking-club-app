@@ -60,14 +60,6 @@ class GoogleAuthService {
       dev.log('📦 Google response received:');
       dev.log('   account: $account');
 
-      if (account == null) {
-        dev.log('❌ Account is null - sign-in was cancelled');
-        throw const AuthException(
-          message: 'Google sign-in was cancelled',
-          code: 'GOOGLE_SIGN_IN_CANCELLED',
-        );
-      }
-
       dev.log('👤 Account details:');
       dev.log('   email: ${account.email}');
       dev.log('   displayName: ${account.displayName}');

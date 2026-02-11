@@ -180,16 +180,33 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         onRefresh: _handleRefresh,
         child: _buildBody(context, presenceState, colorScheme, textTheme, currentUserId),
       ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: _handleFindMatch,
-        icon: Icon(presenceState.isWaiting ? Icons.close : Icons.shuffle),
-        label: Text(presenceState.isWaiting ? 'Cancel' : 'Find Match'),
-        backgroundColor: presenceState.isWaiting
-            ? colorScheme.errorContainer
-            : colorScheme.primaryContainer,
-        foregroundColor: presenceState.isWaiting
-            ? colorScheme.onErrorContainer
-            : colorScheme.onPrimaryContainer,
+      floatingActionButton: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          // AI Practice button
+          FloatingActionButton.extended(
+            heroTag: 'ai_practice',
+            onPressed: () => context.push(Routes.aiPractice),
+            icon: const Icon(Icons.smart_toy_outlined),
+            label: const Text('AI Practice'),
+            backgroundColor: colorScheme.secondaryContainer,
+            foregroundColor: colorScheme.onSecondaryContainer,
+          ),
+          const SizedBox(width: 12),
+          // Find Match button
+          FloatingActionButton.extended(
+            heroTag: 'find_match',
+            onPressed: _handleFindMatch,
+            icon: Icon(presenceState.isWaiting ? Icons.close : Icons.shuffle),
+            label: Text(presenceState.isWaiting ? 'Cancel' : 'Find Match'),
+            backgroundColor: presenceState.isWaiting
+                ? colorScheme.errorContainer
+                : colorScheme.primaryContainer,
+            foregroundColor: presenceState.isWaiting
+                ? colorScheme.onErrorContainer
+                : colorScheme.onPrimaryContainer,
+          ),
+        ],
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
     );

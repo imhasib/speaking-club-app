@@ -18,4 +18,14 @@ class ApiEndpoints {
   // Call endpoints
   static const String callHistory = '/calls/history';
   static String callDetails(String id) => '/calls/$id';
+
+  // AI Practice endpoints
+  static const String aiSessionToken = '/ai/session/token';
+  static const String aiSessionEnd = '/ai/session/end';
+  static const String aiSessionRefreshToken = '/ai/session/refresh-token';
+  static const String aiSessions = '/ai/sessions';
+  static String aiSessionDetails(String id) => '/ai/sessions/$id';
+  static const String aiUsage = '/ai/usage';
+  static const String aiTopics = '/ai/topics';
+  static const String aiScenarios = '/ai/scenarios';
 }

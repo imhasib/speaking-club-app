@@ -178,7 +178,9 @@ class _PasswordTextFieldState extends State<PasswordTextField> {
     if (password.length >= 8) strength++;
     if (password.length >= 12) strength++;
     if (password.contains(RegExp(r'[A-Z]')) &&
-        password.contains(RegExp(r'[a-z]'))) strength++;
+        password.contains(RegExp(r'[a-z]'))) {
+      strength++;
+    }
     if (password.contains(RegExp(r'[0-9]'))) strength++;
     if (password.contains(RegExp(r'[!@#$%^&*(),.?":{}|<>]'))) strength++;
     return strength.clamp(0, 4);

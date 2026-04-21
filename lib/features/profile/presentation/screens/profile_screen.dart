@@ -193,28 +193,6 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
       ),
       body: profileState.when(
         data: (user) {
-          if (user == null) {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.person_outline,
-                    size: 80,
-                    color: colorScheme.onSurfaceVariant.withOpacity(0.5),
-                  ),
-                  const SizedBox(height: 24),
-                  Text(
-                    'No user data available',
-                    style: textTheme.titleLarge?.copyWith(
-                      color: colorScheme.onSurfaceVariant,
-                    ),
-                  ),
-                ],
-              ),
-            );
-          }
-
           return SingleChildScrollView(
             padding: const EdgeInsets.all(24),
             child: Column(

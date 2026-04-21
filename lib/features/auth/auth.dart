@@ -1,4 +1,5 @@
 /// Auth feature exports
+library;
 export 'data/auth_repository.dart';
 export 'data/google_auth_service.dart';
 export 'domain/auth_state.dart';

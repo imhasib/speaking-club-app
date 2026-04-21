@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../features/ai_practice/presentation/screens/ai_session_screen.dart';
+import '../../features/ai_practice/presentation/screens/ai_summary_screen.dart';
+import '../../features/ai_practice/presentation/screens/mode_selection_screen.dart';
 import '../../features/auth/auth.dart';
 import '../../features/call/call.dart';
 import '../../features/history/presentation/screens/history_screen.dart';
@@ -58,7 +61,10 @@ class AppRouter {
             currentPath == Routes.profile ||
             currentPath == Routes.waiting ||
             currentPath == Routes.call ||
-            currentPath == Routes.incomingCall;
+            currentPath == Routes.incomingCall ||
+            currentPath == Routes.aiPractice ||
+            currentPath == Routes.aiSession ||
+            currentPath == Routes.aiSummary;
 
         // If authenticated and on auth route, go to home
         if (isAuthenticated && isAuthRoute) {
@@ -160,6 +166,35 @@ class AppRouter {
             type: PageTransitionType.slideUp,
             duration: const Duration(milliseconds: 300),
           ),
+        ),
+
+        // AI Practice routes
+        GoRoute(
+          path: Routes.aiPractice,
+          name: Routes.aiPracticeName,
+          pageBuilder: (context, state) => buildPageWithTransition(
+            context: context,
+            state: state,
+            child: const ModeSelectionScreen(),
+            type: PageTransitionType.slideUp,
+            duration: const Duration(milliseconds: 300),
+          ),
+        ),
+        GoRoute(
+          path: Routes.aiSession,
+          name: Routes.aiSessionName,
+          pageBuilder: (context, state) => buildPageWithTransition(
+            context: context,
+            state: state,
+            child: const AiSessionScreen(),
+            type: PageTransitionType.fadeScale,
+            duration: const Duration(milliseconds: 400),
+          ),
+        ),
+        GoRoute(
+          path: Routes.aiSummary,
+          name: Routes.aiSummaryName,
+          builder: (context, state) => const AiSummaryScreen(),
         ),
 
         // Main app routes with bottom navigation

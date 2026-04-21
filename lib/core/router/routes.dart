@@ -38,6 +38,16 @@ class Routes {
   static const String waiting = '/waiting';
   static const String waitingName = 'waiting';
 
+  // AI Practice routes
+  static const String aiPractice = '/ai-practice';
+  static const String aiPracticeName = 'aiPractice';
+
+  static const String aiSession = '/ai-practice/session';
+  static const String aiSessionName = 'aiSession';
+
+  static const String aiSummary = '/ai-practice/summary';
+  static const String aiSummaryName = 'aiSummary';
+
   // User routes
   static const String userProfile = '/user/:userId';
   static const String userProfileName = 'userProfile';

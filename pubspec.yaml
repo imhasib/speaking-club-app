@@ -44,6 +44,12 @@ dependencies:
   image_picker: ^1.1.2
   image_cropper: ^11.0.0
 
+  # AI Practice (Milestone 2)
+  speech_to_text: ^7.3.0        # On-device STT
+  flutter_tts: ^4.2.5           # On-device TTS
+  audio_waveforms: ^2.0.2       # Audio visualization
+  web_socket_channel: ^3.0.3    # WebSocket for OpenAI Realtime API
+
   # Models & Serialization
   freezed_annotation: ^3.1.0
   json_annotation: ^4.9.0

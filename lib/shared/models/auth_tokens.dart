@@ -45,7 +45,7 @@ sealed class AuthUser with _$AuthUser {
     required String username,
     required String email,
     String? mobileNumber,
-    String? avatar,
+    @JsonKey(name: 'profilePicture') String? avatar,
   }) = _AuthUser;
 
   factory AuthUser.fromJson(Map<String, dynamic> json) =>

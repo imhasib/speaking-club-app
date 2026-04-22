@@ -10,10 +10,11 @@ class ApiEndpoints {
   static const String refreshToken = '/auth/refresh';
 
   // User endpoints
-  static const String me = '/users/me';
-  static const String avatar = '/users/me/avatar';
-  static const String fcmToken = '/users/me/fcm-token';
+  static const String me = '/account/me';
   static const String onlineUsers = '/users/online';
+
+  // Image upload
+  static const String images = '/images';
 
   // Call endpoints
   static const String callHistory = '/calls/history';

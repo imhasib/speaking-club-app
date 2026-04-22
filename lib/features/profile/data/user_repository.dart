@@ -21,7 +21,7 @@ class UserRepository {
   Future<User> getCurrentUser() async {
     try {
       final response = await _dio.get(ApiEndpoints.me);
-      return User.fromJson(response.data['data']);
+      return User.fromJson(_unwrap(response.data));
     } on DioException catch (e) {
       throw e.error ?? e;
     }
@@ -34,10 +34,17 @@ class UserRepository {
         ApiEndpoints.me,
         data: request.toJson(),
       );
-      return User.fromJson(response.data['data']);
+      return User.fromJson(_unwrap(response.data));
     } on DioException catch (e) {
       throw e.error ?? e;
     }
+  }
+
+  /// Tolerate both { data: {...} } envelopes and flat payloads.
+  Map<String, dynamic> _unwrap(dynamic raw) {
+    final map = raw as Map<String, dynamic>;
+    final inner = map['data'];
+    return inner is Map<String, dynamic> ? inner : map;
   }
 
   /// Upload avatar image
@@ -49,11 +56,11 @@ class UserRepository {
       });
 
       final response = await _dio.post(
-        ApiEndpoints.avatar,
+        ApiEndpoints.images,
         data: formData,
       );
 
-      return response.data['data']['avatarUrl'] as String;
+      return response.data['data']['url'] as String;
     } on DioException catch (e) {
       throw e.error ?? e;
     }

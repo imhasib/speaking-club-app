@@ -80,7 +80,27 @@ class AuthRepository {
       dev.log('   Status: ${response.statusCode}');
       dev.log('   Data: ${response.data}');
 
-      final authResponse = AuthResponse.fromJson(response.data['data']);
+      // Response shape: { user: {...}, tokens: { accessToken, refreshToken } }
+      // Some API versions wrap the payload in { data: { ... } }; tolerate both.
+      final raw = response.data as Map<String, dynamic>;
+      final payload = (raw['data'] is Map<String, dynamic>)
+          ? raw['data'] as Map<String, dynamic>
+          : raw;
+
+      final userJson = payload['user'] as Map<String, dynamic>;
+      final tokensJson = payload['tokens'] as Map<String, dynamic>;
+
+      final authResponse = AuthResponse(
+        accessToken: tokensJson['accessToken'] as String,
+        refreshToken: tokensJson['refreshToken'] as String,
+        user: AuthUser(
+          id: (userJson['id'] ?? userJson['_id']) as String,
+          username: (userJson['name'] ?? userJson['username']) as String,
+          email: userJson['email'] as String,
+          mobileNumber: userJson['mobileNumber'] as String?,
+          avatar: (userJson['profilePicture'] ?? userJson['avatar']) as String?,
+        ),
+      );
       dev.log('✅ Auth response parsed successfully');
       dev.log('   User: ${authResponse.user.email}');
 
@@ -139,7 +159,11 @@ class AuthRepository {
   Future<User> getCurrentUser() async {
     try {
       final response = await _dio.get(ApiEndpoints.me);
-      return User.fromJson(response.data['data']);
+      final raw = response.data as Map<String, dynamic>;
+      final payload = raw['data'] is Map<String, dynamic>
+          ? raw['data'] as Map<String, dynamic>
+          : raw;
+      return User.fromJson(payload);
     } on DioException catch (e) {
       throw e.error ?? e;
     }

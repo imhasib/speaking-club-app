@@ -65,9 +65,11 @@ class AuthNotifier extends Notifier<AuthState> {
   /// Register with email and password.
   ///
   /// The backend's register endpoint does not issue tokens — on success the
-  /// user must log in separately. Returns `true` when the account was
-  /// created; the caller is responsible for routing to the login screen.
-  Future<bool> register({
+  /// user must log in separately. Returns the server's success message on
+  /// success (or a default message if the server did not provide one), or
+  /// `null` on failure. The caller is responsible for routing to the
+  /// registration-success screen.
+  Future<String?> register({
     required String username,
     required String email,
     required String mobileNumber,
@@ -76,7 +78,7 @@ class AuthNotifier extends Notifier<AuthState> {
     state = const AuthState.loading();
 
     try {
-      await _authRepository.register(
+      final message = await _authRepository.register(
         RegisterRequest(
           username: username,
           email: email,
@@ -85,16 +87,16 @@ class AuthNotifier extends Notifier<AuthState> {
         ),
       );
       state = const AuthState.unauthenticated();
-      return true;
+      return message ?? 'Account created successfully.';
     } on AppException catch (e) {
       state = AuthState.error(message: e.message, code: e.code);
-      return false;
+      return null;
     } catch (_) {
       state = const AuthState.error(
         message: 'Registration failed. Please try again.',
         code: 'UNKNOWN_ERROR',
       );
-      return false;
+      return null;
     }
   }
 

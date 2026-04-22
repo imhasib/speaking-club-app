@@ -15,13 +15,19 @@ class RegisterScreen extends ConsumerStatefulWidget {
 
   /// Called after Google sign-in completes (which authenticates immediately).
   /// Email/password registration does not issue a session — the user is
-  /// routed to the login screen instead via [onLoginTap].
+  /// routed to the registration-success screen via [onRegistered].
   final VoidCallback onSuccess;
+
+  /// Called after successful email/password registration with the server's
+  /// success message. The caller should show a success screen that leads
+  /// the user to sign in.
+  final ValueChanged<String> onRegistered;
 
   const RegisterScreen({
     super.key,
     required this.onLoginTap,
     required this.onSuccess,
+    required this.onRegistered,
   });
 
   @override
@@ -63,21 +69,16 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   Future<void> _register() async {
     if (!_formKey.currentState!.validate()) return;
 
-    final success = await ref.read(authProvider.notifier).register(
+    final message = await ref.read(authProvider.notifier).register(
           username: _usernameController.text.trim(),
           email: _emailController.text.trim(),
           mobileNumber: _fullPhoneNumber,
           password: _passwordController.text,
         );
 
-    if (!success || !mounted) return;
+    if (message == null || !mounted) return;
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Account created. Please log in to continue.'),
-      ),
-    );
-    widget.onLoginTap();
+    widget.onRegistered(message);
   }
 
   Future<void> _googleLogin() async {

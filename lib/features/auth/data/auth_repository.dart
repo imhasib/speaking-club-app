@@ -35,14 +35,21 @@ class AuthRepository {
   /// Register a new user with email and password.
   ///
   /// The backend does not issue tokens on registration — the caller is
-  /// expected to follow up with a login call. This method returns normally
-  /// on HTTP 2xx and throws on error.
-  Future<void> register(RegisterRequest request) async {
+  /// expected to follow up with a login call. Returns the server's success
+  /// message (e.g. "Account created successfully") when present, or `null`
+  /// if the response contains no message. Throws on error.
+  Future<String?> register(RegisterRequest request) async {
     try {
-      await _dio.post(
+      final response = await _dio.post(
         ApiEndpoints.register,
         data: request.toJson(),
       );
+      final data = response.data;
+      if (data is Map<String, dynamic>) {
+        final message = data['message'];
+        if (message is String && message.isNotEmpty) return message;
+      }
+      return null;
     } on DioException catch (e) {
       throw e.error ?? e;
     }

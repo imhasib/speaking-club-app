@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'login_screen.dart';
 import 'onboarding_screen.dart';
 import 'register_screen.dart';
+import 'registration_success_screen.dart';
 import 'welcome_screen.dart';
 
 /// Authentication flow wrapper that manages navigation between auth screens
@@ -28,6 +29,7 @@ class AuthWrapper extends StatefulWidget {
 
 class _AuthWrapperState extends State<AuthWrapper> {
   late _AuthScreen _currentScreen;
+  String? _registrationSuccessMessage;
 
   @override
   void initState() {
@@ -102,6 +104,20 @@ class _AuthWrapperState extends State<AuthWrapper> {
           key: const ValueKey('register'),
           onLoginTap: () => _navigateTo(_AuthScreen.login),
           onSuccess: widget.onAuthSuccess,
+          onRegistered: (message) {
+            setState(() {
+              _registrationSuccessMessage = message;
+              _currentScreen = _AuthScreen.registrationSuccess;
+            });
+          },
+        );
+
+      case _AuthScreen.registrationSuccess:
+        return RegistrationSuccessScreen(
+          key: const ValueKey('registration-success'),
+          message: _registrationSuccessMessage ??
+              'Your account has been created.',
+          onSignInTap: () => _navigateTo(_AuthScreen.login),
         );
     }
   }
@@ -112,4 +128,5 @@ enum _AuthScreen {
   welcome,
   login,
   register,
+  registrationSuccess,
 }

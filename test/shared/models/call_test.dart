@@ -5,12 +5,12 @@ void main() {
   group('Call', () {
     final testParticipant = CallParticipant(
       id: 'user1',
-      username: 'User 1',
+      name: 'User 1',
     );
 
     final testParticipant2 = CallParticipant(
       id: 'user2',
-      username: 'User 2',
+      name: 'User 2',
     );
 
     test('creates call with required fields', () {
@@ -113,7 +113,7 @@ void main() {
 
       final other = call.getOtherParticipant('user1');
       expect(other?.id, 'user2');
-      expect(other?.username, 'User 2');
+      expect(other?.name, 'User 2');
     });
 
     test('getOtherParticipant returns first participant if not found', () {
@@ -136,9 +136,9 @@ void main() {
         'callType': 'random',
         'status': 'completed',
         'participants': [
-          {'_id': 'user1', 'username': 'User 1'},
+          {'_id': 'user1', 'name': 'User 1'},
         ],
-        'initiatedBy': {'_id': 'user1', 'username': 'User 1'},
+        'initiatedBy': {'_id': 'user1', 'name': 'User 1'},
         'startedAt': '2024-01-01T10:00:00.000Z',
         'duration': 1800,
       };
@@ -221,36 +221,36 @@ void main() {
     test('creates participant with required fields', () {
       const participant = CallParticipant(
         id: 'user1',
-        username: 'User 1',
+        name: 'User 1',
       );
 
       expect(participant.id, 'user1');
-      expect(participant.username, 'User 1');
-      expect(participant.avatar, isNull);
+      expect(participant.name, 'User 1');
+      expect(participant.profilePicture, isNull);
     });
 
-    test('creates participant with avatar', () {
+    test('creates participant with profile picture', () {
       const participant = CallParticipant(
         id: 'user1',
-        username: 'User 1',
-        avatar: 'https://example.com/avatar.jpg',
+        name: 'User 1',
+        profilePicture: 'https://example.com/pic.jpg',
       );
 
-      expect(participant.avatar, 'https://example.com/avatar.jpg');
+      expect(participant.profilePicture, 'https://example.com/pic.jpg');
     });
 
     test('fromJson creates participant correctly', () {
       final json = {
         '_id': 'user1',
-        'username': 'User 1',
-        'avatar': 'https://example.com/avatar.jpg',
+        'name': 'User 1',
+        'profilePicture': 'https://example.com/pic.jpg',
       };
 
       final participant = CallParticipant.fromJson(json);
 
       expect(participant.id, 'user1');
-      expect(participant.username, 'User 1');
-      expect(participant.avatar, 'https://example.com/avatar.jpg');
+      expect(participant.name, 'User 1');
+      expect(participant.profilePicture, 'https://example.com/pic.jpg');
     });
   });
 
@@ -258,25 +258,25 @@ void main() {
     test('creates peer info correctly', () {
       const peer = PeerInfo(
         id: 'user1',
-        username: 'User 1',
+        name: 'User 1',
       );
 
       expect(peer.id, 'user1');
-      expect(peer.username, 'User 1');
+      expect(peer.name, 'User 1');
     });
 
     test('fromJson creates peer info correctly', () {
       final json = {
         'id': 'user1',
-        'username': 'User 1',
-        'avatar': 'https://example.com/avatar.jpg',
+        'name': 'User 1',
+        'profilePicture': 'https://example.com/pic.jpg',
       };
 
       final peer = PeerInfo.fromJson(json);
 
       expect(peer.id, 'user1');
-      expect(peer.username, 'User 1');
-      expect(peer.avatar, 'https://example.com/avatar.jpg');
+      expect(peer.name, 'User 1');
+      expect(peer.profilePicture, 'https://example.com/pic.jpg');
     });
   });
 
@@ -286,13 +286,13 @@ void main() {
         callId: 'call-123',
         dbCallId: 'db-call-123',
         peerId: 'user1',
-        peerInfo: PeerInfo(id: 'user1', username: 'User 1'),
+        peerInfo: PeerInfo(id: 'user1', name: 'User 1'),
         initiator: true,
       );
 
       expect(result.callId, 'call-123');
       expect(result.initiator, isTrue);
-      expect(result.peerInfo.username, 'User 1');
+      expect(result.peerInfo.name, 'User 1');
     });
 
     test('fromJson creates result correctly', () {
@@ -302,7 +302,7 @@ void main() {
         'peerId': 'user1',
         'peerInfo': {
           'id': 'user1',
-          'username': 'User 1',
+          'name': 'User 1',
         },
         'initiator': true,
       };
@@ -319,11 +319,11 @@ void main() {
       const incoming = IncomingCall(
         callId: 'call-123',
         callerId: 'user1',
-        callerInfo: PeerInfo(id: 'user1', username: 'User 1'),
+        callerInfo: PeerInfo(id: 'user1', name: 'User 1'),
       );
 
       expect(incoming.callId, 'call-123');
-      expect(incoming.callerInfo.username, 'User 1');
+      expect(incoming.callerInfo.name, 'User 1');
     });
 
     test('fromJson creates incoming call correctly', () {
@@ -332,7 +332,7 @@ void main() {
         'callerId': 'user1',
         'callerInfo': {
           'id': 'user1',
-          'username': 'User 1',
+          'name': 'User 1',
         },
       };
 

@@ -227,7 +227,7 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        otherParticipant?.username ?? 'Unknown',
+                        otherParticipant?.name ?? 'Unknown',
                         style: textTheme.titleLarge,
                       ),
                       Text(

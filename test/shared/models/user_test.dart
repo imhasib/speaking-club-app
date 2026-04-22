@@ -6,41 +6,41 @@ void main() {
     test('creates user with required fields', () {
       final user = User(
         id: '123',
-        username: 'testuser',
+        name: 'testuser',
         email: 'test@example.com',
         createdAt: DateTime(2024, 1, 1),
         updatedAt: DateTime(2024, 1, 1),
       );
 
       expect(user.id, '123');
-      expect(user.username, 'testuser');
+      expect(user.name, 'testuser');
       expect(user.email, 'test@example.com');
       expect(user.mobileNumber, isNull);
-      expect(user.avatar, isNull);
+      expect(user.profilePicture, isNull);
     });
 
     test('creates user with all fields', () {
       final user = User(
         id: '123',
-        username: 'testuser',
+        name: 'testuser',
         email: 'test@example.com',
         mobileNumber: '+1234567890',
-        avatar: 'https://example.com/avatar.jpg',
+        profilePicture: 'https://example.com/pic.jpg',
         createdAt: DateTime(2024, 1, 1),
         updatedAt: DateTime(2024, 1, 1),
       );
 
       expect(user.mobileNumber, '+1234567890');
-      expect(user.avatar, 'https://example.com/avatar.jpg');
+      expect(user.profilePicture, 'https://example.com/pic.jpg');
     });
 
     test('fromJson creates user correctly', () {
       final json = {
         '_id': '123',
-        'username': 'testuser',
+        'name': 'testuser',
         'email': 'test@example.com',
         'mobileNumber': '+1234567890',
-        'avatar': 'https://example.com/avatar.jpg',
+        'profilePicture': 'https://example.com/pic.jpg',
         'createdAt': '2024-01-01T00:00:00.000Z',
         'updatedAt': '2024-01-01T00:00:00.000Z',
       };
@@ -48,15 +48,16 @@ void main() {
       final user = User.fromJson(json);
 
       expect(user.id, '123');
-      expect(user.username, 'testuser');
+      expect(user.name, 'testuser');
       expect(user.email, 'test@example.com');
       expect(user.mobileNumber, '+1234567890');
+      expect(user.profilePicture, 'https://example.com/pic.jpg');
     });
 
     test('toJson converts user correctly', () {
       final user = User(
         id: '123',
-        username: 'testuser',
+        name: 'testuser',
         email: 'test@example.com',
         mobileNumber: '+1234567890',
         createdAt: DateTime.utc(2024, 1, 1),
@@ -66,7 +67,7 @@ void main() {
       final json = user.toJson();
 
       expect(json['_id'], '123');
-      expect(json['username'], 'testuser');
+      expect(json['name'], 'testuser');
       expect(json['email'], 'test@example.com');
       expect(json['mobileNumber'], '+1234567890');
     });
@@ -74,23 +75,23 @@ void main() {
     test('copyWith creates new user with updated fields', () {
       final user = User(
         id: '123',
-        username: 'testuser',
+        name: 'testuser',
         email: 'test@example.com',
         createdAt: DateTime(2024, 1, 1),
         updatedAt: DateTime(2024, 1, 1),
       );
 
-      final updatedUser = user.copyWith(username: 'newusername');
+      final updatedUser = user.copyWith(name: 'newname');
 
       expect(updatedUser.id, '123');
-      expect(updatedUser.username, 'newusername');
+      expect(updatedUser.name, 'newname');
       expect(updatedUser.email, 'test@example.com');
     });
 
     test('equality works correctly', () {
       final user1 = User(
         id: '123',
-        username: 'testuser',
+        name: 'testuser',
         email: 'test@example.com',
         createdAt: DateTime(2024, 1, 1),
         updatedAt: DateTime(2024, 1, 1),
@@ -98,7 +99,7 @@ void main() {
 
       final user2 = User(
         id: '123',
-        username: 'testuser',
+        name: 'testuser',
         email: 'test@example.com',
         createdAt: DateTime(2024, 1, 1),
         updatedAt: DateTime(2024, 1, 1),
@@ -111,13 +112,13 @@ void main() {
   group('RegisterRequest', () {
     test('creates register request correctly', () {
       final request = RegisterRequest(
-        username: 'newuser',
+        name: 'newuser',
         email: 'new@example.com',
         password: 'password123',
         mobileNumber: '+1234567890',
       );
 
-      expect(request.username, 'newuser');
+      expect(request.name, 'newuser');
       expect(request.email, 'new@example.com');
       expect(request.password, 'password123');
       expect(request.mobileNumber, '+1234567890');
@@ -125,7 +126,7 @@ void main() {
 
     test('toJson converts register request correctly', () {
       final request = RegisterRequest(
-        username: 'newuser',
+        name: 'newuser',
         email: 'new@example.com',
         password: 'password123',
         mobileNumber: '+1234567890',
@@ -165,19 +166,19 @@ void main() {
   });
 
   group('UpdateProfileRequest', () {
-    test('creates update request with username', () {
-      final request = UpdateProfileRequest(username: 'newname');
+    test('creates update request with name', () {
+      final request = UpdateProfileRequest(name: 'newname');
 
-      expect(request.username, 'newname');
+      expect(request.name, 'newname');
       expect(request.mobileNumber, isNull);
     });
 
     test('toJson includes only non-null fields', () {
-      final request = UpdateProfileRequest(username: 'newname');
+      final request = UpdateProfileRequest(name: 'newname');
 
       final json = request.toJson();
 
-      expect(json['username'], 'newname');
+      expect(json['name'], 'newname');
     });
   });
 }

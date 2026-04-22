@@ -34,10 +34,10 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   AuthUser _toAuthUser(User user) {
     return AuthUser(
       id: user.id,
-      username: user.username,
+      name: user.name,
       email: user.email,
       mobileNumber: user.mobileNumber,
-      avatar: user.avatar,
+      profilePicture: user.profilePicture,
     );
   }
 
@@ -82,7 +82,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
 
     try {
       final profileActions = ref.read(profileActionsProvider);
-      final updatedUser = await profileActions.uploadAvatar(imagePath);
+      final updatedUser = await profileActions.uploadProfilePicture(imagePath);
 
       if (mounted) {
         // Close loading dialog
@@ -108,12 +108,12 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   }
 
   Future<void> _handleUpdateUsername() async {
-    final username = _usernameController.text.trim();
-    if (username.isEmpty) return;
+    final name = _usernameController.text.trim();
+    if (name.isEmpty) return;
 
     try {
       final profileActions = ref.read(profileActionsProvider);
-      final updatedUser = await profileActions.updateUsername(username);
+      final updatedUser = await profileActions.updateName(name);
 
       // Update auth state with new user
       if (mounted) {
@@ -205,10 +205,10 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                       CircleAvatar(
                         radius: 60,
                         backgroundColor: colorScheme.primaryContainer,
-                        backgroundImage: user.avatar != null
-                            ? CachedNetworkImageProvider(user.avatar!)
+                        backgroundImage: user.profilePicture != null
+                            ? CachedNetworkImageProvider(user.profilePicture!)
                             : null,
-                        child: user.avatar == null
+                        child: user.profilePicture == null
                             ? Icon(
                                 Icons.person,
                                 size: 60,
@@ -263,7 +263,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                                 onPressed: () {
                                   setState(() {
                                     _isEditingUsername = true;
-                                    _usernameController.text = user.username;
+                                    _usernameController.text = user.name;
                                   });
                                 },
                               ),
@@ -300,7 +300,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                           )
                         else
                           Text(
-                            user.username,
+                            user.name,
                             style: textTheme.titleMedium,
                           ),
                       ],

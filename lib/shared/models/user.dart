@@ -8,25 +8,16 @@ part 'user.g.dart';
 sealed class User with _$User {
   const factory User({
     @JsonKey(name: '_id') required String id,
-    required String username,
+    required String name,
     required String email,
     String? mobileNumber,
-    @JsonKey(name: 'profilePicture') String? avatar,
+    String? profilePicture,
     required DateTime createdAt,
     required DateTime updatedAt,
   }) = _User;
 
-  factory User.fromJson(Map<String, dynamic> json) {
-    // Tolerate both API shapes: { _id, username, ... } and { id, name, ... }
-    final normalized = Map<String, dynamic>.from(json);
-    if (normalized['_id'] == null && normalized['id'] != null) {
-      normalized['_id'] = normalized['id'];
-    }
-    if (normalized['username'] == null && normalized['name'] != null) {
-      normalized['username'] = normalized['name'];
-    }
-    return _$UserFromJson(normalized);
-  }
+  factory User.fromJson(Map<String, dynamic> json) =>
+      _$UserFromJson(json);
 }
 
 /// Request model for user registration.
@@ -35,12 +26,11 @@ sealed class User with _$User {
 @Freezed(toJson: true)
 sealed class RegisterRequest with _$RegisterRequest {
   const factory RegisterRequest({
-    @JsonKey(name: 'name') required String username,
+    required String name,
     required String email,
     @JsonKey(name: 'mobile') required String mobileNumber,
     required String password,
-    @JsonKey(name: 'profilePicture', includeIfNull: false)
-    String? avatar,
+    @JsonKey(includeIfNull: false) String? profilePicture,
   }) = _RegisterRequest;
 
   factory RegisterRequest.fromJson(Map<String, dynamic> json) =>
@@ -63,8 +53,8 @@ sealed class LoginRequest with _$LoginRequest {
 @freezed
 sealed class UpdateProfileRequest with _$UpdateProfileRequest {
   const factory UpdateProfileRequest({
-    String? username,
-    @JsonKey(name: 'profilePicture') String? avatar,
+    String? name,
+    String? profilePicture,
     String? mobileNumber,
   }) = _UpdateProfileRequest;
 

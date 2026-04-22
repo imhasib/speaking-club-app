@@ -37,10 +37,10 @@ class OnlineUserCard extends StatelessWidget {
                   CircleAvatar(
                     radius: 32,
                     backgroundColor: colorScheme.surfaceContainerHighest,
-                    child: user.avatar != null && user.avatar!.isNotEmpty
+                    child: user.profilePicture != null && user.profilePicture!.isNotEmpty
                         ? ClipOval(
                             child: CachedNetworkImage(
-                              imageUrl: user.avatar!,
+                              imageUrl: user.profilePicture!,
                               width: 64,
                               height: 64,
                               fit: BoxFit.cover,
@@ -82,9 +82,9 @@ class OnlineUserCard extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: 8),
-              // Username
+              // Name
               Text(
-                user.username,
+                user.name,
                 style: textTheme.bodyMedium?.copyWith(
                   fontWeight: FontWeight.w500,
                 ),

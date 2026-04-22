@@ -59,8 +59,8 @@ enum UserStatus {
 sealed class OnlineUser with _$OnlineUser {
   const factory OnlineUser({
     required String id,
-    required String username,
-    String? avatar,
+    required String name,
+    String? profilePicture,
     @UserStatusConverter() required UserStatus status,
   }) = _OnlineUser;
 

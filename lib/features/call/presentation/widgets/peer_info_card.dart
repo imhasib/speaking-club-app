@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 
 import '../../../../shared/models/call.dart';
 
-/// Peer information card widget displaying avatar and username
+/// Peer information card widget displaying profile picture and name
 class PeerInfoCard extends StatelessWidget {
   final PeerInfo peerInfo;
 
@@ -26,10 +26,10 @@ class PeerInfoCard extends StatelessWidget {
           CircleAvatar(
             radius: 16,
             backgroundColor: Colors.white24,
-            child: peerInfo.avatar != null
+            child: peerInfo.profilePicture != null
                 ? ClipOval(
                     child: CachedNetworkImage(
-                      imageUrl: peerInfo.avatar!,
+                      imageUrl: peerInfo.profilePicture!,
                       width: 32,
                       height: 32,
                       fit: BoxFit.cover,
@@ -53,7 +53,7 @@ class PeerInfoCard extends StatelessWidget {
           ),
           const SizedBox(width: 8),
           Text(
-            peerInfo.username,
+            peerInfo.name,
             style: const TextStyle(
               color: Colors.white,
               fontWeight: FontWeight.w500,
@@ -86,10 +86,10 @@ class LargePeerInfo extends StatelessWidget {
         CircleAvatar(
           radius: 60,
           backgroundColor: Colors.white24,
-          child: peerInfo.avatar != null
+          child: peerInfo.profilePicture != null
               ? ClipOval(
                   child: CachedNetworkImage(
-                    imageUrl: peerInfo.avatar!,
+                    imageUrl: peerInfo.profilePicture!,
                     width: 120,
                     height: 120,
                     fit: BoxFit.cover,
@@ -114,9 +114,9 @@ class LargePeerInfo extends StatelessWidget {
 
         const SizedBox(height: 24),
 
-        // Username
+        // Name
         Text(
-          peerInfo.username,
+          peerInfo.name,
           style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                 color: Colors.white,
                 fontWeight: FontWeight.bold,

@@ -45,14 +45,14 @@ void main() {
         refreshToken: 'refresh-token-456',
         user: AuthUser(
           id: 'user-123',
-          username: 'testuser',
+          name: 'testuser',
           email: 'test@example.com',
         ),
       );
 
       expect(response.accessToken, 'access-token-123');
       expect(response.refreshToken, 'refresh-token-456');
-      expect(response.user.username, 'testuser');
+      expect(response.user.name, 'testuser');
     });
 
     test('tokens getter returns AuthTokens', () {
@@ -61,7 +61,7 @@ void main() {
         refreshToken: 'refresh-token-456',
         user: AuthUser(
           id: 'user-123',
-          username: 'testuser',
+          name: 'testuser',
           email: 'test@example.com',
         ),
       );
@@ -77,7 +77,7 @@ void main() {
         'refreshToken': 'refresh-token-456',
         'user': {
           '_id': 'user-123',
-          'username': 'testuser',
+          'name': 'testuser',
           'email': 'test@example.com',
         },
       };
@@ -94,7 +94,7 @@ void main() {
         refreshToken: 'refresh-token-456',
         user: AuthUser(
           id: 'user-123',
-          username: 'testuser',
+          name: 'testuser',
           email: 'test@example.com',
         ),
       );
@@ -111,32 +111,32 @@ void main() {
     test('creates auth user correctly', () {
       const authUser = AuthUser(
         id: 'user-123',
-        username: 'testuser',
+        name: 'testuser',
         email: 'test@example.com',
       );
 
       expect(authUser.id, 'user-123');
-      expect(authUser.username, 'testuser');
+      expect(authUser.name, 'testuser');
       expect(authUser.email, 'test@example.com');
     });
 
     test('creates auth user with optional fields', () {
       const authUser = AuthUser(
         id: 'user-123',
-        username: 'testuser',
+        name: 'testuser',
         email: 'test@example.com',
         mobileNumber: '+1234567890',
-        avatar: 'https://example.com/avatar.jpg',
+        profilePicture: 'https://example.com/pic.jpg',
       );
 
       expect(authUser.mobileNumber, '+1234567890');
-      expect(authUser.avatar, 'https://example.com/avatar.jpg');
+      expect(authUser.profilePicture, 'https://example.com/pic.jpg');
     });
 
     test('fromJson creates auth user correctly', () {
       final json = {
         '_id': 'user-123',
-        'username': 'testuser',
+        'name': 'testuser',
         'email': 'test@example.com',
         'mobileNumber': '+1234567890',
       };
@@ -144,34 +144,34 @@ void main() {
       final authUser = AuthUser.fromJson(json);
 
       expect(authUser.id, 'user-123');
-      expect(authUser.username, 'testuser');
+      expect(authUser.name, 'testuser');
       expect(authUser.mobileNumber, '+1234567890');
     });
 
     test('toJson converts auth user correctly', () {
       const authUser = AuthUser(
         id: 'user-123',
-        username: 'testuser',
+        name: 'testuser',
         email: 'test@example.com',
       );
 
       final json = authUser.toJson();
 
       expect(json['_id'], 'user-123');
-      expect(json['username'], 'testuser');
+      expect(json['name'], 'testuser');
     });
 
     test('copyWith updates fields correctly', () {
       const authUser = AuthUser(
         id: 'user-123',
-        username: 'testuser',
+        name: 'testuser',
         email: 'test@example.com',
       );
 
-      final updatedUser = authUser.copyWith(username: 'newusername');
+      final updatedUser = authUser.copyWith(name: 'newname');
 
       expect(updatedUser.id, 'user-123');
-      expect(updatedUser.username, 'newusername');
+      expect(updatedUser.name, 'newname');
     });
   });
 

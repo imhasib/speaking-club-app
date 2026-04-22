@@ -84,8 +84,8 @@ sealed class Call with _$Call {
 sealed class CallParticipant with _$CallParticipant {
   const factory CallParticipant({
     @JsonKey(name: '_id') required String id,
-    required String username,
-    String? avatar,
+    required String name,
+    String? profilePicture,
   }) = _CallParticipant;
 
   factory CallParticipant.fromJson(Map<String, dynamic> json) =>
@@ -93,8 +93,8 @@ sealed class CallParticipant with _$CallParticipant {
 
   factory CallParticipant.fromUser(User user) => CallParticipant(
         id: user.id,
-        username: user.username,
-        avatar: user.avatar,
+        name: user.name,
+        profilePicture: user.profilePicture,
       );
 }
 
@@ -118,8 +118,8 @@ sealed class MatchmakingResult with _$MatchmakingResult {
 sealed class PeerInfo with _$PeerInfo {
   const factory PeerInfo({
     required String id,
-    required String username,
-    String? avatar,
+    required String name,
+    String? profilePicture,
   }) = _PeerInfo;
 
   factory PeerInfo.fromJson(Map<String, dynamic> json) =>

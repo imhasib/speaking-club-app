@@ -91,7 +91,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('Call ${user.username}?'),
+        title: Text('Call ${user.name}?'),
         content: const Text('Start a video call with this user?'),
         actions: [
           TextButton(
@@ -106,8 +106,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 user.id,
                 PeerInfo(
                   id: user.id,
-                  username: user.username,
-                  avatar: user.avatar,
+                  name: user.name,
+                  profilePicture: user.profilePicture,
                 ),
               );
               // Navigate to waiting screen for outgoing call

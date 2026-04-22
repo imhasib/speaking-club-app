@@ -47,10 +47,10 @@ class AuthNotifier extends Notifier<AuthState> {
         state = AuthState.authenticated(
           user: AuthUser(
             id: user.id,
-            username: user.username,
+            name: user.name,
             email: user.email,
             mobileNumber: user.mobileNumber,
-            avatar: user.avatar,
+            profilePicture: user.profilePicture,
           ),
         );
       } catch (e) {
@@ -70,7 +70,7 @@ class AuthNotifier extends Notifier<AuthState> {
   /// `null` on failure. The caller is responsible for routing to the
   /// registration-success screen.
   Future<String?> register({
-    required String username,
+    required String name,
     required String email,
     required String mobileNumber,
     required String password,
@@ -80,7 +80,7 @@ class AuthNotifier extends Notifier<AuthState> {
     try {
       final message = await _authRepository.register(
         RegisterRequest(
-          username: username,
+          name: name,
           email: email,
           mobileNumber: mobileNumber,
           password: password,

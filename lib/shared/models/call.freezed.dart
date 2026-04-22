@@ -317,7 +317,7 @@ $CallParticipantCopyWith<$Res> get initiatedBy {
 /// @nodoc
 mixin _$CallParticipant {
 
-@JsonKey(name: '_id') String get id; String get username; String? get avatar;
+@JsonKey(name: '_id') String get id; String get name; String? get profilePicture;
 /// Create a copy of CallParticipant
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -330,16 +330,16 @@ $CallParticipantCopyWith<CallParticipant> get copyWith => _$CallParticipantCopyW
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is CallParticipant&&(identical(other.id, id) || other.id == id)&&(identical(other.username, username) || other.username == username)&&(identical(other.avatar, avatar) || other.avatar == avatar));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is CallParticipant&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.profilePicture, profilePicture) || other.profilePicture == profilePicture));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,username,avatar);
+int get hashCode => Object.hash(runtimeType,id,name,profilePicture);
 
 @override
 String toString() {
-  return 'CallParticipant(id: $id, username: $username, avatar: $avatar)';
+  return 'CallParticipant(id: $id, name: $name, profilePicture: $profilePicture)';
 }
 
 
@@ -350,7 +350,7 @@ abstract mixin class $CallParticipantCopyWith<$Res>  {
   factory $CallParticipantCopyWith(CallParticipant value, $Res Function(CallParticipant) _then) = _$CallParticipantCopyWithImpl;
 @useResult
 $Res call({
-@JsonKey(name: '_id') String id, String username, String? avatar
+@JsonKey(name: '_id') String id, String name, String? profilePicture
 });
 
 
@@ -367,11 +367,11 @@ class _$CallParticipantCopyWithImpl<$Res>
 
 /// Create a copy of CallParticipant
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? username = null,Object? avatar = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? name = null,Object? profilePicture = freezed,}) {
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
-as String,username: null == username ? _self.username : username // ignore: cast_nullable_to_non_nullable
-as String,avatar: freezed == avatar ? _self.avatar : avatar // ignore: cast_nullable_to_non_nullable
+as String,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
+as String,profilePicture: freezed == profilePicture ? _self.profilePicture : profilePicture // ignore: cast_nullable_to_non_nullable
 as String?,
   ));
 }
@@ -454,10 +454,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function(@JsonKey(name: '_id')  String id,  String username,  String? avatar)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function(@JsonKey(name: '_id')  String id,  String name,  String? profilePicture)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _CallParticipant() when $default != null:
-return $default(_that.id,_that.username,_that.avatar);case _:
+return $default(_that.id,_that.name,_that.profilePicture);case _:
   return orElse();
 
 }
@@ -475,10 +475,10 @@ return $default(_that.id,_that.username,_that.avatar);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function(@JsonKey(name: '_id')  String id,  String username,  String? avatar)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function(@JsonKey(name: '_id')  String id,  String name,  String? profilePicture)  $default,) {final _that = this;
 switch (_that) {
 case _CallParticipant():
-return $default(_that.id,_that.username,_that.avatar);}
+return $default(_that.id,_that.name,_that.profilePicture);}
 }
 /// A variant of `when` that fallback to returning `null`
 ///
@@ -492,10 +492,10 @@ return $default(_that.id,_that.username,_that.avatar);}
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function(@JsonKey(name: '_id')  String id,  String username,  String? avatar)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function(@JsonKey(name: '_id')  String id,  String name,  String? profilePicture)?  $default,) {final _that = this;
 switch (_that) {
 case _CallParticipant() when $default != null:
-return $default(_that.id,_that.username,_that.avatar);case _:
+return $default(_that.id,_that.name,_that.profilePicture);case _:
   return null;
 
 }
@@ -507,12 +507,12 @@ return $default(_that.id,_that.username,_that.avatar);case _:
 @JsonSerializable()
 
 class _CallParticipant implements CallParticipant {
-  const _CallParticipant({@JsonKey(name: '_id') required this.id, required this.username, this.avatar});
+  const _CallParticipant({@JsonKey(name: '_id') required this.id, required this.name, this.profilePicture});
   factory _CallParticipant.fromJson(Map<String, dynamic> json) => _$CallParticipantFromJson(json);
 
 @override@JsonKey(name: '_id') final  String id;
-@override final  String username;
-@override final  String? avatar;
+@override final  String name;
+@override final  String? profilePicture;
 
 /// Create a copy of CallParticipant
 /// with the given fields replaced by the non-null parameter values.
@@ -527,16 +527,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _CallParticipant&&(identical(other.id, id) || other.id == id)&&(identical(other.username, username) || other.username == username)&&(identical(other.avatar, avatar) || other.avatar == avatar));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _CallParticipant&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.profilePicture, profilePicture) || other.profilePicture == profilePicture));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,username,avatar);
+int get hashCode => Object.hash(runtimeType,id,name,profilePicture);
 
 @override
 String toString() {
-  return 'CallParticipant(id: $id, username: $username, avatar: $avatar)';
+  return 'CallParticipant(id: $id, name: $name, profilePicture: $profilePicture)';
 }
 
 
@@ -547,7 +547,7 @@ abstract mixin class _$CallParticipantCopyWith<$Res> implements $CallParticipant
   factory _$CallParticipantCopyWith(_CallParticipant value, $Res Function(_CallParticipant) _then) = __$CallParticipantCopyWithImpl;
 @override @useResult
 $Res call({
-@JsonKey(name: '_id') String id, String username, String? avatar
+@JsonKey(name: '_id') String id, String name, String? profilePicture
 });
 
 
@@ -564,11 +564,11 @@ class __$CallParticipantCopyWithImpl<$Res>
 
 /// Create a copy of CallParticipant
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? username = null,Object? avatar = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? name = null,Object? profilePicture = freezed,}) {
   return _then(_CallParticipant(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
-as String,username: null == username ? _self.username : username // ignore: cast_nullable_to_non_nullable
-as String,avatar: freezed == avatar ? _self.avatar : avatar // ignore: cast_nullable_to_non_nullable
+as String,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
+as String,profilePicture: freezed == profilePicture ? _self.profilePicture : profilePicture // ignore: cast_nullable_to_non_nullable
 as String?,
   ));
 }
@@ -867,7 +867,7 @@ $PeerInfoCopyWith<$Res> get peerInfo {
 /// @nodoc
 mixin _$PeerInfo {
 
- String get id; String get username; String? get avatar;
+ String get id; String get name; String? get profilePicture;
 /// Create a copy of PeerInfo
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -880,16 +880,16 @@ $PeerInfoCopyWith<PeerInfo> get copyWith => _$PeerInfoCopyWithImpl<PeerInfo>(thi
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is PeerInfo&&(identical(other.id, id) || other.id == id)&&(identical(other.username, username) || other.username == username)&&(identical(other.avatar, avatar) || other.avatar == avatar));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is PeerInfo&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.profilePicture, profilePicture) || other.profilePicture == profilePicture));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,username,avatar);
+int get hashCode => Object.hash(runtimeType,id,name,profilePicture);
 
 @override
 String toString() {
-  return 'PeerInfo(id: $id, username: $username, avatar: $avatar)';
+  return 'PeerInfo(id: $id, name: $name, profilePicture: $profilePicture)';
 }
 
 
@@ -900,7 +900,7 @@ abstract mixin class $PeerInfoCopyWith<$Res>  {
   factory $PeerInfoCopyWith(PeerInfo value, $Res Function(PeerInfo) _then) = _$PeerInfoCopyWithImpl;
 @useResult
 $Res call({
- String id, String username, String? avatar
+ String id, String name, String? profilePicture
 });
 
 
@@ -917,11 +917,11 @@ class _$PeerInfoCopyWithImpl<$Res>
 
 /// Create a copy of PeerInfo
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? username = null,Object? avatar = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? name = null,Object? profilePicture = freezed,}) {
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
-as String,username: null == username ? _self.username : username // ignore: cast_nullable_to_non_nullable
-as String,avatar: freezed == avatar ? _self.avatar : avatar // ignore: cast_nullable_to_non_nullable
+as String,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
+as String,profilePicture: freezed == profilePicture ? _self.profilePicture : profilePicture // ignore: cast_nullable_to_non_nullable
 as String?,
   ));
 }
@@ -1004,10 +1004,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String username,  String? avatar)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String name,  String? profilePicture)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _PeerInfo() when $default != null:
-return $default(_that.id,_that.username,_that.avatar);case _:
+return $default(_that.id,_that.name,_that.profilePicture);case _:
   return orElse();
 
 }
@@ -1025,10 +1025,10 @@ return $default(_that.id,_that.username,_that.avatar);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String username,  String? avatar)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String name,  String? profilePicture)  $default,) {final _that = this;
 switch (_that) {
 case _PeerInfo():
-return $default(_that.id,_that.username,_that.avatar);}
+return $default(_that.id,_that.name,_that.profilePicture);}
 }
 /// A variant of `when` that fallback to returning `null`
 ///
@@ -1042,10 +1042,10 @@ return $default(_that.id,_that.username,_that.avatar);}
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String username,  String? avatar)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String name,  String? profilePicture)?  $default,) {final _that = this;
 switch (_that) {
 case _PeerInfo() when $default != null:
-return $default(_that.id,_that.username,_that.avatar);case _:
+return $default(_that.id,_that.name,_that.profilePicture);case _:
   return null;
 
 }
@@ -1057,12 +1057,12 @@ return $default(_that.id,_that.username,_that.avatar);case _:
 @JsonSerializable()
 
 class _PeerInfo implements PeerInfo {
-  const _PeerInfo({required this.id, required this.username, this.avatar});
+  const _PeerInfo({required this.id, required this.name, this.profilePicture});
   factory _PeerInfo.fromJson(Map<String, dynamic> json) => _$PeerInfoFromJson(json);
 
 @override final  String id;
-@override final  String username;
-@override final  String? avatar;
+@override final  String name;
+@override final  String? profilePicture;
 
 /// Create a copy of PeerInfo
 /// with the given fields replaced by the non-null parameter values.
@@ -1077,16 +1077,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _PeerInfo&&(identical(other.id, id) || other.id == id)&&(identical(other.username, username) || other.username == username)&&(identical(other.avatar, avatar) || other.avatar == avatar));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _PeerInfo&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.profilePicture, profilePicture) || other.profilePicture == profilePicture));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,username,avatar);
+int get hashCode => Object.hash(runtimeType,id,name,profilePicture);
 
 @override
 String toString() {
-  return 'PeerInfo(id: $id, username: $username, avatar: $avatar)';
+  return 'PeerInfo(id: $id, name: $name, profilePicture: $profilePicture)';
 }
 
 
@@ -1097,7 +1097,7 @@ abstract mixin class _$PeerInfoCopyWith<$Res> implements $PeerInfoCopyWith<$Res>
   factory _$PeerInfoCopyWith(_PeerInfo value, $Res Function(_PeerInfo) _then) = __$PeerInfoCopyWithImpl;
 @override @useResult
 $Res call({
- String id, String username, String? avatar
+ String id, String name, String? profilePicture
 });
 
 
@@ -1114,11 +1114,11 @@ class __$PeerInfoCopyWithImpl<$Res>
 
 /// Create a copy of PeerInfo
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? username = null,Object? avatar = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? name = null,Object? profilePicture = freezed,}) {
   return _then(_PeerInfo(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
-as String,username: null == username ? _self.username : username // ignore: cast_nullable_to_non_nullable
-as String,avatar: freezed == avatar ? _self.avatar : avatar // ignore: cast_nullable_to_non_nullable
+as String,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
+as String,profilePicture: freezed == profilePicture ? _self.profilePicture : profilePicture // ignore: cast_nullable_to_non_nullable
 as String?,
   ));
 }

@@ -380,7 +380,7 @@ class PlaceholderMainScreen extends ConsumerWidget {
               ),
               const SizedBox(height: 24),
               Text(
-                'Welcome, ${user?.username ?? 'User'}!',
+                'Welcome, ${user?.name ?? 'User'}!',
                 style: Theme.of(context).textTheme.headlineMedium,
                 textAlign: TextAlign.center,
               ),

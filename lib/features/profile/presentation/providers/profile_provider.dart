@@ -36,9 +36,9 @@ class ProfileActions {
     return await _userRepository.getCurrentUser();
   }
 
-  /// Update username
-  Future<User> updateUsername(String username) async {
-    final request = UpdateProfileRequest(username: username);
+  /// Update display name
+  Future<User> updateName(String name) async {
+    final request = UpdateProfileRequest(name: name);
     final updatedUser = await _userRepository.updateProfile(request);
     // Invalidate profile data to refetch
     _ref.invalidate(profileDataProvider);
@@ -54,11 +54,10 @@ class ProfileActions {
     return updatedUser;
   }
 
-  /// Upload avatar
-  Future<User> uploadAvatar(String filePath) async {
-    final avatarUrl = await _userRepository.uploadAvatar(filePath);
-    // Update profile with new avatar URL
-    final request = UpdateProfileRequest(avatar: avatarUrl);
+  /// Upload profile picture
+  Future<User> uploadProfilePicture(String filePath) async {
+    final url = await _userRepository.uploadProfilePicture(filePath);
+    final request = UpdateProfileRequest(profilePicture: url);
     final updatedUser = await _userRepository.updateProfile(request);
     // Invalidate profile data to refetch
     _ref.invalidate(profileDataProvider);

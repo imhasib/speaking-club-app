@@ -42,10 +42,10 @@ sealed class AuthUser with _$AuthUser {
   const factory AuthUser({
     @JsonKey(name: '_id')
     required String id,
-    required String username,
+    required String name,
     required String email,
     String? mobileNumber,
-    @JsonKey(name: 'profilePicture') String? avatar,
+    String? profilePicture,
   }) = _AuthUser;
 
   factory AuthUser.fromJson(Map<String, dynamic> json) =>

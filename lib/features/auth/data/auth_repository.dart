@@ -72,26 +72,26 @@ class AuthRepository {
   }
 
   /// Parse auth response tolerating both wrapped ({data: {...}}) and flat
-  /// ({user, tokens}) shapes, and user id/name field variants.
+  /// ({user, tokens}) shapes. Auth-side payloads use `id` while the rest of
+  /// the app expects `_id`, so we normalize that one field.
   AuthResponse _parseAuthResponse(dynamic data) {
     final raw = data as Map<String, dynamic>;
     final payload = (raw['data'] is Map<String, dynamic>)
         ? raw['data'] as Map<String, dynamic>
         : raw;
 
-    final userJson = payload['user'] as Map<String, dynamic>;
+    final userJson = Map<String, dynamic>.from(
+      payload['user'] as Map<String, dynamic>,
+    );
+    if (userJson['_id'] == null && userJson['id'] != null) {
+      userJson['_id'] = userJson['id'];
+    }
     final tokensJson = payload['tokens'] as Map<String, dynamic>;
 
     return AuthResponse(
       accessToken: tokensJson['accessToken'] as String,
       refreshToken: tokensJson['refreshToken'] as String,
-      user: AuthUser(
-        id: (userJson['id'] ?? userJson['_id']) as String,
-        username: (userJson['name'] ?? userJson['username']) as String,
-        email: userJson['email'] as String,
-        mobileNumber: userJson['mobileNumber'] as String?,
-        avatar: (userJson['profilePicture'] ?? userJson['avatar']) as String?,
-      ),
+      user: AuthUser.fromJson(userJson),
     );
   }
 
@@ -177,9 +177,15 @@ class AuthRepository {
     try {
       final response = await _dio.get(ApiEndpoints.me);
       final raw = response.data as Map<String, dynamic>;
-      final payload = raw['data'] is Map<String, dynamic>
-          ? raw['data'] as Map<String, dynamic>
-          : raw;
+      final payload = Map<String, dynamic>.from(
+        raw['data'] is Map<String, dynamic>
+            ? raw['data'] as Map<String, dynamic>
+            : raw,
+      );
+      // Some endpoints return `id` instead of `_id`; normalize to `_id`.
+      if (payload['_id'] == null && payload['id'] != null) {
+        payload['_id'] = payload['id'];
+      }
       return User.fromJson(payload);
     } on DioException catch (e) {
       throw e.error ?? e;

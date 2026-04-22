@@ -6,61 +6,61 @@ void main() {
     test('creates online user with required fields', () {
       const user = OnlineUser(
         id: '123',
-        username: 'testuser',
+        name: 'testuser',
         status: UserStatus.online,
       );
 
       expect(user.id, '123');
-      expect(user.username, 'testuser');
+      expect(user.name, 'testuser');
       expect(user.status, UserStatus.online);
-      expect(user.avatar, isNull);
+      expect(user.profilePicture, isNull);
     });
 
     test('creates online user with all fields', () {
       const user = OnlineUser(
         id: '123',
-        username: 'testuser',
+        name: 'testuser',
         status: UserStatus.online,
-        avatar: 'https://example.com/avatar.jpg',
+        profilePicture: 'https://example.com/pic.jpg',
       );
 
-      expect(user.avatar, 'https://example.com/avatar.jpg');
+      expect(user.profilePicture, 'https://example.com/pic.jpg');
     });
 
     test('fromJson creates online user correctly', () {
       final json = {
         'id': '123',
-        'username': 'testuser',
+        'name': 'testuser',
         'status': 'ONLINE',
-        'avatar': 'https://example.com/avatar.jpg',
+        'profilePicture': 'https://example.com/pic.jpg',
       };
 
       final user = OnlineUser.fromJson(json);
 
       expect(user.id, '123');
-      expect(user.username, 'testuser');
+      expect(user.name, 'testuser');
       expect(user.status, UserStatus.online);
-      expect(user.avatar, 'https://example.com/avatar.jpg');
+      expect(user.profilePicture, 'https://example.com/pic.jpg');
     });
 
     test('toJson converts online user correctly', () {
       const user = OnlineUser(
         id: '123',
-        username: 'testuser',
+        name: 'testuser',
         status: UserStatus.online,
       );
 
       final json = user.toJson();
 
       expect(json['id'], '123');
-      expect(json['username'], 'testuser');
+      expect(json['name'], 'testuser');
       expect(json['status'], 'ONLINE');
     });
 
     test('copyWith creates new user with updated fields', () {
       const user = OnlineUser(
         id: '123',
-        username: 'testuser',
+        name: 'testuser',
         status: UserStatus.online,
       );
 

@@ -169,7 +169,7 @@ class _WaitingScreenState extends ConsumerState<WaitingScreen>
 
               Text(
                 isDirectCall
-                    ? 'Calling ${callState.peerInfo?.username ?? 'user'}...'
+                    ? 'Calling ${callState.peerInfo?.name ?? 'user'}...'
                     : 'Finding someone to talk to...',
                 style: Theme.of(context).textTheme.titleLarge?.copyWith(
                       fontWeight: FontWeight.w500,

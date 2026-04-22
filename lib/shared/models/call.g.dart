@@ -52,15 +52,15 @@ const _$CallTypeEnumMap = {
 _CallParticipant _$CallParticipantFromJson(Map<String, dynamic> json) =>
     _CallParticipant(
       id: json['_id'] as String,
-      username: json['username'] as String,
-      avatar: json['avatar'] as String?,
+      name: json['name'] as String,
+      profilePicture: json['profilePicture'] as String?,
     );
 
 Map<String, dynamic> _$CallParticipantToJson(_CallParticipant instance) =>
     <String, dynamic>{
       '_id': instance.id,
-      'username': instance.username,
-      'avatar': instance.avatar,
+      'name': instance.name,
+      'profilePicture': instance.profilePicture,
     };
 
 _MatchmakingResult _$MatchmakingResultFromJson(Map<String, dynamic> json) =>
@@ -83,14 +83,14 @@ Map<String, dynamic> _$MatchmakingResultToJson(_MatchmakingResult instance) =>
 
 _PeerInfo _$PeerInfoFromJson(Map<String, dynamic> json) => _PeerInfo(
   id: json['id'] as String,
-  username: json['username'] as String,
-  avatar: json['avatar'] as String?,
+  name: json['name'] as String,
+  profilePicture: json['profilePicture'] as String?,
 );
 
 Map<String, dynamic> _$PeerInfoToJson(_PeerInfo instance) => <String, dynamic>{
   'id': instance.id,
-  'username': instance.username,
-  'avatar': instance.avatar,
+  'name': instance.name,
+  'profilePicture': instance.profilePicture,
 };
 
 _IncomingCall _$IncomingCallFromJson(Map<String, dynamic> json) =>

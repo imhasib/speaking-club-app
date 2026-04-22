@@ -47,12 +47,12 @@ class UserRepository {
     return inner is Map<String, dynamic> ? inner : map;
   }
 
-  /// Upload avatar image
+  /// Upload profile picture image
   /// Note: Backend endpoint not yet implemented
-  Future<String> uploadAvatar(String filePath) async {
+  Future<String> uploadProfilePicture(String filePath) async {
     try {
       final formData = FormData.fromMap({
-        'avatar': await MultipartFile.fromFile(filePath),
+        'profilePicture': await MultipartFile.fromFile(filePath),
       });
 
       final response = await _dio.post(

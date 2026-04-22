@@ -70,7 +70,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     if (!_formKey.currentState!.validate()) return;
 
     final message = await ref.read(authProvider.notifier).register(
-          username: _usernameController.text.trim(),
+          name: _usernameController.text.trim(),
           email: _emailController.text.trim(),
           mobileNumber: _fullPhoneNumber,
           password: _passwordController.text,

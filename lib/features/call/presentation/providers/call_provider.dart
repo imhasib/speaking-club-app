@@ -73,7 +73,7 @@ class CallNotifier extends Notifier<CallState> {
   // === Socket Event Handlers ===
 
   void _onMatchmakingMatched(MatchmakingResult result) async {
-    dev.log('Call: Matched with ${result.peerInfo.username}');
+    dev.log('Call: Matched with ${result.peerInfo.name}');
 
     // Notify matchmaking provider
     ref.read(matchmakingProvider.notifier).onMatchFound();
@@ -106,7 +106,7 @@ class CallNotifier extends Notifier<CallState> {
   }
 
   void _onIncomingCall(IncomingCall incoming) {
-    dev.log('Call: Incoming call from ${incoming.callerInfo.username}');
+    dev.log('Call: Incoming call from ${incoming.callerInfo.name}');
 
     state = state.copyWith(
       phase: CallPhase.incoming,
@@ -119,7 +119,7 @@ class CallNotifier extends Notifier<CallState> {
   }
 
   void _onCallAccepted(CallAccepted accepted) async {
-    dev.log('Call: Call accepted by ${accepted.recipientInfo.username}');
+    dev.log('Call: Call accepted by ${accepted.recipientInfo.name}');
 
     state = state.copyWith(
       phase: CallPhase.connecting,
@@ -244,7 +244,7 @@ class CallNotifier extends Notifier<CallState> {
 
   /// Initiate a direct call to a user
   Future<void> initiateCall(String targetUserId, PeerInfo peerInfo) async {
-    dev.log('Call: Initiating call to ${peerInfo.username}');
+    dev.log('Call: Initiating call to ${peerInfo.name}');
 
     state = state.copyWith(
       phase: CallPhase.initiating,

@@ -42,12 +42,12 @@ class CallHistoryItem extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Username and call type
+                    // Name and call type
                     Row(
                       children: [
                         Expanded(
                           child: Text(
-                            otherParticipant?.username ?? 'Unknown',
+                            otherParticipant?.name ?? 'Unknown',
                             style: textTheme.bodyLarge?.copyWith(
                               fontWeight: FontWeight.w500,
                             ),
@@ -106,10 +106,10 @@ class CallHistoryItem extends StatelessWidget {
     return CircleAvatar(
       radius: 24,
       backgroundColor: colorScheme.surfaceContainerHighest,
-      child: participant?.avatar != null && participant!.avatar!.isNotEmpty
+      child: participant?.profilePicture != null && participant!.profilePicture!.isNotEmpty
           ? ClipOval(
               child: CachedNetworkImage(
-                imageUrl: participant.avatar!,
+                imageUrl: participant.profilePicture!,
                 width: 48,
                 height: 48,
                 fit: BoxFit.cover,

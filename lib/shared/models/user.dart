@@ -10,7 +10,7 @@ sealed class User with _$User {
     required String id,
     required String name,
     required String email,
-    String? mobileNumber,
+    @JsonKey(name: 'mobile') String? mobileNumber,
     String? profilePicture,
     required DateTime createdAt,
     required DateTime updatedAt,
@@ -49,13 +49,15 @@ sealed class LoginRequest with _$LoginRequest {
       _$LoginRequestFromJson(json);
 }
 
-/// Request model for profile update
-@freezed
+/// Request model for profile update.
+///
+/// Null fields are omitted so a partial update doesn't overwrite unrelated fields.
+@Freezed(toJson: true)
 sealed class UpdateProfileRequest with _$UpdateProfileRequest {
   const factory UpdateProfileRequest({
-    String? name,
-    String? profilePicture,
-    String? mobileNumber,
+    @JsonKey(includeIfNull: false) String? name,
+    @JsonKey(includeIfNull: false) String? profilePicture,
+    @JsonKey(name: 'mobile', includeIfNull: false) String? mobileNumber,
   }) = _UpdateProfileRequest;
 
   factory UpdateProfileRequest.fromJson(Map<String, dynamic> json) =>

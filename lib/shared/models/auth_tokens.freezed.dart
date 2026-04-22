@@ -556,7 +556,7 @@ $AuthUserCopyWith<$Res> get user {
 /// @nodoc
 mixin _$AuthUser {
 
- String get id; String get name; String get email; String? get mobileNumber; String? get profilePicture;
+ String get id; String get name; String get email;@JsonKey(name: 'mobile') String? get mobileNumber; String? get profilePicture;
 /// Create a copy of AuthUser
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -589,7 +589,7 @@ abstract mixin class $AuthUserCopyWith<$Res>  {
   factory $AuthUserCopyWith(AuthUser value, $Res Function(AuthUser) _then) = _$AuthUserCopyWithImpl;
 @useResult
 $Res call({
- String id, String name, String email, String? mobileNumber, String? profilePicture
+ String id, String name, String email,@JsonKey(name: 'mobile') String? mobileNumber, String? profilePicture
 });
 
 
@@ -695,7 +695,7 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String name,  String email,  String? mobileNumber,  String? profilePicture)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String name,  String email, @JsonKey(name: 'mobile')  String? mobileNumber,  String? profilePicture)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _AuthUser() when $default != null:
 return $default(_that.id,_that.name,_that.email,_that.mobileNumber,_that.profilePicture);case _:
@@ -716,7 +716,7 @@ return $default(_that.id,_that.name,_that.email,_that.mobileNumber,_that.profile
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String name,  String email,  String? mobileNumber,  String? profilePicture)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String name,  String email, @JsonKey(name: 'mobile')  String? mobileNumber,  String? profilePicture)  $default,) {final _that = this;
 switch (_that) {
 case _AuthUser():
 return $default(_that.id,_that.name,_that.email,_that.mobileNumber,_that.profilePicture);}
@@ -733,7 +733,7 @@ return $default(_that.id,_that.name,_that.email,_that.mobileNumber,_that.profile
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String name,  String email,  String? mobileNumber,  String? profilePicture)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String name,  String email, @JsonKey(name: 'mobile')  String? mobileNumber,  String? profilePicture)?  $default,) {final _that = this;
 switch (_that) {
 case _AuthUser() when $default != null:
 return $default(_that.id,_that.name,_that.email,_that.mobileNumber,_that.profilePicture);case _:
@@ -748,13 +748,13 @@ return $default(_that.id,_that.name,_that.email,_that.mobileNumber,_that.profile
 @JsonSerializable()
 
 class _AuthUser implements AuthUser {
-  const _AuthUser({required this.id, required this.name, required this.email, this.mobileNumber, this.profilePicture});
+  const _AuthUser({required this.id, required this.name, required this.email, @JsonKey(name: 'mobile') this.mobileNumber, this.profilePicture});
   factory _AuthUser.fromJson(Map<String, dynamic> json) => _$AuthUserFromJson(json);
 
 @override final  String id;
 @override final  String name;
 @override final  String email;
-@override final  String? mobileNumber;
+@override@JsonKey(name: 'mobile') final  String? mobileNumber;
 @override final  String? profilePicture;
 
 /// Create a copy of AuthUser
@@ -790,7 +790,7 @@ abstract mixin class _$AuthUserCopyWith<$Res> implements $AuthUserCopyWith<$Res>
   factory _$AuthUserCopyWith(_AuthUser value, $Res Function(_AuthUser) _then) = __$AuthUserCopyWithImpl;
 @override @useResult
 $Res call({
- String id, String name, String email, String? mobileNumber, String? profilePicture
+ String id, String name, String email,@JsonKey(name: 'mobile') String? mobileNumber, String? profilePicture
 });
 
 

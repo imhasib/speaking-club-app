@@ -10,7 +10,7 @@ _User _$UserFromJson(Map<String, dynamic> json) => _User(
   id: json['id'] as String,
   name: json['name'] as String,
   email: json['email'] as String,
-  mobileNumber: json['mobileNumber'] as String?,
+  mobileNumber: json['mobile'] as String?,
   profilePicture: json['profilePicture'] as String?,
   createdAt: DateTime.parse(json['createdAt'] as String),
   updatedAt: DateTime.parse(json['updatedAt'] as String),
@@ -20,7 +20,7 @@ Map<String, dynamic> _$UserToJson(_User instance) => <String, dynamic>{
   'id': instance.id,
   'name': instance.name,
   'email': instance.email,
-  'mobileNumber': instance.mobileNumber,
+  'mobile': instance.mobileNumber,
   'profilePicture': instance.profilePicture,
   'createdAt': instance.createdAt.toIso8601String(),
   'updatedAt': instance.updatedAt.toIso8601String(),
@@ -58,13 +58,13 @@ _UpdateProfileRequest _$UpdateProfileRequestFromJson(
 ) => _UpdateProfileRequest(
   name: json['name'] as String?,
   profilePicture: json['profilePicture'] as String?,
-  mobileNumber: json['mobileNumber'] as String?,
+  mobileNumber: json['mobile'] as String?,
 );
 
 Map<String, dynamic> _$UpdateProfileRequestToJson(
   _UpdateProfileRequest instance,
 ) => <String, dynamic>{
-  'name': instance.name,
-  'profilePicture': instance.profilePicture,
-  'mobileNumber': instance.mobileNumber,
+  'name': ?instance.name,
+  'profilePicture': ?instance.profilePicture,
+  'mobile': ?instance.mobileNumber,
 };

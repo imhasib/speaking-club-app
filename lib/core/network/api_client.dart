@@ -206,10 +206,15 @@ class ErrorInterceptor extends Interceptor {
         final data = err.response?.data;
         String message = 'An error occurred';
         String? code;
+        Map<String, dynamic>? errorBody;
 
         if (data is Map<String, dynamic>) {
-          message = data['message'] ?? message;
-          code = data['code']?.toString();
+          // Server wraps errors as { "error": { "message": "...", "code": "..." } }.
+          // Tolerate a flat { "message": "..." } shape too.
+          final inner = data['error'];
+          errorBody = inner is Map<String, dynamic> ? inner : data;
+          message = (errorBody['message'] as String?) ?? message;
+          code = errorBody['code']?.toString();
         }
 
         if (statusCode == 401) {
@@ -220,8 +225,8 @@ class ErrorInterceptor extends Interceptor {
           );
         } else if (statusCode == 422 || statusCode == 400) {
           Map<String, List<String>>? fieldErrors;
-          if (data is Map<String, dynamic> && data['errors'] != null) {
-            fieldErrors = (data['errors'] as Map<String, dynamic>).map(
+          if (errorBody != null && errorBody['errors'] != null) {
+            fieldErrors = (errorBody['errors'] as Map<String, dynamic>).map(
               (key, value) => MapEntry(
                 key,
                 (value as List).map((e) => e.toString()).toList(),

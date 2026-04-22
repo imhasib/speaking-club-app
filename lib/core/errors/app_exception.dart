@@ -11,7 +11,7 @@ sealed class AppException implements Exception {
   });
 
   @override
-  String toString() => 'AppException: $message (code: $code)';
+  String toString() => message;
 }
 
 /// Network-related exceptions

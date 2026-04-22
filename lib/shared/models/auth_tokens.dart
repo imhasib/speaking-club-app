@@ -43,7 +43,7 @@ sealed class AuthUser with _$AuthUser {
     required String id,
     required String name,
     required String email,
-    String? mobileNumber,
+    @JsonKey(name: 'mobile') String? mobileNumber,
     String? profilePicture,
   }) = _AuthUser;
 

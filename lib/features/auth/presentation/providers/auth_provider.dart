@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/errors/app_exception.dart';
 import '../../../../shared/models/auth_tokens.dart';
 import '../../../../shared/models/user.dart';
+import '../../../profile/presentation/providers/profile_provider.dart';
 import '../../data/auth_repository.dart';
 import '../../data/google_auth_service.dart';
 import '../../domain/auth_state.dart';
@@ -112,6 +113,7 @@ class AuthNotifier extends Notifier<AuthState> {
         ),
       );
 
+      ref.invalidate(profileDataProvider);
       state = AuthState.authenticated(user: response.user);
       return true;
     } on UnauthorizedException {
@@ -143,6 +145,7 @@ class AuthNotifier extends Notifier<AuthState> {
       final idToken = await _googleAuthService.signIn();
       final response = await _authRepository.googleLogin(idToken);
 
+      ref.invalidate(profileDataProvider);
       state = AuthState.authenticated(user: response.user);
       return true;
     } on AuthException catch (e) {
@@ -176,6 +179,7 @@ class AuthNotifier extends Notifier<AuthState> {
       await _googleAuthService.signOut();
       await _authRepository.logout();
     } finally {
+      ref.invalidate(profileDataProvider);
       state = const AuthState.unauthenticated();
     }
   }

@@ -29,13 +29,15 @@ sealed class User with _$User {
   }
 }
 
-/// Request model for user registration
+/// Request model for user registration.
+///
+/// Serializes to the backend contract: `{ name, email, mobile, password }`.
 @Freezed(toJson: true)
 sealed class RegisterRequest with _$RegisterRequest {
   const factory RegisterRequest({
-    required String username,
+    @JsonKey(name: 'name') required String username,
     required String email,
-    required String mobileNumber,
+    @JsonKey(name: 'mobile') required String mobileNumber,
     required String password,
     @JsonKey(name: 'profilePicture', includeIfNull: false)
     String? avatar,

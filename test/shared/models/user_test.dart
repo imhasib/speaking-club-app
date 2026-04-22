@@ -133,9 +133,10 @@ void main() {
 
       final json = request.toJson();
 
-      expect(json['username'], 'newuser');
+      expect(json['name'], 'newuser');
       expect(json['email'], 'new@example.com');
       expect(json['password'], 'password123');
+      expect(json['mobile'], '+1234567890');
     });
   });
 

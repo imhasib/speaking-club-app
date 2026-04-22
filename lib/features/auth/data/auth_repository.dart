@@ -32,17 +32,17 @@ class AuthRepository {
   })  : _dio = dio,
         _secureStorage = secureStorage;
 
-  /// Register a new user with email and password
-  Future<AuthResponse> register(RegisterRequest request) async {
+  /// Register a new user with email and password.
+  ///
+  /// The backend does not issue tokens on registration — the caller is
+  /// expected to follow up with a login call. This method returns normally
+  /// on HTTP 2xx and throws on error.
+  Future<void> register(RegisterRequest request) async {
     try {
-      final response = await _dio.post(
+      await _dio.post(
         ApiEndpoints.register,
         data: request.toJson(),
       );
-
-      final authResponse = _parseAuthResponse(response.data);
-      await _saveTokens(authResponse.tokens);
-      return authResponse;
     } on DioException catch (e) {
       throw e.error ?? e;
     }

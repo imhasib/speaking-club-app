@@ -12,6 +12,10 @@ import '../widgets/social_auth_button.dart';
 /// Registration screen
 class RegisterScreen extends ConsumerStatefulWidget {
   final VoidCallback onLoginTap;
+
+  /// Called after Google sign-in completes (which authenticates immediately).
+  /// Email/password registration does not issue a session — the user is
+  /// routed to the login screen instead via [onLoginTap].
   final VoidCallback onSuccess;
 
   const RegisterScreen({
@@ -66,9 +70,14 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
           password: _passwordController.text,
         );
 
-    if (success && mounted) {
-      widget.onSuccess();
-    }
+    if (!success || !mounted) return;
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Account created. Please log in to continue.'),
+      ),
+    );
+    widget.onLoginTap();
   }
 
   Future<void> _googleLogin() async {

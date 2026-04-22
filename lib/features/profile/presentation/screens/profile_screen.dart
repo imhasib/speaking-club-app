@@ -86,7 +86,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
 
       if (mounted) {
         // Close loading dialog
-        Navigator.of(context).pop();
+        Navigator.of(context, rootNavigator: true).pop();
 
         // Update auth state
         ref.read(authProvider.notifier).updateUser(_toAuthUser(updatedUser));
@@ -98,7 +98,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     } catch (e) {
       if (mounted) {
         // Close loading dialog
-        Navigator.of(context).pop();
+        Navigator.of(context, rootNavigator: true).pop();
 
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Failed to upload avatar: $e')),

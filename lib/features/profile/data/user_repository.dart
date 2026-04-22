@@ -52,7 +52,7 @@ class UserRepository {
   Future<String> uploadProfilePicture(String filePath) async {
     try {
       final formData = FormData.fromMap({
-        'profilePicture': await MultipartFile.fromFile(filePath),
+        'image': await MultipartFile.fromFile(filePath),
       });
 
       final response = await _dio.post(

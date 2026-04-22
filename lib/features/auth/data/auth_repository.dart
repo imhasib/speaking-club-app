@@ -147,7 +147,13 @@ class AuthRepository {
   /// Logout current user
   Future<void> logout() async {
     try {
-      await _dio.post(ApiEndpoints.logout);
+      final refreshToken = await _secureStorage.read(
+        key: AppConstants.refreshTokenKey,
+      );
+      await _dio.post(
+        ApiEndpoints.logout,
+        data: {'refreshToken': refreshToken ?? ''},
+      );
     } catch (_) {
       // Ignore logout API errors
     } finally {

@@ -72,20 +72,14 @@ class AuthRepository {
   }
 
   /// Parse auth response tolerating both wrapped ({data: {...}}) and flat
-  /// ({user, tokens}) shapes. Auth-side payloads use `id` while the rest of
-  /// the app expects `_id`, so we normalize that one field.
+  /// ({user, tokens}) shapes.
   AuthResponse _parseAuthResponse(dynamic data) {
     final raw = data as Map<String, dynamic>;
     final payload = (raw['data'] is Map<String, dynamic>)
         ? raw['data'] as Map<String, dynamic>
         : raw;
 
-    final userJson = Map<String, dynamic>.from(
-      payload['user'] as Map<String, dynamic>,
-    );
-    if (userJson['_id'] == null && userJson['id'] != null) {
-      userJson['_id'] = userJson['id'];
-    }
+    final userJson = payload['user'] as Map<String, dynamic>;
     final tokensJson = payload['tokens'] as Map<String, dynamic>;
 
     return AuthResponse(
@@ -177,15 +171,9 @@ class AuthRepository {
     try {
       final response = await _dio.get(ApiEndpoints.me);
       final raw = response.data as Map<String, dynamic>;
-      final payload = Map<String, dynamic>.from(
-        raw['data'] is Map<String, dynamic>
-            ? raw['data'] as Map<String, dynamic>
-            : raw,
-      );
-      // Some endpoints return `id` instead of `_id`; normalize to `_id`.
-      if (payload['_id'] == null && payload['id'] != null) {
-        payload['_id'] = payload['id'];
-      }
+      final payload = raw['data'] is Map<String, dynamic>
+          ? raw['data'] as Map<String, dynamic>
+          : raw;
       return User.fromJson(payload);
     } on DioException catch (e) {
       throw e.error ?? e;

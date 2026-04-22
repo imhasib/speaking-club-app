@@ -41,7 +41,7 @@ sealed class Call with _$Call {
   const Call._();
 
   const factory Call({
-    @JsonKey(name: '_id') required String id,
+    required String id,
     required List<CallParticipant> participants,
     required CallParticipant initiatedBy,
     required DateTime startedAt,
@@ -83,7 +83,7 @@ sealed class Call with _$Call {
 @freezed
 sealed class CallParticipant with _$CallParticipant {
   const factory CallParticipant({
-    @JsonKey(name: '_id') required String id,
+    required String id,
     required String name,
     String? profilePicture,
   }) = _CallParticipant;

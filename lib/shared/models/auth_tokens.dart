@@ -40,7 +40,6 @@ sealed class AuthResponse with _$AuthResponse {
 @freezed
 sealed class AuthUser with _$AuthUser {
   const factory AuthUser({
-    @JsonKey(name: '_id')
     required String id,
     required String name,
     required String email,

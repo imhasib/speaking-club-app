@@ -7,7 +7,7 @@ part 'user.g.dart';
 @freezed
 sealed class User with _$User {
   const factory User({
-    @JsonKey(name: '_id') required String id,
+    required String id,
     required String name,
     required String email,
     String? mobileNumber,

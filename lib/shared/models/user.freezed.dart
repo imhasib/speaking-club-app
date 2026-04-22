@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$User {
 
-@JsonKey(name: '_id') String get id; String get name; String get email; String? get mobileNumber; String? get profilePicture; DateTime get createdAt; DateTime get updatedAt;
+ String get id; String get name; String get email; String? get mobileNumber; String? get profilePicture; DateTime get createdAt; DateTime get updatedAt;
 /// Create a copy of User
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -48,7 +48,7 @@ abstract mixin class $UserCopyWith<$Res>  {
   factory $UserCopyWith(User value, $Res Function(User) _then) = _$UserCopyWithImpl;
 @useResult
 $Res call({
-@JsonKey(name: '_id') String id, String name, String email, String? mobileNumber, String? profilePicture, DateTime createdAt, DateTime updatedAt
+ String id, String name, String email, String? mobileNumber, String? profilePicture, DateTime createdAt, DateTime updatedAt
 });
 
 
@@ -156,7 +156,7 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function(@JsonKey(name: '_id')  String id,  String name,  String email,  String? mobileNumber,  String? profilePicture,  DateTime createdAt,  DateTime updatedAt)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String name,  String email,  String? mobileNumber,  String? profilePicture,  DateTime createdAt,  DateTime updatedAt)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _User() when $default != null:
 return $default(_that.id,_that.name,_that.email,_that.mobileNumber,_that.profilePicture,_that.createdAt,_that.updatedAt);case _:
@@ -177,7 +177,7 @@ return $default(_that.id,_that.name,_that.email,_that.mobileNumber,_that.profile
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function(@JsonKey(name: '_id')  String id,  String name,  String email,  String? mobileNumber,  String? profilePicture,  DateTime createdAt,  DateTime updatedAt)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String name,  String email,  String? mobileNumber,  String? profilePicture,  DateTime createdAt,  DateTime updatedAt)  $default,) {final _that = this;
 switch (_that) {
 case _User():
 return $default(_that.id,_that.name,_that.email,_that.mobileNumber,_that.profilePicture,_that.createdAt,_that.updatedAt);}
@@ -194,7 +194,7 @@ return $default(_that.id,_that.name,_that.email,_that.mobileNumber,_that.profile
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function(@JsonKey(name: '_id')  String id,  String name,  String email,  String? mobileNumber,  String? profilePicture,  DateTime createdAt,  DateTime updatedAt)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String name,  String email,  String? mobileNumber,  String? profilePicture,  DateTime createdAt,  DateTime updatedAt)?  $default,) {final _that = this;
 switch (_that) {
 case _User() when $default != null:
 return $default(_that.id,_that.name,_that.email,_that.mobileNumber,_that.profilePicture,_that.createdAt,_that.updatedAt);case _:
@@ -209,10 +209,10 @@ return $default(_that.id,_that.name,_that.email,_that.mobileNumber,_that.profile
 @JsonSerializable()
 
 class _User implements User {
-  const _User({@JsonKey(name: '_id') required this.id, required this.name, required this.email, this.mobileNumber, this.profilePicture, required this.createdAt, required this.updatedAt});
+  const _User({required this.id, required this.name, required this.email, this.mobileNumber, this.profilePicture, required this.createdAt, required this.updatedAt});
   factory _User.fromJson(Map<String, dynamic> json) => _$UserFromJson(json);
 
-@override@JsonKey(name: '_id') final  String id;
+@override final  String id;
 @override final  String name;
 @override final  String email;
 @override final  String? mobileNumber;
@@ -253,7 +253,7 @@ abstract mixin class _$UserCopyWith<$Res> implements $UserCopyWith<$Res> {
   factory _$UserCopyWith(_User value, $Res Function(_User) _then) = __$UserCopyWithImpl;
 @override @useResult
 $Res call({
-@JsonKey(name: '_id') String id, String name, String email, String? mobileNumber, String? profilePicture, DateTime createdAt, DateTime updatedAt
+ String id, String name, String email, String? mobileNumber, String? profilePicture, DateTime createdAt, DateTime updatedAt
 });
 
 

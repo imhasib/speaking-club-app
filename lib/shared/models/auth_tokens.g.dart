@@ -32,7 +32,7 @@ Map<String, dynamic> _$AuthResponseToJson(_AuthResponse instance) =>
     };
 
 _AuthUser _$AuthUserFromJson(Map<String, dynamic> json) => _AuthUser(
-  id: json['_id'] as String,
+  id: json['id'] as String,
   name: json['name'] as String,
   email: json['email'] as String,
   mobileNumber: json['mobileNumber'] as String?,
@@ -40,7 +40,7 @@ _AuthUser _$AuthUserFromJson(Map<String, dynamic> json) => _AuthUser(
 );
 
 Map<String, dynamic> _$AuthUserToJson(_AuthUser instance) => <String, dynamic>{
-  '_id': instance.id,
+  'id': instance.id,
   'name': instance.name,
   'email': instance.email,
   'mobileNumber': instance.mobileNumber,

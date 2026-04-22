@@ -66,7 +66,7 @@ sealed class AiSession with _$AiSession {
   const AiSession._();
 
   const factory AiSession({
-    @JsonKey(name: '_id') required String id,
+    required String id,
     required String odId,
     required DateTime startedAt,
     required DateTime endedAt,

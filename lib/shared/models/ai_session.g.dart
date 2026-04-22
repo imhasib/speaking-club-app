@@ -7,7 +7,7 @@ part of 'ai_session.dart';
 // **************************************************************************
 
 _AiSession _$AiSessionFromJson(Map<String, dynamic> json) => _AiSession(
-  id: json['_id'] as String,
+  id: json['id'] as String,
   odId: json['odId'] as String,
   startedAt: DateTime.parse(json['startedAt'] as String),
   endedAt: DateTime.parse(json['endedAt'] as String),
@@ -29,7 +29,7 @@ _AiSession _$AiSessionFromJson(Map<String, dynamic> json) => _AiSession(
 
 Map<String, dynamic> _$AiSessionToJson(_AiSession instance) =>
     <String, dynamic>{
-      '_id': instance.id,
+      'id': instance.id,
       'odId': instance.odId,
       'startedAt': instance.startedAt.toIso8601String(),
       'endedAt': instance.endedAt.toIso8601String(),

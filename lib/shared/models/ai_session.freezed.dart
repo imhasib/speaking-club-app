@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$AiSession {
 
-@JsonKey(name: '_id') String get id; String get odId; DateTime get startedAt; DateTime get endedAt; int get durationSeconds; AiSessionMode get mode; AiPersona get persona; String? get topic; String? get scenario; List<AiMessage> get messages; List<Correction> get corrections; SessionStats get stats;
+ String get id; String get odId; DateTime get startedAt; DateTime get endedAt; int get durationSeconds; AiSessionMode get mode; AiPersona get persona; String? get topic; String? get scenario; List<AiMessage> get messages; List<Correction> get corrections; SessionStats get stats;
 /// Create a copy of AiSession
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -48,7 +48,7 @@ abstract mixin class $AiSessionCopyWith<$Res>  {
   factory $AiSessionCopyWith(AiSession value, $Res Function(AiSession) _then) = _$AiSessionCopyWithImpl;
 @useResult
 $Res call({
-@JsonKey(name: '_id') String id, String odId, DateTime startedAt, DateTime endedAt, int durationSeconds, AiSessionMode mode, AiPersona persona, String? topic, String? scenario, List<AiMessage> messages, List<Correction> corrections, SessionStats stats
+ String id, String odId, DateTime startedAt, DateTime endedAt, int durationSeconds, AiSessionMode mode, AiPersona persona, String? topic, String? scenario, List<AiMessage> messages, List<Correction> corrections, SessionStats stats
 });
 
 
@@ -170,7 +170,7 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function(@JsonKey(name: '_id')  String id,  String odId,  DateTime startedAt,  DateTime endedAt,  int durationSeconds,  AiSessionMode mode,  AiPersona persona,  String? topic,  String? scenario,  List<AiMessage> messages,  List<Correction> corrections,  SessionStats stats)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String odId,  DateTime startedAt,  DateTime endedAt,  int durationSeconds,  AiSessionMode mode,  AiPersona persona,  String? topic,  String? scenario,  List<AiMessage> messages,  List<Correction> corrections,  SessionStats stats)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _AiSession() when $default != null:
 return $default(_that.id,_that.odId,_that.startedAt,_that.endedAt,_that.durationSeconds,_that.mode,_that.persona,_that.topic,_that.scenario,_that.messages,_that.corrections,_that.stats);case _:
@@ -191,7 +191,7 @@ return $default(_that.id,_that.odId,_that.startedAt,_that.endedAt,_that.duration
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function(@JsonKey(name: '_id')  String id,  String odId,  DateTime startedAt,  DateTime endedAt,  int durationSeconds,  AiSessionMode mode,  AiPersona persona,  String? topic,  String? scenario,  List<AiMessage> messages,  List<Correction> corrections,  SessionStats stats)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String odId,  DateTime startedAt,  DateTime endedAt,  int durationSeconds,  AiSessionMode mode,  AiPersona persona,  String? topic,  String? scenario,  List<AiMessage> messages,  List<Correction> corrections,  SessionStats stats)  $default,) {final _that = this;
 switch (_that) {
 case _AiSession():
 return $default(_that.id,_that.odId,_that.startedAt,_that.endedAt,_that.durationSeconds,_that.mode,_that.persona,_that.topic,_that.scenario,_that.messages,_that.corrections,_that.stats);}
@@ -208,7 +208,7 @@ return $default(_that.id,_that.odId,_that.startedAt,_that.endedAt,_that.duration
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function(@JsonKey(name: '_id')  String id,  String odId,  DateTime startedAt,  DateTime endedAt,  int durationSeconds,  AiSessionMode mode,  AiPersona persona,  String? topic,  String? scenario,  List<AiMessage> messages,  List<Correction> corrections,  SessionStats stats)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String odId,  DateTime startedAt,  DateTime endedAt,  int durationSeconds,  AiSessionMode mode,  AiPersona persona,  String? topic,  String? scenario,  List<AiMessage> messages,  List<Correction> corrections,  SessionStats stats)?  $default,) {final _that = this;
 switch (_that) {
 case _AiSession() when $default != null:
 return $default(_that.id,_that.odId,_that.startedAt,_that.endedAt,_that.durationSeconds,_that.mode,_that.persona,_that.topic,_that.scenario,_that.messages,_that.corrections,_that.stats);case _:
@@ -223,10 +223,10 @@ return $default(_that.id,_that.odId,_that.startedAt,_that.endedAt,_that.duration
 @JsonSerializable()
 
 class _AiSession extends AiSession {
-  const _AiSession({@JsonKey(name: '_id') required this.id, required this.odId, required this.startedAt, required this.endedAt, required this.durationSeconds, required this.mode, this.persona = AiPersona.emma, this.topic, this.scenario, required final  List<AiMessage> messages, required final  List<Correction> corrections, required this.stats}): _messages = messages,_corrections = corrections,super._();
+  const _AiSession({required this.id, required this.odId, required this.startedAt, required this.endedAt, required this.durationSeconds, required this.mode, this.persona = AiPersona.emma, this.topic, this.scenario, required final  List<AiMessage> messages, required final  List<Correction> corrections, required this.stats}): _messages = messages,_corrections = corrections,super._();
   factory _AiSession.fromJson(Map<String, dynamic> json) => _$AiSessionFromJson(json);
 
-@override@JsonKey(name: '_id') final  String id;
+@override final  String id;
 @override final  String odId;
 @override final  DateTime startedAt;
 @override final  DateTime endedAt;
@@ -284,7 +284,7 @@ abstract mixin class _$AiSessionCopyWith<$Res> implements $AiSessionCopyWith<$Re
   factory _$AiSessionCopyWith(_AiSession value, $Res Function(_AiSession) _then) = __$AiSessionCopyWithImpl;
 @override @useResult
 $Res call({
-@JsonKey(name: '_id') String id, String odId, DateTime startedAt, DateTime endedAt, int durationSeconds, AiSessionMode mode, AiPersona persona, String? topic, String? scenario, List<AiMessage> messages, List<Correction> corrections, SessionStats stats
+ String id, String odId, DateTime startedAt, DateTime endedAt, int durationSeconds, AiSessionMode mode, AiPersona persona, String? topic, String? scenario, List<AiMessage> messages, List<Correction> corrections, SessionStats stats
 });
 
 

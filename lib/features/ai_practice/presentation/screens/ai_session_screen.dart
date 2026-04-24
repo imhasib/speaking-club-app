@@ -143,14 +143,16 @@ class _AiSessionScreenState extends ConsumerState<AiSessionScreen>
       if (next.error != null &&
           next.error != previous?.error &&
           !next.sttPersistentError) {
+        // Capture the notifier now — the SnackBar action can fire after
+        // this screen is unmounted (e.g. after navigating to the summary),
+        // at which point `ref` can no longer be used safely.
+        final notifier = ref.read(aiPracticeProvider.notifier);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(next.error!),
             action: SnackBarAction(
               label: 'Dismiss',
-              onPressed: () {
-                ref.read(aiPracticeProvider.notifier).clearError();
-              },
+              onPressed: notifier.clearError,
             ),
           ),
         );

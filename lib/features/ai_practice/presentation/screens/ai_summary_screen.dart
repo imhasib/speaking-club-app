@@ -147,10 +147,12 @@ class AiSummaryScreen extends ConsumerWidget {
               size: 24,
             ),
             const SizedBox(width: 12),
-            Text(
-              'No corrections in this session — nice work!',
-              style: textTheme.bodyLarge?.copyWith(
-                color: AppColors.success,
+            Expanded(
+              child: Text(
+                'No corrections in this session — nice work!',
+                style: textTheme.bodyLarge?.copyWith(
+                  color: AppColors.success,
+                ),
               ),
             ),
           ],

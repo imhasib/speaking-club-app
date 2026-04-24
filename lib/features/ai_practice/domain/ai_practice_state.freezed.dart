@@ -234,7 +234,7 @@ return $default(_that.phase,_that.sessionId,_that.mode,_that.persona,_that.topic
 
 class _AiPracticeState extends AiPracticeState {
   const _AiPracticeState({this.phase = AiPracticePhase.idle, this.sessionId, this.mode = AiSessionMode.freeChat, this.persona = AiPersona.emma, this.topic, this.scenario, this.openAIConnectionState = OpenAIConnectionState.disconnected, this.speechState = SpeechState.idle, this.ttsState = TtsState.idle, final  List<AiMessage> messages = const [], this.currentUserText = '', this.currentAiText = '', this.currentSpeaker = Speaker.none, this.sessionStartTime, this.sessionDurationSeconds = 0, this.remainingDailySeconds = 300, final  List<Correction> corrections = const [], this.wordsSpoken = 0, this.isMuted = false, this.isSpeakerOn = true, this.ttsAvailable = true, this.error, this.sttPersistentError = false}): _messages = messages,_corrections = corrections,super._();
-
+  
 
 @override@JsonKey() final  AiPracticePhase phase;
 // Session info
@@ -571,7 +571,7 @@ return $default(_that.isLoading,_that.topicCategories,_that.scenarios,_that.usag
 
 class _ModeSelectionState implements ModeSelectionState {
   const _ModeSelectionState({this.isLoading = false, final  List<TopicCategory> topicCategories = const [], final  List<Scenario> scenarios = const [], this.usageInfo, this.error}): _topicCategories = topicCategories,_scenarios = scenarios;
-
+  
 
 @override@JsonKey() final  bool isLoading;
  final  List<TopicCategory> _topicCategories;

@@ -64,10 +64,13 @@ class CallHistoryItem extends StatelessWidget {
                       children: [
                         _buildStatusIcon(),
                         const SizedBox(width: 4),
-                        Text(
-                          _formatRelativeTime(call.startedAt),
-                          style: textTheme.bodySmall?.copyWith(
-                            color: colorScheme.onSurfaceVariant,
+                        Flexible(
+                          child: Text(
+                            _formatRelativeTime(call.startedAt),
+                            style: textTheme.bodySmall?.copyWith(
+                              color: colorScheme.onSurfaceVariant,
+                            ),
+                            overflow: TextOverflow.ellipsis,
                           ),
                         ),
                         if (call.status.isCompleted && call.duration != null) ...[
@@ -77,11 +80,14 @@ class CallHistoryItem extends StatelessWidget {
                               color: colorScheme.onSurfaceVariant,
                             ),
                           ),
-                          Text(
-                            call.formattedDuration,
-                            style: textTheme.bodySmall?.copyWith(
-                              color: colorScheme.onSurfaceVariant,
-                              fontWeight: FontWeight.w500,
+                          Flexible(
+                            child: Text(
+                              call.formattedDuration,
+                              style: textTheme.bodySmall?.copyWith(
+                                color: colorScheme.onSurfaceVariant,
+                                fontWeight: FontWeight.w500,
+                              ),
+                              overflow: TextOverflow.ellipsis,
                             ),
                           ),
                         ],

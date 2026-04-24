@@ -175,7 +175,7 @@ class AiSessionRepository {
         ).toJson(),
       );
 
-      return EphemeralKeyResponse.fromJson(response.data['data']);
+      return _parseEphemeralKeyResponse(response.data);
     } on DioException catch (e) {
       throw e.error ?? e;
     }
@@ -189,10 +189,50 @@ class AiSessionRepository {
         data: {'sessionId': sessionId},
       );
 
-      return EphemeralKeyResponse.fromJson(response.data['data']);
+      return _parseEphemeralKeyResponse(
+        response.data,
+        fallbackSessionId: sessionId,
+      );
     } on DioException catch (e) {
       throw e.error ?? e;
     }
+  }
+
+  /// Parse and validate an [EphemeralKeyResponse] from a raw API response map.
+  /// Throws a [FormatException] with a clear message instead of a cryptic
+  /// `type 'Null' is not a subtype of type 'String'` cast error when required
+  /// string fields are absent in the server response.
+  ///
+  /// [fallbackSessionId] supplies a session id when the server omits it —
+  /// the refresh-token endpoint does not echo `sessionId` back because the
+  /// client already provided it in the request.
+  EphemeralKeyResponse _parseEphemeralKeyResponse(
+    dynamic responseBody, {
+    String? fallbackSessionId,
+  }) {
+    final data = responseBody is Map ? responseBody['data'] : null;
+    if (data == null || data is! Map<String, dynamic>) {
+      throw FormatException(
+        'Session token response is missing the "data" field or has unexpected shape',
+      );
+    }
+    final key = data['ephemeralKey'];
+    if (key == null || key is! String) {
+      throw FormatException(
+        'Session token response missing or non-string "ephemeralKey"',
+      );
+    }
+    final sid = data['sessionId'];
+    final normalized = Map<String, dynamic>.from(data);
+    if (sid is! String) {
+      if (fallbackSessionId == null) {
+        throw FormatException(
+          'Session token response missing or non-string "sessionId"',
+        );
+      }
+      normalized['sessionId'] = fallbackSessionId;
+    }
+    return EphemeralKeyResponse.fromJson(normalized);
   }
 
   /// End AI session and save conversation data

@@ -7,7 +7,7 @@ part of 'call.dart';
 // **************************************************************************
 
 _Call _$CallFromJson(Map<String, dynamic> json) => _Call(
-  id: json['id'] as String,
+  id: json['_id'] as String,
   participants: (json['participants'] as List<dynamic>)
       .map((e) => CallParticipant.fromJson(e as Map<String, dynamic>))
       .toList(),
@@ -26,7 +26,7 @@ _Call _$CallFromJson(Map<String, dynamic> json) => _Call(
 );
 
 Map<String, dynamic> _$CallToJson(_Call instance) => <String, dynamic>{
-  'id': instance.id,
+  '_id': instance.id,
   'participants': instance.participants,
   'initiatedBy': instance.initiatedBy,
   'startedAt': instance.startedAt.toIso8601String(),
@@ -51,14 +51,14 @@ const _$CallTypeEnumMap = {
 
 _CallParticipant _$CallParticipantFromJson(Map<String, dynamic> json) =>
     _CallParticipant(
-      id: json['id'] as String,
+      id: json['_id'] as String,
       name: json['name'] as String,
       profilePicture: json['profilePicture'] as String?,
     );
 
 Map<String, dynamic> _$CallParticipantToJson(_CallParticipant instance) =>
     <String, dynamic>{
-      'id': instance.id,
+      '_id': instance.id,
       'name': instance.name,
       'profilePicture': instance.profilePicture,
     };

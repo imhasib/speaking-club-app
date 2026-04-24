@@ -191,7 +191,7 @@ class AiPracticeNotifier extends Notifier<AiPracticeState> {
     final message = AiMessage(
       role: 'assistant',
       content: fullText,
-      timestamp: DateTime.now(),
+      timestamp: DateTime.now().toUtc(),
     );
 
     state = state.copyWith(
@@ -460,7 +460,7 @@ class AiPracticeNotifier extends Notifier<AiPracticeState> {
     final message = AiMessage(
       role: 'user',
       content: text,
-      timestamp: DateTime.now(),
+      timestamp: DateTime.now().toUtc(),
     );
 
     // Count words

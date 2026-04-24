@@ -62,6 +62,28 @@ class StartSessionRequest {
       };
 }
 
+/// Request for POST /api/ai/session/start (called after WebSocket connects)
+class SessionStartRequest {
+  final String sessionId;
+  final AiSessionMode mode;
+  final String? topic;
+  final String? scenario;
+
+  const SessionStartRequest({
+    required this.sessionId,
+    required this.mode,
+    this.topic,
+    this.scenario,
+  });
+
+  Map<String, dynamic> toJson() => {
+        'sessionId': sessionId,
+        'mode': mode.apiValue,
+        if (topic != null) 'topic': topic,
+        if (scenario != null) 'scenario': scenario,
+      };
+}
+
 /// Request for ending an AI session
 class EndSessionRequest {
   final String sessionId;
@@ -92,6 +114,50 @@ class AiSessionRepository {
   final Dio _dio;
 
   AiSessionRepository({required Dio dio}) : _dio = dio;
+
+  /// POST /api/ai/session/start — called after WebSocket connects.
+  /// Returns normally on success; throws on failure (caller ignores errors).
+  Future<void> startSession(SessionStartRequest request) async {
+    try {
+      await _dio.post(
+        ApiEndpoints.aiSessionStart,
+        data: request.toJson(),
+      );
+    } on DioException catch (e) {
+      throw e.error ?? e;
+    }
+  }
+
+  /// GET /api/ai/sessions — paginated history with optional mode filter.
+  Future<PaginatedAiSessionHistory> getSessions({
+    int page = 1,
+    int limit = 20,
+    AiSessionMode? mode,
+  }) async {
+    try {
+      final response = await _dio.get(
+        ApiEndpoints.aiSessions,
+        queryParameters: {
+          'page': page,
+          'limit': limit,
+          if (mode != null) 'mode': mode.apiValue,
+        },
+      );
+      return PaginatedAiSessionHistory.fromApiResponse(response.data);
+    } on DioException catch (e) {
+      throw e.error ?? e;
+    }
+  }
+
+  /// GET /api/ai/sessions/:id — single session detail.
+  Future<AiSession> getSessionById(String id) async {
+    try {
+      final response = await _dio.get(ApiEndpoints.aiSessionDetails(id));
+      return AiSession.fromJson(response.data['data'] as Map<String, dynamic>);
+    } on DioException catch (e) {
+      throw e.error ?? e;
+    }
+  }
 
   /// Request ephemeral key to start a new AI session
   Future<EphemeralKeyResponse> getSessionToken({

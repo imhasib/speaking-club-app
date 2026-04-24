@@ -48,6 +48,16 @@ class Routes {
   static const String aiSummary = '/ai-practice/summary';
   static const String aiSummaryName = 'aiSummary';
 
+  static const String aiHistory = '/ai-practice/history';
+  static const String aiHistoryName = 'aiHistory';
+
+  static const String aiSessionDetail = '/ai-practice/sessions/:sessionId';
+  static const String aiSessionDetailName = 'aiSessionDetail';
+
+  /// Build a concrete path to a session detail page.
+  static String aiSessionDetailPath(String sessionId) =>
+      '/ai-practice/sessions/$sessionId';
+
   // User routes
   static const String userProfile = '/user/:userId';
   static const String userProfileName = 'userProfile';

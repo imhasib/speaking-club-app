@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:developer' as dev;
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 import '../../../../shared/models/ai_session.dart';
 import '../../data/ai_session_repository.dart';
@@ -9,6 +10,7 @@ import '../../data/openai_realtime_service.dart';
 import '../../data/speech_service.dart';
 import '../../data/tts_service.dart';
 import '../../domain/ai_practice_state.dart';
+import 'ai_summary_provider.dart';
 
 /// OpenAI Realtime Service provider
 final openAIServiceProvider = Provider<OpenAIRealtimeService>((ref) {
@@ -48,6 +50,16 @@ class AiPracticeNotifier extends Notifier<AiPracticeState> {
   String? _currentEphemeralKey;
   DateTime? _keyExpiresAt;
 
+  // STT consecutive failure counter (resets on success)
+  int _sttFailureCount = 0;
+  static const int _sttMaxFailures = 3;
+
+  // Whether TTS initialized successfully
+  bool _ttsAvailable = true;
+
+  // Whether a reconnect attempt is in progress
+  bool _reconnecting = false;
+
   @override
   AiPracticeState build() {
     _setupCallbacks();
@@ -64,6 +76,7 @@ class AiPracticeNotifier extends Notifier<AiPracticeState> {
     _openAI.onConnectionStateChange = _onOpenAIConnectionChange;
     _openAI.onTextDelta = _onTextDelta;
     _openAI.onTextComplete = _onTextComplete;
+    _openAI.onCorrectionFound = _onCorrectionFound;
     _openAI.onError = _onOpenAIError;
 
     // Speech callbacks
@@ -99,13 +112,67 @@ class AiPracticeNotifier extends Notifier<AiPracticeState> {
       _startDurationTimer();
       dev.log('AI Practice: Session started, triggering AI greeting');
 
+      // M3: Fire POST /session/start after WebSocket + session.update
+      _postSessionStart();
+
       // Trigger AI to send initial greeting
       _openAI.triggerInitialGreeting();
+    } else if (connectionState == OpenAIConnectionState.disconnected &&
+        state.isActive &&
+        !_reconnecting) {
+      // M7: Mid-session disconnect — attempt one reconnect
+      dev.log('AI Practice: WebSocket disconnected mid-session, attempting reconnect');
+      _attemptReconnect();
     } else if (connectionState == OpenAIConnectionState.error) {
       state = state.copyWith(
         phase: AiPracticePhase.error,
         error: 'Failed to connect to AI',
       );
+    }
+  }
+
+  /// M3: POST /api/ai/session/start — best-effort, never blocks session.
+  Future<void> _postSessionStart() async {
+    if (state.sessionId == null) return;
+    try {
+      await _repository.startSession(SessionStartRequest(
+        sessionId: state.sessionId!,
+        mode: state.mode,
+        topic: state.topic,
+        scenario: state.scenario,
+      ));
+      dev.log('AI Practice: POST /session/start succeeded');
+    } catch (e) {
+      dev.log('AI Practice: POST /session/start failed (non-fatal): $e');
+    }
+  }
+
+  /// M7: Attempt a single reconnect with a fresh ephemeral key.
+  Future<void> _attemptReconnect() async {
+    if (_reconnecting) return;
+    _reconnecting = true;
+
+    try {
+      dev.log('AI Practice: Reconnecting — fetching fresh token');
+      final tokenResponse = await _repository.refreshSessionToken(
+        state.sessionId ?? '',
+      );
+      _currentEphemeralKey = tokenResponse.ephemeralKey;
+      _keyExpiresAt = tokenResponse.expiresAt;
+
+      await _openAI.connect(
+        ephemeralKey: tokenResponse.ephemeralKey,
+        mode: state.mode,
+        topic: state.topic,
+        scenario: state.scenario,
+      );
+      dev.log('AI Practice: Reconnect successful');
+    } catch (e) {
+      dev.log('AI Practice: Reconnect failed: $e — ending session gracefully');
+      // Save partial data and navigate to summary
+      await endSession();
+    } finally {
+      _reconnecting = false;
     }
   }
 
@@ -119,7 +186,8 @@ class AiPracticeNotifier extends Notifier<AiPracticeState> {
   }
 
   void _onTextComplete(String fullText) {
-    // AI response complete, add to messages and speak
+    // AI response complete — fullText is already cleaned (no marker) by the
+    // service layer.  Add to messages and pass to TTS.
     final message = AiMessage(
       role: 'assistant',
       content: fullText,
@@ -131,8 +199,18 @@ class AiPracticeNotifier extends Notifier<AiPracticeState> {
       currentAiText: '',
     );
 
-    // Speak the response
-    _tts.speak(fullText);
+    // M7: Only speak if TTS is available
+    if (_ttsAvailable) {
+      _tts.speak(fullText);
+    }
+  }
+
+  /// M1: Append a correction emitted by the service.
+  void _onCorrectionFound(Correction correction) {
+    dev.log('AI Practice: Correction received: ${correction.original} → ${correction.corrected}');
+    state = state.copyWith(
+      corrections: [...state.corrections, correction],
+    );
   }
 
   void _onOpenAIError(String error) {
@@ -149,18 +227,41 @@ class AiPracticeNotifier extends Notifier<AiPracticeState> {
     );
 
     if (isFinal && text.isNotEmpty) {
+      // Successful recognition — reset failure counter
+      _sttFailureCount = 0;
       // User finished speaking, send to AI
       _sendUserMessage(text);
+    } else if (isFinal && text.isEmpty) {
+      // No speech detected — auto-restart listening
+      dev.log('AI Practice: No speech detected, auto-restarting listener');
+      if (state.isInConversation) {
+        Future.delayed(const Duration(milliseconds: 200), () {
+          if (state.isInConversation) startListening();
+        });
+      }
     }
   }
 
   void _onSpeechError(String error) {
     dev.log('AI Practice: Speech error: $error');
-    state = state.copyWith(
-      phase: AiPracticePhase.ready,
-      speechState: _speech.state,
-      error: error,
-    );
+    _sttFailureCount++;
+
+    if (_sttFailureCount >= _sttMaxFailures) {
+      // M7: Show persistent "Having trouble hearing you" error after 3 failures
+      dev.log('AI Practice: STT failed $_sttFailureCount times — showing persistent error');
+      state = state.copyWith(
+        phase: AiPracticePhase.ready,
+        speechState: _speech.state,
+        error: 'Having trouble hearing you. Please check your microphone and try again.',
+        sttPersistentError: true,
+      );
+    } else {
+      state = state.copyWith(
+        phase: AiPracticePhase.ready,
+        speechState: _speech.state,
+        error: error,
+      );
+    }
   }
 
   void _onListeningStateChange(bool isListening) {
@@ -270,6 +371,9 @@ class AiPracticeNotifier extends Notifier<AiPracticeState> {
 
     dev.log('AI Practice: Starting session - mode: ${mode.name}');
 
+    _sttFailureCount = 0;
+    _reconnecting = false;
+
     state = state.copyWith(
       phase: AiPracticePhase.initializing,
       mode: mode,
@@ -281,13 +385,37 @@ class AiPracticeNotifier extends Notifier<AiPracticeState> {
       currentAiText: '',
       sessionDurationSeconds: 0,
       wordsSpoken: 0,
+      ttsAvailable: true,
+      sttPersistentError: false,
       error: null,
     );
 
     try {
-      // Initialize STT and TTS
+      // M7: Check microphone permission before initialising STT.
+      final micStatus = await Permission.microphone.status;
+      if (micStatus.isDenied || micStatus.isPermanentlyDenied) {
+        final requested = await Permission.microphone.request();
+        if (!requested.isGranted) {
+          state = state.copyWith(
+            phase: AiPracticePhase.error,
+            error: 'microphone_denied',
+          );
+          return;
+        }
+      }
+
+      // Initialize STT
       await _speech.initialize();
-      await _tts.initialize();
+
+      // Initialize TTS — M7: gracefully degrade if it fails
+      try {
+        await _tts.initialize();
+        _ttsAvailable = true;
+      } catch (e) {
+        dev.log('AI Practice: TTS init failed (text-only mode): $e');
+        _ttsAvailable = false;
+        state = state.copyWith(ttsAvailable: false);
+      }
 
       // Request ephemeral key from backend
       state = state.copyWith(phase: AiPracticePhase.requestingToken);
@@ -382,27 +510,49 @@ class AiPracticeNotifier extends Notifier<AiPracticeState> {
     await _tts.stop();
     await _openAI.disconnect();
 
-    // Send session data to backend
-    if (state.sessionId != null) {
-      try {
-        await _repository.endSession(EndSessionRequest(
-          sessionId: state.sessionId!,
-          messages: state.messages,
-          corrections: state.corrections,
-          stats: SessionStats(
-            wordsSpoken: state.wordsSpoken,
-            averageSentenceLength: _calculateAverageSentenceLength(),
-            speakingTimePercent: _calculateSpeakingTimePercent(),
-            vocabularyUsed: _extractVocabulary(),
-          ),
-          durationSeconds: state.sessionDurationSeconds,
-        ));
-      } catch (e) {
-        dev.log('AI Practice: Failed to save session: $e');
-      }
-    }
+    // M7: Capture summary data before resetting state
+    final stats = SessionStats(
+      wordsSpoken: state.wordsSpoken,
+      averageSentenceLength: _calculateAverageSentenceLength(),
+      speakingTimePercent: _calculateSpeakingTimePercent(),
+      vocabularyUsed: _extractVocabulary(),
+    );
+    final correctionsCopy = List<Correction>.unmodifiable(state.corrections);
+    final durationCopy = state.sessionDurationSeconds;
 
+    final endRequest = state.sessionId != null
+        ? EndSessionRequest(
+            sessionId: state.sessionId!,
+            messages: state.messages,
+            corrections: correctionsCopy,
+            stats: stats,
+            durationSeconds: durationCopy,
+          )
+        : null;
+
+    // M2: Populate summary provider so summary screen has real data.
+    ref.read(aiSummaryProvider.notifier).set(
+          durationSeconds: durationCopy,
+          stats: stats,
+          corrections: correctionsCopy,
+        );
+
+    // Reset state immediately so UI can navigate to summary without blocking.
     state = const AiPracticeState();
+
+    // Send session data to backend — fire and forget with one silent retry.
+    if (endRequest != null) {
+      _saveSessionWithRetry(endRequest);
+    }
+  }
+
+  /// M7: Retry speech recognition after persistent STT error.
+  void retryStt() {
+    _sttFailureCount = 0;
+    state = state.copyWith(sttPersistentError: false, error: null);
+    if (state.isInConversation) {
+      startListening();
+    }
   }
 
   /// Toggle mute
@@ -422,6 +572,26 @@ class AiPracticeNotifier extends Notifier<AiPracticeState> {
       state = const AiPracticeState(); // Reset to initial idle state
     } else {
       state = state.copyWith(error: null);
+    }
+  }
+
+  // === Session Save ===
+
+  /// M7: Fire-and-forget end-session POST with one silent retry after 5 s.
+  Future<void> _saveSessionWithRetry(EndSessionRequest request) async {
+    try {
+      await _repository.endSession(request);
+      dev.log('AI Practice: Session saved successfully');
+    } catch (e) {
+      dev.log('AI Practice: Failed to save session, scheduling retry: $e');
+      Future.delayed(const Duration(seconds: 5), () async {
+        try {
+          await _repository.endSession(request);
+          dev.log('AI Practice: Session save retry succeeded');
+        } catch (retryErr) {
+          dev.log('AI Practice: Session save retry failed: $retryErr');
+        }
+      });
     }
   }
 

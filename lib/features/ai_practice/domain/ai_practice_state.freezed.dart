@@ -22,8 +22,10 @@ mixin _$AiPracticeState {
 // Corrections collected during session
  List<Correction> get corrections;// Stats (calculated on end)
  int get wordsSpoken;// Audio controls
- bool get isMuted; bool get isSpeakerOn;// Error
- String? get error;
+ bool get isMuted; bool get isSpeakerOn;// TTS availability (false when TTS init failed)
+ bool get ttsAvailable;// Error
+ String? get error;// Whether the current error is a persistent STT failure (show manual retry)
+ bool get sttPersistentError;
 /// Create a copy of AiPracticeState
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -34,16 +36,16 @@ $AiPracticeStateCopyWith<AiPracticeState> get copyWith => _$AiPracticeStateCopyW
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is AiPracticeState&&(identical(other.phase, phase) || other.phase == phase)&&(identical(other.sessionId, sessionId) || other.sessionId == sessionId)&&(identical(other.mode, mode) || other.mode == mode)&&(identical(other.persona, persona) || other.persona == persona)&&(identical(other.topic, topic) || other.topic == topic)&&(identical(other.scenario, scenario) || other.scenario == scenario)&&(identical(other.openAIConnectionState, openAIConnectionState) || other.openAIConnectionState == openAIConnectionState)&&(identical(other.speechState, speechState) || other.speechState == speechState)&&(identical(other.ttsState, ttsState) || other.ttsState == ttsState)&&const DeepCollectionEquality().equals(other.messages, messages)&&(identical(other.currentUserText, currentUserText) || other.currentUserText == currentUserText)&&(identical(other.currentAiText, currentAiText) || other.currentAiText == currentAiText)&&(identical(other.currentSpeaker, currentSpeaker) || other.currentSpeaker == currentSpeaker)&&(identical(other.sessionStartTime, sessionStartTime) || other.sessionStartTime == sessionStartTime)&&(identical(other.sessionDurationSeconds, sessionDurationSeconds) || other.sessionDurationSeconds == sessionDurationSeconds)&&(identical(other.remainingDailySeconds, remainingDailySeconds) || other.remainingDailySeconds == remainingDailySeconds)&&const DeepCollectionEquality().equals(other.corrections, corrections)&&(identical(other.wordsSpoken, wordsSpoken) || other.wordsSpoken == wordsSpoken)&&(identical(other.isMuted, isMuted) || other.isMuted == isMuted)&&(identical(other.isSpeakerOn, isSpeakerOn) || other.isSpeakerOn == isSpeakerOn)&&(identical(other.error, error) || other.error == error));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is AiPracticeState&&(identical(other.phase, phase) || other.phase == phase)&&(identical(other.sessionId, sessionId) || other.sessionId == sessionId)&&(identical(other.mode, mode) || other.mode == mode)&&(identical(other.persona, persona) || other.persona == persona)&&(identical(other.topic, topic) || other.topic == topic)&&(identical(other.scenario, scenario) || other.scenario == scenario)&&(identical(other.openAIConnectionState, openAIConnectionState) || other.openAIConnectionState == openAIConnectionState)&&(identical(other.speechState, speechState) || other.speechState == speechState)&&(identical(other.ttsState, ttsState) || other.ttsState == ttsState)&&const DeepCollectionEquality().equals(other.messages, messages)&&(identical(other.currentUserText, currentUserText) || other.currentUserText == currentUserText)&&(identical(other.currentAiText, currentAiText) || other.currentAiText == currentAiText)&&(identical(other.currentSpeaker, currentSpeaker) || other.currentSpeaker == currentSpeaker)&&(identical(other.sessionStartTime, sessionStartTime) || other.sessionStartTime == sessionStartTime)&&(identical(other.sessionDurationSeconds, sessionDurationSeconds) || other.sessionDurationSeconds == sessionDurationSeconds)&&(identical(other.remainingDailySeconds, remainingDailySeconds) || other.remainingDailySeconds == remainingDailySeconds)&&const DeepCollectionEquality().equals(other.corrections, corrections)&&(identical(other.wordsSpoken, wordsSpoken) || other.wordsSpoken == wordsSpoken)&&(identical(other.isMuted, isMuted) || other.isMuted == isMuted)&&(identical(other.isSpeakerOn, isSpeakerOn) || other.isSpeakerOn == isSpeakerOn)&&(identical(other.ttsAvailable, ttsAvailable) || other.ttsAvailable == ttsAvailable)&&(identical(other.error, error) || other.error == error)&&(identical(other.sttPersistentError, sttPersistentError) || other.sttPersistentError == sttPersistentError));
 }
 
 
 @override
-int get hashCode => Object.hashAll([runtimeType,phase,sessionId,mode,persona,topic,scenario,openAIConnectionState,speechState,ttsState,const DeepCollectionEquality().hash(messages),currentUserText,currentAiText,currentSpeaker,sessionStartTime,sessionDurationSeconds,remainingDailySeconds,const DeepCollectionEquality().hash(corrections),wordsSpoken,isMuted,isSpeakerOn,error]);
+int get hashCode => Object.hashAll([runtimeType,phase,sessionId,mode,persona,topic,scenario,openAIConnectionState,speechState,ttsState,const DeepCollectionEquality().hash(messages),currentUserText,currentAiText,currentSpeaker,sessionStartTime,sessionDurationSeconds,remainingDailySeconds,const DeepCollectionEquality().hash(corrections),wordsSpoken,isMuted,isSpeakerOn,ttsAvailable,error,sttPersistentError]);
 
 @override
 String toString() {
-  return 'AiPracticeState(phase: $phase, sessionId: $sessionId, mode: $mode, persona: $persona, topic: $topic, scenario: $scenario, openAIConnectionState: $openAIConnectionState, speechState: $speechState, ttsState: $ttsState, messages: $messages, currentUserText: $currentUserText, currentAiText: $currentAiText, currentSpeaker: $currentSpeaker, sessionStartTime: $sessionStartTime, sessionDurationSeconds: $sessionDurationSeconds, remainingDailySeconds: $remainingDailySeconds, corrections: $corrections, wordsSpoken: $wordsSpoken, isMuted: $isMuted, isSpeakerOn: $isSpeakerOn, error: $error)';
+  return 'AiPracticeState(phase: $phase, sessionId: $sessionId, mode: $mode, persona: $persona, topic: $topic, scenario: $scenario, openAIConnectionState: $openAIConnectionState, speechState: $speechState, ttsState: $ttsState, messages: $messages, currentUserText: $currentUserText, currentAiText: $currentAiText, currentSpeaker: $currentSpeaker, sessionStartTime: $sessionStartTime, sessionDurationSeconds: $sessionDurationSeconds, remainingDailySeconds: $remainingDailySeconds, corrections: $corrections, wordsSpoken: $wordsSpoken, isMuted: $isMuted, isSpeakerOn: $isSpeakerOn, ttsAvailable: $ttsAvailable, error: $error, sttPersistentError: $sttPersistentError)';
 }
 
 
@@ -54,7 +56,7 @@ abstract mixin class $AiPracticeStateCopyWith<$Res>  {
   factory $AiPracticeStateCopyWith(AiPracticeState value, $Res Function(AiPracticeState) _then) = _$AiPracticeStateCopyWithImpl;
 @useResult
 $Res call({
- AiPracticePhase phase, String? sessionId, AiSessionMode mode, AiPersona persona, String? topic, String? scenario, OpenAIConnectionState openAIConnectionState, SpeechState speechState, TtsState ttsState, List<AiMessage> messages, String currentUserText, String currentAiText, Speaker currentSpeaker, DateTime? sessionStartTime, int sessionDurationSeconds, int remainingDailySeconds, List<Correction> corrections, int wordsSpoken, bool isMuted, bool isSpeakerOn, String? error
+ AiPracticePhase phase, String? sessionId, AiSessionMode mode, AiPersona persona, String? topic, String? scenario, OpenAIConnectionState openAIConnectionState, SpeechState speechState, TtsState ttsState, List<AiMessage> messages, String currentUserText, String currentAiText, Speaker currentSpeaker, DateTime? sessionStartTime, int sessionDurationSeconds, int remainingDailySeconds, List<Correction> corrections, int wordsSpoken, bool isMuted, bool isSpeakerOn, bool ttsAvailable, String? error, bool sttPersistentError
 });
 
 
@@ -71,7 +73,7 @@ class _$AiPracticeStateCopyWithImpl<$Res>
 
 /// Create a copy of AiPracticeState
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? phase = null,Object? sessionId = freezed,Object? mode = null,Object? persona = null,Object? topic = freezed,Object? scenario = freezed,Object? openAIConnectionState = null,Object? speechState = null,Object? ttsState = null,Object? messages = null,Object? currentUserText = null,Object? currentAiText = null,Object? currentSpeaker = null,Object? sessionStartTime = freezed,Object? sessionDurationSeconds = null,Object? remainingDailySeconds = null,Object? corrections = null,Object? wordsSpoken = null,Object? isMuted = null,Object? isSpeakerOn = null,Object? error = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? phase = null,Object? sessionId = freezed,Object? mode = null,Object? persona = null,Object? topic = freezed,Object? scenario = freezed,Object? openAIConnectionState = null,Object? speechState = null,Object? ttsState = null,Object? messages = null,Object? currentUserText = null,Object? currentAiText = null,Object? currentSpeaker = null,Object? sessionStartTime = freezed,Object? sessionDurationSeconds = null,Object? remainingDailySeconds = null,Object? corrections = null,Object? wordsSpoken = null,Object? isMuted = null,Object? isSpeakerOn = null,Object? ttsAvailable = null,Object? error = freezed,Object? sttPersistentError = null,}) {
   return _then(_self.copyWith(
 phase: null == phase ? _self.phase : phase // ignore: cast_nullable_to_non_nullable
 as AiPracticePhase,sessionId: freezed == sessionId ? _self.sessionId : sessionId // ignore: cast_nullable_to_non_nullable
@@ -93,8 +95,10 @@ as int,corrections: null == corrections ? _self.corrections : corrections // ign
 as List<Correction>,wordsSpoken: null == wordsSpoken ? _self.wordsSpoken : wordsSpoken // ignore: cast_nullable_to_non_nullable
 as int,isMuted: null == isMuted ? _self.isMuted : isMuted // ignore: cast_nullable_to_non_nullable
 as bool,isSpeakerOn: null == isSpeakerOn ? _self.isSpeakerOn : isSpeakerOn // ignore: cast_nullable_to_non_nullable
+as bool,ttsAvailable: null == ttsAvailable ? _self.ttsAvailable : ttsAvailable // ignore: cast_nullable_to_non_nullable
 as bool,error: freezed == error ? _self.error : error // ignore: cast_nullable_to_non_nullable
-as String?,
+as String?,sttPersistentError: null == sttPersistentError ? _self.sttPersistentError : sttPersistentError // ignore: cast_nullable_to_non_nullable
+as bool,
   ));
 }
 
@@ -176,10 +180,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( AiPracticePhase phase,  String? sessionId,  AiSessionMode mode,  AiPersona persona,  String? topic,  String? scenario,  OpenAIConnectionState openAIConnectionState,  SpeechState speechState,  TtsState ttsState,  List<AiMessage> messages,  String currentUserText,  String currentAiText,  Speaker currentSpeaker,  DateTime? sessionStartTime,  int sessionDurationSeconds,  int remainingDailySeconds,  List<Correction> corrections,  int wordsSpoken,  bool isMuted,  bool isSpeakerOn,  String? error)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( AiPracticePhase phase,  String? sessionId,  AiSessionMode mode,  AiPersona persona,  String? topic,  String? scenario,  OpenAIConnectionState openAIConnectionState,  SpeechState speechState,  TtsState ttsState,  List<AiMessage> messages,  String currentUserText,  String currentAiText,  Speaker currentSpeaker,  DateTime? sessionStartTime,  int sessionDurationSeconds,  int remainingDailySeconds,  List<Correction> corrections,  int wordsSpoken,  bool isMuted,  bool isSpeakerOn,  bool ttsAvailable,  String? error,  bool sttPersistentError)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _AiPracticeState() when $default != null:
-return $default(_that.phase,_that.sessionId,_that.mode,_that.persona,_that.topic,_that.scenario,_that.openAIConnectionState,_that.speechState,_that.ttsState,_that.messages,_that.currentUserText,_that.currentAiText,_that.currentSpeaker,_that.sessionStartTime,_that.sessionDurationSeconds,_that.remainingDailySeconds,_that.corrections,_that.wordsSpoken,_that.isMuted,_that.isSpeakerOn,_that.error);case _:
+return $default(_that.phase,_that.sessionId,_that.mode,_that.persona,_that.topic,_that.scenario,_that.openAIConnectionState,_that.speechState,_that.ttsState,_that.messages,_that.currentUserText,_that.currentAiText,_that.currentSpeaker,_that.sessionStartTime,_that.sessionDurationSeconds,_that.remainingDailySeconds,_that.corrections,_that.wordsSpoken,_that.isMuted,_that.isSpeakerOn,_that.ttsAvailable,_that.error,_that.sttPersistentError);case _:
   return orElse();
 
 }
@@ -197,10 +201,10 @@ return $default(_that.phase,_that.sessionId,_that.mode,_that.persona,_that.topic
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( AiPracticePhase phase,  String? sessionId,  AiSessionMode mode,  AiPersona persona,  String? topic,  String? scenario,  OpenAIConnectionState openAIConnectionState,  SpeechState speechState,  TtsState ttsState,  List<AiMessage> messages,  String currentUserText,  String currentAiText,  Speaker currentSpeaker,  DateTime? sessionStartTime,  int sessionDurationSeconds,  int remainingDailySeconds,  List<Correction> corrections,  int wordsSpoken,  bool isMuted,  bool isSpeakerOn,  String? error)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( AiPracticePhase phase,  String? sessionId,  AiSessionMode mode,  AiPersona persona,  String? topic,  String? scenario,  OpenAIConnectionState openAIConnectionState,  SpeechState speechState,  TtsState ttsState,  List<AiMessage> messages,  String currentUserText,  String currentAiText,  Speaker currentSpeaker,  DateTime? sessionStartTime,  int sessionDurationSeconds,  int remainingDailySeconds,  List<Correction> corrections,  int wordsSpoken,  bool isMuted,  bool isSpeakerOn,  bool ttsAvailable,  String? error,  bool sttPersistentError)  $default,) {final _that = this;
 switch (_that) {
 case _AiPracticeState():
-return $default(_that.phase,_that.sessionId,_that.mode,_that.persona,_that.topic,_that.scenario,_that.openAIConnectionState,_that.speechState,_that.ttsState,_that.messages,_that.currentUserText,_that.currentAiText,_that.currentSpeaker,_that.sessionStartTime,_that.sessionDurationSeconds,_that.remainingDailySeconds,_that.corrections,_that.wordsSpoken,_that.isMuted,_that.isSpeakerOn,_that.error);}
+return $default(_that.phase,_that.sessionId,_that.mode,_that.persona,_that.topic,_that.scenario,_that.openAIConnectionState,_that.speechState,_that.ttsState,_that.messages,_that.currentUserText,_that.currentAiText,_that.currentSpeaker,_that.sessionStartTime,_that.sessionDurationSeconds,_that.remainingDailySeconds,_that.corrections,_that.wordsSpoken,_that.isMuted,_that.isSpeakerOn,_that.ttsAvailable,_that.error,_that.sttPersistentError);}
 }
 /// A variant of `when` that fallback to returning `null`
 ///
@@ -214,10 +218,10 @@ return $default(_that.phase,_that.sessionId,_that.mode,_that.persona,_that.topic
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( AiPracticePhase phase,  String? sessionId,  AiSessionMode mode,  AiPersona persona,  String? topic,  String? scenario,  OpenAIConnectionState openAIConnectionState,  SpeechState speechState,  TtsState ttsState,  List<AiMessage> messages,  String currentUserText,  String currentAiText,  Speaker currentSpeaker,  DateTime? sessionStartTime,  int sessionDurationSeconds,  int remainingDailySeconds,  List<Correction> corrections,  int wordsSpoken,  bool isMuted,  bool isSpeakerOn,  String? error)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( AiPracticePhase phase,  String? sessionId,  AiSessionMode mode,  AiPersona persona,  String? topic,  String? scenario,  OpenAIConnectionState openAIConnectionState,  SpeechState speechState,  TtsState ttsState,  List<AiMessage> messages,  String currentUserText,  String currentAiText,  Speaker currentSpeaker,  DateTime? sessionStartTime,  int sessionDurationSeconds,  int remainingDailySeconds,  List<Correction> corrections,  int wordsSpoken,  bool isMuted,  bool isSpeakerOn,  bool ttsAvailable,  String? error,  bool sttPersistentError)?  $default,) {final _that = this;
 switch (_that) {
 case _AiPracticeState() when $default != null:
-return $default(_that.phase,_that.sessionId,_that.mode,_that.persona,_that.topic,_that.scenario,_that.openAIConnectionState,_that.speechState,_that.ttsState,_that.messages,_that.currentUserText,_that.currentAiText,_that.currentSpeaker,_that.sessionStartTime,_that.sessionDurationSeconds,_that.remainingDailySeconds,_that.corrections,_that.wordsSpoken,_that.isMuted,_that.isSpeakerOn,_that.error);case _:
+return $default(_that.phase,_that.sessionId,_that.mode,_that.persona,_that.topic,_that.scenario,_that.openAIConnectionState,_that.speechState,_that.ttsState,_that.messages,_that.currentUserText,_that.currentAiText,_that.currentSpeaker,_that.sessionStartTime,_that.sessionDurationSeconds,_that.remainingDailySeconds,_that.corrections,_that.wordsSpoken,_that.isMuted,_that.isSpeakerOn,_that.ttsAvailable,_that.error,_that.sttPersistentError);case _:
   return null;
 
 }
@@ -229,8 +233,8 @@ return $default(_that.phase,_that.sessionId,_that.mode,_that.persona,_that.topic
 
 
 class _AiPracticeState extends AiPracticeState {
-  const _AiPracticeState({this.phase = AiPracticePhase.idle, this.sessionId, this.mode = AiSessionMode.freeChat, this.persona = AiPersona.emma, this.topic, this.scenario, this.openAIConnectionState = OpenAIConnectionState.disconnected, this.speechState = SpeechState.idle, this.ttsState = TtsState.idle, final  List<AiMessage> messages = const [], this.currentUserText = '', this.currentAiText = '', this.currentSpeaker = Speaker.none, this.sessionStartTime, this.sessionDurationSeconds = 0, this.remainingDailySeconds = 300, final  List<Correction> corrections = const [], this.wordsSpoken = 0, this.isMuted = false, this.isSpeakerOn = true, this.error}): _messages = messages,_corrections = corrections,super._();
-  
+  const _AiPracticeState({this.phase = AiPracticePhase.idle, this.sessionId, this.mode = AiSessionMode.freeChat, this.persona = AiPersona.emma, this.topic, this.scenario, this.openAIConnectionState = OpenAIConnectionState.disconnected, this.speechState = SpeechState.idle, this.ttsState = TtsState.idle, final  List<AiMessage> messages = const [], this.currentUserText = '', this.currentAiText = '', this.currentSpeaker = Speaker.none, this.sessionStartTime, this.sessionDurationSeconds = 0, this.remainingDailySeconds = 300, final  List<Correction> corrections = const [], this.wordsSpoken = 0, this.isMuted = false, this.isSpeakerOn = true, this.ttsAvailable = true, this.error, this.sttPersistentError = false}): _messages = messages,_corrections = corrections,super._();
+
 
 @override@JsonKey() final  AiPracticePhase phase;
 // Session info
@@ -275,8 +279,12 @@ class _AiPracticeState extends AiPracticeState {
 // Audio controls
 @override@JsonKey() final  bool isMuted;
 @override@JsonKey() final  bool isSpeakerOn;
+// TTS availability (false when TTS init failed)
+@override@JsonKey() final  bool ttsAvailable;
 // Error
 @override final  String? error;
+// Whether the current error is a persistent STT failure (show manual retry)
+@override@JsonKey() final  bool sttPersistentError;
 
 /// Create a copy of AiPracticeState
 /// with the given fields replaced by the non-null parameter values.
@@ -288,16 +296,16 @@ _$AiPracticeStateCopyWith<_AiPracticeState> get copyWith => __$AiPracticeStateCo
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _AiPracticeState&&(identical(other.phase, phase) || other.phase == phase)&&(identical(other.sessionId, sessionId) || other.sessionId == sessionId)&&(identical(other.mode, mode) || other.mode == mode)&&(identical(other.persona, persona) || other.persona == persona)&&(identical(other.topic, topic) || other.topic == topic)&&(identical(other.scenario, scenario) || other.scenario == scenario)&&(identical(other.openAIConnectionState, openAIConnectionState) || other.openAIConnectionState == openAIConnectionState)&&(identical(other.speechState, speechState) || other.speechState == speechState)&&(identical(other.ttsState, ttsState) || other.ttsState == ttsState)&&const DeepCollectionEquality().equals(other._messages, _messages)&&(identical(other.currentUserText, currentUserText) || other.currentUserText == currentUserText)&&(identical(other.currentAiText, currentAiText) || other.currentAiText == currentAiText)&&(identical(other.currentSpeaker, currentSpeaker) || other.currentSpeaker == currentSpeaker)&&(identical(other.sessionStartTime, sessionStartTime) || other.sessionStartTime == sessionStartTime)&&(identical(other.sessionDurationSeconds, sessionDurationSeconds) || other.sessionDurationSeconds == sessionDurationSeconds)&&(identical(other.remainingDailySeconds, remainingDailySeconds) || other.remainingDailySeconds == remainingDailySeconds)&&const DeepCollectionEquality().equals(other._corrections, _corrections)&&(identical(other.wordsSpoken, wordsSpoken) || other.wordsSpoken == wordsSpoken)&&(identical(other.isMuted, isMuted) || other.isMuted == isMuted)&&(identical(other.isSpeakerOn, isSpeakerOn) || other.isSpeakerOn == isSpeakerOn)&&(identical(other.error, error) || other.error == error));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _AiPracticeState&&(identical(other.phase, phase) || other.phase == phase)&&(identical(other.sessionId, sessionId) || other.sessionId == sessionId)&&(identical(other.mode, mode) || other.mode == mode)&&(identical(other.persona, persona) || other.persona == persona)&&(identical(other.topic, topic) || other.topic == topic)&&(identical(other.scenario, scenario) || other.scenario == scenario)&&(identical(other.openAIConnectionState, openAIConnectionState) || other.openAIConnectionState == openAIConnectionState)&&(identical(other.speechState, speechState) || other.speechState == speechState)&&(identical(other.ttsState, ttsState) || other.ttsState == ttsState)&&const DeepCollectionEquality().equals(other._messages, _messages)&&(identical(other.currentUserText, currentUserText) || other.currentUserText == currentUserText)&&(identical(other.currentAiText, currentAiText) || other.currentAiText == currentAiText)&&(identical(other.currentSpeaker, currentSpeaker) || other.currentSpeaker == currentSpeaker)&&(identical(other.sessionStartTime, sessionStartTime) || other.sessionStartTime == sessionStartTime)&&(identical(other.sessionDurationSeconds, sessionDurationSeconds) || other.sessionDurationSeconds == sessionDurationSeconds)&&(identical(other.remainingDailySeconds, remainingDailySeconds) || other.remainingDailySeconds == remainingDailySeconds)&&const DeepCollectionEquality().equals(other._corrections, _corrections)&&(identical(other.wordsSpoken, wordsSpoken) || other.wordsSpoken == wordsSpoken)&&(identical(other.isMuted, isMuted) || other.isMuted == isMuted)&&(identical(other.isSpeakerOn, isSpeakerOn) || other.isSpeakerOn == isSpeakerOn)&&(identical(other.ttsAvailable, ttsAvailable) || other.ttsAvailable == ttsAvailable)&&(identical(other.error, error) || other.error == error)&&(identical(other.sttPersistentError, sttPersistentError) || other.sttPersistentError == sttPersistentError));
 }
 
 
 @override
-int get hashCode => Object.hashAll([runtimeType,phase,sessionId,mode,persona,topic,scenario,openAIConnectionState,speechState,ttsState,const DeepCollectionEquality().hash(_messages),currentUserText,currentAiText,currentSpeaker,sessionStartTime,sessionDurationSeconds,remainingDailySeconds,const DeepCollectionEquality().hash(_corrections),wordsSpoken,isMuted,isSpeakerOn,error]);
+int get hashCode => Object.hashAll([runtimeType,phase,sessionId,mode,persona,topic,scenario,openAIConnectionState,speechState,ttsState,const DeepCollectionEquality().hash(_messages),currentUserText,currentAiText,currentSpeaker,sessionStartTime,sessionDurationSeconds,remainingDailySeconds,const DeepCollectionEquality().hash(_corrections),wordsSpoken,isMuted,isSpeakerOn,ttsAvailable,error,sttPersistentError]);
 
 @override
 String toString() {
-  return 'AiPracticeState(phase: $phase, sessionId: $sessionId, mode: $mode, persona: $persona, topic: $topic, scenario: $scenario, openAIConnectionState: $openAIConnectionState, speechState: $speechState, ttsState: $ttsState, messages: $messages, currentUserText: $currentUserText, currentAiText: $currentAiText, currentSpeaker: $currentSpeaker, sessionStartTime: $sessionStartTime, sessionDurationSeconds: $sessionDurationSeconds, remainingDailySeconds: $remainingDailySeconds, corrections: $corrections, wordsSpoken: $wordsSpoken, isMuted: $isMuted, isSpeakerOn: $isSpeakerOn, error: $error)';
+  return 'AiPracticeState(phase: $phase, sessionId: $sessionId, mode: $mode, persona: $persona, topic: $topic, scenario: $scenario, openAIConnectionState: $openAIConnectionState, speechState: $speechState, ttsState: $ttsState, messages: $messages, currentUserText: $currentUserText, currentAiText: $currentAiText, currentSpeaker: $currentSpeaker, sessionStartTime: $sessionStartTime, sessionDurationSeconds: $sessionDurationSeconds, remainingDailySeconds: $remainingDailySeconds, corrections: $corrections, wordsSpoken: $wordsSpoken, isMuted: $isMuted, isSpeakerOn: $isSpeakerOn, ttsAvailable: $ttsAvailable, error: $error, sttPersistentError: $sttPersistentError)';
 }
 
 
@@ -308,7 +316,7 @@ abstract mixin class _$AiPracticeStateCopyWith<$Res> implements $AiPracticeState
   factory _$AiPracticeStateCopyWith(_AiPracticeState value, $Res Function(_AiPracticeState) _then) = __$AiPracticeStateCopyWithImpl;
 @override @useResult
 $Res call({
- AiPracticePhase phase, String? sessionId, AiSessionMode mode, AiPersona persona, String? topic, String? scenario, OpenAIConnectionState openAIConnectionState, SpeechState speechState, TtsState ttsState, List<AiMessage> messages, String currentUserText, String currentAiText, Speaker currentSpeaker, DateTime? sessionStartTime, int sessionDurationSeconds, int remainingDailySeconds, List<Correction> corrections, int wordsSpoken, bool isMuted, bool isSpeakerOn, String? error
+ AiPracticePhase phase, String? sessionId, AiSessionMode mode, AiPersona persona, String? topic, String? scenario, OpenAIConnectionState openAIConnectionState, SpeechState speechState, TtsState ttsState, List<AiMessage> messages, String currentUserText, String currentAiText, Speaker currentSpeaker, DateTime? sessionStartTime, int sessionDurationSeconds, int remainingDailySeconds, List<Correction> corrections, int wordsSpoken, bool isMuted, bool isSpeakerOn, bool ttsAvailable, String? error, bool sttPersistentError
 });
 
 
@@ -325,7 +333,7 @@ class __$AiPracticeStateCopyWithImpl<$Res>
 
 /// Create a copy of AiPracticeState
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? phase = null,Object? sessionId = freezed,Object? mode = null,Object? persona = null,Object? topic = freezed,Object? scenario = freezed,Object? openAIConnectionState = null,Object? speechState = null,Object? ttsState = null,Object? messages = null,Object? currentUserText = null,Object? currentAiText = null,Object? currentSpeaker = null,Object? sessionStartTime = freezed,Object? sessionDurationSeconds = null,Object? remainingDailySeconds = null,Object? corrections = null,Object? wordsSpoken = null,Object? isMuted = null,Object? isSpeakerOn = null,Object? error = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? phase = null,Object? sessionId = freezed,Object? mode = null,Object? persona = null,Object? topic = freezed,Object? scenario = freezed,Object? openAIConnectionState = null,Object? speechState = null,Object? ttsState = null,Object? messages = null,Object? currentUserText = null,Object? currentAiText = null,Object? currentSpeaker = null,Object? sessionStartTime = freezed,Object? sessionDurationSeconds = null,Object? remainingDailySeconds = null,Object? corrections = null,Object? wordsSpoken = null,Object? isMuted = null,Object? isSpeakerOn = null,Object? ttsAvailable = null,Object? error = freezed,Object? sttPersistentError = null,}) {
   return _then(_AiPracticeState(
 phase: null == phase ? _self.phase : phase // ignore: cast_nullable_to_non_nullable
 as AiPracticePhase,sessionId: freezed == sessionId ? _self.sessionId : sessionId // ignore: cast_nullable_to_non_nullable
@@ -347,8 +355,10 @@ as int,corrections: null == corrections ? _self._corrections : corrections // ig
 as List<Correction>,wordsSpoken: null == wordsSpoken ? _self.wordsSpoken : wordsSpoken // ignore: cast_nullable_to_non_nullable
 as int,isMuted: null == isMuted ? _self.isMuted : isMuted // ignore: cast_nullable_to_non_nullable
 as bool,isSpeakerOn: null == isSpeakerOn ? _self.isSpeakerOn : isSpeakerOn // ignore: cast_nullable_to_non_nullable
+as bool,ttsAvailable: null == ttsAvailable ? _self.ttsAvailable : ttsAvailable // ignore: cast_nullable_to_non_nullable
 as bool,error: freezed == error ? _self.error : error // ignore: cast_nullable_to_non_nullable
-as String?,
+as String?,sttPersistentError: null == sttPersistentError ? _self.sttPersistentError : sttPersistentError // ignore: cast_nullable_to_non_nullable
+as bool,
   ));
 }
 
@@ -561,7 +571,7 @@ return $default(_that.isLoading,_that.topicCategories,_that.scenarios,_that.usag
 
 class _ModeSelectionState implements ModeSelectionState {
   const _ModeSelectionState({this.isLoading = false, final  List<TopicCategory> topicCategories = const [], final  List<Scenario> scenarios = const [], this.usageInfo, this.error}): _topicCategories = topicCategories,_scenarios = scenarios;
-  
+
 
 @override@JsonKey() final  bool isLoading;
  final  List<TopicCategory> _topicCategories;

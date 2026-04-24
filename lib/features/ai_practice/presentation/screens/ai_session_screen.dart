@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 import '../../../../core/router/routes.dart';
 import '../../../../core/theme/app_colors.dart';
@@ -17,10 +18,64 @@ class AiSessionScreen extends ConsumerStatefulWidget {
   ConsumerState<AiSessionScreen> createState() => _AiSessionScreenState();
 }
 
-class _AiSessionScreenState extends ConsumerState<AiSessionScreen> {
+class _AiSessionScreenState extends ConsumerState<AiSessionScreen>
+    with WidgetsBindingObserver {
   @override
   void initState() {
     super.initState();
+    // M4: Register for app lifecycle events
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  /// M4: End session best-effort when app goes to background or is killed.
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState lifecycle) {
+    if (lifecycle == AppLifecycleState.paused ||
+        lifecycle == AppLifecycleState.detached) {
+      final sessionActive = ref.read(aiPracticeProvider).isActive;
+      if (sessionActive) {
+        // Fire-and-forget — never block the OS lifecycle callback
+        ref.read(aiPracticeProvider.notifier).endSession();
+      }
+    }
+  }
+
+  /// M7: Show a rationale dialog for microphone permission with Settings link.
+  void _showMicPermissionDialog(BuildContext context) {
+    showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => AlertDialog(
+        title: const Text('Microphone Access Required'),
+        content: const Text(
+          'Speaking Club needs access to your microphone to practise speaking. '
+          'Please allow microphone access in your device settings.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+              ref.read(aiPracticeProvider.notifier).clearError();
+              context.go(Routes.aiPractice);
+            },
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            onPressed: () async {
+              Navigator.pop(context);
+              await openAppSettings();
+            },
+            child: const Text('Open Settings'),
+          ),
+        ],
+      ),
+    );
   }
 
   void _handleMicTap() {
@@ -67,7 +122,7 @@ class _AiSessionScreenState extends ConsumerState<AiSessionScreen> {
     final textTheme = Theme.of(context).textTheme;
     final state = ref.watch(aiPracticeProvider);
 
-    // Listen for session end
+    // Listen for session end / errors
     ref.listen<AiPracticeState>(aiPracticeProvider, (previous, next) {
       if (previous?.isActive == true && !next.isActive) {
         // Session ended, navigate to summary or home
@@ -76,8 +131,18 @@ class _AiSessionScreenState extends ConsumerState<AiSessionScreen> {
         }
       }
 
-      // Show error snackbar
-      if (next.error != null && next.error != previous?.error) {
+      // M7: Show microphone rationale dialog
+      if (next.error == 'microphone_denied' &&
+          next.error != previous?.error &&
+          context.mounted) {
+        _showMicPermissionDialog(context);
+        return;
+      }
+
+      // Show error snackbar for non-persistent, non-microphone errors
+      if (next.error != null &&
+          next.error != previous?.error &&
+          !next.sttPersistentError) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(next.error!),
@@ -107,6 +172,14 @@ class _AiSessionScreenState extends ConsumerState<AiSessionScreen> {
               // Header
               _buildHeader(colorScheme, textTheme, state),
 
+              // M7: Persistent STT error banner
+              if (state.sttPersistentError)
+                _buildSttErrorBanner(context, colorScheme),
+
+              // M7: TTS unavailable notice
+              if (!state.ttsAvailable)
+                _buildTtsUnavailableBanner(context, colorScheme),
+
               // Waveform area
               Expanded(
                 flex: 2,
@@ -129,6 +202,69 @@ class _AiSessionScreenState extends ConsumerState<AiSessionScreen> {
               _buildControls(colorScheme, state),
             ],
           ),
+        ),
+      ),
+    );
+  }
+
+  /// M7: Persistent STT failure banner with manual retry button.
+  Widget _buildSttErrorBanner(BuildContext context, ColorScheme colorScheme) {
+    return Material(
+      color: colorScheme.errorContainer,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+        child: Row(
+          children: [
+            Icon(Icons.hearing_disabled, color: colorScheme.onErrorContainer),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                'Having trouble hearing you. Check your microphone.',
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      color: colorScheme.onErrorContainer,
+                    ),
+              ),
+            ),
+            TextButton(
+              onPressed: () =>
+                  ref.read(aiPracticeProvider.notifier).retryStt(),
+              style: TextButton.styleFrom(
+                foregroundColor: colorScheme.onErrorContainer,
+              ),
+              child: const Text('Retry'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// M7: TTS unavailable banner — text-only fallback notice.
+  Widget _buildTtsUnavailableBanner(
+    BuildContext context,
+    ColorScheme colorScheme,
+  ) {
+    return Material(
+      color: colorScheme.secondaryContainer,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        child: Row(
+          children: [
+            Icon(
+              Icons.volume_off,
+              color: colorScheme.onSecondaryContainer,
+              size: 18,
+            ),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                'Audio output unavailable — text-only mode',
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      color: colorScheme.onSecondaryContainer,
+                    ),
+              ),
+            ),
+          ],
         ),
       ),
     );

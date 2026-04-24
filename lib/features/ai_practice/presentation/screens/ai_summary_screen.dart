@@ -5,17 +5,19 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/router/routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../shared/models/ai_session.dart';
+import '../providers/ai_summary_provider.dart';
 
-/// Session summary screen shown after ending an AI practice session
+/// Session summary screen shown after ending an AI practice session.
+///
+/// Reads [AiSummaryState] from [aiSummaryProvider], which is populated by
+/// [AiPracticeNotifier.endSession] before navigating here.
 class AiSummaryScreen extends ConsumerWidget {
   const AiSummaryScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final summary = ref.watch(aiSummaryProvider);
 
-    // Get the last session data from the provider
-    // Note: In a real app, you'd fetch this from the repository using the session ID
-    // For now, we'll use placeholder data
     return Scaffold(
       appBar: AppBar(
         title: const Text('Session Summary'),
@@ -30,7 +32,7 @@ class AiSummaryScreen extends ConsumerWidget {
             _SummaryCard(
               icon: Icons.timer_outlined,
               title: 'Duration',
-              content: _buildDurationContent(context),
+              content: _buildDurationContent(context, summary.durationSeconds),
             ),
             const SizedBox(height: 16),
 
@@ -38,15 +40,15 @@ class AiSummaryScreen extends ConsumerWidget {
             _SummaryCard(
               icon: Icons.mic_outlined,
               title: 'Speaking Stats',
-              content: _buildStatsContent(context),
+              content: _buildStatsContent(context, summary.stats),
             ),
             const SizedBox(height: 16),
 
-            // Corrections card (placeholder)
+            // Corrections card
             _SummaryCard(
               icon: Icons.edit_outlined,
               title: 'Corrections',
-              content: _buildCorrectionsContent(context),
+              content: _buildCorrectionsContent(context, summary.corrections),
             ),
             const SizedBox(height: 32),
 
@@ -72,14 +74,20 @@ class AiSummaryScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildDurationContent(BuildContext context) {
+  Widget _buildDurationContent(BuildContext context, int durationSeconds) {
     final textTheme = Theme.of(context).textTheme;
     final colorScheme = Theme.of(context).colorScheme;
+
+    final minutes = durationSeconds ~/ 60;
+    final seconds = durationSeconds % 60;
+    final display = minutes > 0
+        ? '$minutes:${seconds.toString().padLeft(2, '0')}'
+        : '0:${seconds.toString().padLeft(2, '0')}';
 
     return Row(
       children: [
         Text(
-          '4:32', // Placeholder
+          display,
           style: textTheme.displaySmall?.copyWith(
             fontWeight: FontWeight.bold,
             color: colorScheme.primary,
@@ -96,58 +104,51 @@ class AiSummaryScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildStatsContent(BuildContext context) {
+  Widget _buildStatsContent(BuildContext context, SessionStats? stats) {
+    final wordsSpoken = stats?.wordsSpoken ?? 0;
+    final avgSentenceLength = stats?.averageSentenceLength ?? 0;
+    final speakingTimePercent = stats?.speakingTimePercent ?? 0;
+
     return Column(
       children: [
         _StatRow(
           label: 'Words spoken',
-          value: '127', // Placeholder
+          value: '$wordsSpoken',
         ),
         const Divider(),
         _StatRow(
           label: 'Avg. sentence length',
-          value: '8 words', // Placeholder
+          value: '$avgSentenceLength words',
         ),
         const Divider(),
         _StatRow(
           label: 'Speaking time',
-          value: '65%', // Placeholder
+          value: '$speakingTimePercent%',
         ),
       ],
     );
   }
 
-  Widget _buildCorrectionsContent(BuildContext context) {
+  Widget _buildCorrectionsContent(
+    BuildContext context,
+    List<Correction> corrections,
+  ) {
     final textTheme = Theme.of(context).textTheme;
     final colorScheme = Theme.of(context).colorScheme;
-
-    // Placeholder corrections
-    final corrections = [
-      Correction(
-        original: 'I go to store yesterday',
-        corrected: 'I went to the store yesterday',
-        explanation: 'Use past tense for completed actions',
-      ),
-      Correction(
-        original: 'More better',
-        corrected: 'Much better',
-        explanation: "Don't use 'more' with comparative adjectives",
-      ),
-    ];
 
     if (corrections.isEmpty) {
       return Padding(
         padding: const EdgeInsets.symmetric(vertical: 8),
         child: Row(
           children: [
-            Icon(
+            const Icon(
               Icons.check_circle,
               color: AppColors.success,
               size: 24,
             ),
             const SizedBox(width: 12),
             Text(
-              'No corrections - great job!',
+              'No corrections in this session — nice work!',
               style: textTheme.bodyLarge?.copyWith(
                 color: AppColors.success,
               ),
@@ -200,8 +201,11 @@ class AiSummaryScreen extends ConsumerWidget {
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Icon(Icons.lightbulb_outline,
-                      color: AppColors.warning, size: 20),
+                  const Icon(
+                    Icons.lightbulb_outline,
+                    color: AppColors.warning,
+                    size: 20,
+                  ),
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(

@@ -22,6 +22,7 @@ class ApiEndpoints {
 
   // AI Practice endpoints
   static const String aiSessionToken = '/ai/session/token';
+  static const String aiSessionStart = '/ai/session/start';
   static const String aiSessionEnd = '/ai/session/end';
   static const String aiSessionRefreshToken = '/ai/session/refresh-token';
   static const String aiSessions = '/ai/sessions';

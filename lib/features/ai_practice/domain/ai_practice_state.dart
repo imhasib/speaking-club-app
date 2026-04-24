@@ -89,8 +89,14 @@ sealed class AiPracticeState with _$AiPracticeState {
     @Default(false) bool isMuted,
     @Default(true) bool isSpeakerOn,
 
+    // TTS availability (false when TTS init failed)
+    @Default(true) bool ttsAvailable,
+
     // Error
     String? error,
+
+    // Whether the current error is a persistent STT failure (show manual retry)
+    @Default(false) bool sttPersistentError,
   }) = _AiPracticeState;
 
   /// Whether session is active

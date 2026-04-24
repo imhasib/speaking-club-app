@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 
 import '../../../shared/models/ai_session.dart';
+import 'correction_parser.dart';
 
 /// OpenAI Realtime API event types
 class OpenAIEventTypes {
@@ -32,6 +33,7 @@ enum OpenAIConnectionState {
 /// Callback types for OpenAI events
 typedef OnTextDelta = void Function(String delta);
 typedef OnTextComplete = void Function(String fullText);
+typedef OnCorrectionFound = void Function(Correction correction);
 typedef OnError = void Function(String error);
 typedef OnConnectionStateChange = void Function(OpenAIConnectionState state);
 
@@ -47,12 +49,18 @@ class OpenAIRealtimeService {
   // Callbacks
   OnTextDelta? onTextDelta;
   OnTextComplete? onTextComplete;
+  OnCorrectionFound? onCorrectionFound;
   OnError? onError;
   OnConnectionStateChange? onConnectionStateChange;
 
   // Response accumulator
   final StringBuffer _currentResponse = StringBuffer();
   bool _responseTextHandled = false;
+
+  // Whether the current response buffer may contain a correction marker that
+  // has not yet been fully received.  While true, delta events are buffered
+  // instead of being forwarded directly to [onTextDelta].
+  bool _pendingMarkerCheck = true;
 
   /// Current connection state
   OpenAIConnectionState get connectionState => _connectionState;
@@ -276,17 +284,18 @@ Start by setting the scene and initiating the roleplay scenario.
         case OpenAIEventTypes.responseCreated:
           debugPrint('OpenAI: Response generation started');
           _responseTextHandled = false;
+          _pendingMarkerCheck = true;
           break;
 
         case OpenAIEventTypes.responseTextDelta:
           final delta = data['delta'] as String? ?? '';
           _currentResponse.write(delta);
-          onTextDelta?.call(delta);
+          _handleDelta(delta);
           break;
 
         case OpenAIEventTypes.responseTextDone:
           final fullText = _currentResponse.toString();
-          onTextComplete?.call(fullText);
+          _handleTextComplete(fullText);
           _currentResponse.clear();
           _responseTextHandled = true;
           break;
@@ -319,7 +328,7 @@ Start by setting the scene and initiating the roleplay scenario.
                         final text = part['text'] as String?;
                         if (text != null && text.isNotEmpty) {
                           debugPrint('OpenAI: Extracted text from response.done: $text');
-                          onTextComplete?.call(text);
+                          _handleTextComplete(text);
                         }
                       }
                     }
@@ -342,6 +351,52 @@ Start by setting the scene and initiating the roleplay scenario.
       }
     } catch (e) {
       debugPrint('OpenAI: Error parsing message: $e');
+    }
+  }
+
+  /// Handle a streaming delta event.
+  ///
+  /// If the buffer starts with `[CORRECTION:` and the marker is not yet fully
+  /// closed, we hold off forwarding deltas to [onTextDelta] so TTS does not
+  /// speak the marker text.  Once the marker is closed (or if no marker is
+  /// present) we forward immediately.
+  void _handleDelta(String delta) {
+    final buffer = _currentResponse.toString();
+
+    if (_pendingMarkerCheck) {
+      if (CorrectionParser.bufferMayHaveMarker(buffer)) {
+        if (CorrectionParser.markerIsClosed(buffer)) {
+          // Marker is now fully buffered — don't forward any delta; the full
+          // cleaned text will be forwarded via [_handleTextComplete].
+          _pendingMarkerCheck = false;
+        }
+        // Still accumulating the marker — do not forward delta.
+        return;
+      } else {
+        // Buffer does not start with a marker — safe to stream immediately.
+        _pendingMarkerCheck = false;
+        onTextDelta?.call(delta);
+      }
+    } else {
+      onTextDelta?.call(delta);
+    }
+  }
+
+  /// Handle the fully-accumulated response text.
+  ///
+  /// Runs the text through [CorrectionParser], emits any found [Correction]
+  /// via [onCorrectionFound], and calls [onTextComplete] with the cleaned text.
+  void _handleTextComplete(String fullText) {
+    final result = CorrectionParser.parse(fullText);
+
+    if (result.correction != null) {
+      debugPrint('OpenAI: Correction found: ${result.correction}');
+      onCorrectionFound?.call(result.correction!);
+    }
+
+    final cleaned = result.cleanedText;
+    if (cleaned.isNotEmpty) {
+      onTextComplete?.call(cleaned);
     }
   }
 
@@ -369,6 +424,7 @@ Start by setting the scene and initiating the roleplay scenario.
     disconnect();
     onTextDelta = null;
     onTextComplete = null;
+    onCorrectionFound = null;
     onError = null;
     onConnectionStateChange = null;
   }

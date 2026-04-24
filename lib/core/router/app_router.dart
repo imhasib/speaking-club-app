@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../features/ai_practice/presentation/screens/ai_history_screen.dart';
+import '../../features/ai_practice/presentation/screens/ai_session_detail_screen.dart';
 import '../../features/ai_practice/presentation/screens/ai_session_screen.dart';
 import '../../features/ai_practice/presentation/screens/ai_summary_screen.dart';
 import '../../features/ai_practice/presentation/screens/mode_selection_screen.dart';
@@ -64,7 +66,9 @@ class AppRouter {
             currentPath == Routes.incomingCall ||
             currentPath == Routes.aiPractice ||
             currentPath == Routes.aiSession ||
-            currentPath == Routes.aiSummary;
+            currentPath == Routes.aiSummary ||
+            currentPath == Routes.aiHistory ||
+            currentPath.startsWith('/ai-practice/sessions/');
 
         // If authenticated and on auth route, go to home
         if (isAuthenticated && isAuthRoute) {
@@ -195,6 +199,25 @@ class AppRouter {
           path: Routes.aiSummary,
           name: Routes.aiSummaryName,
           builder: (context, state) => const AiSummaryScreen(),
+        ),
+        GoRoute(
+          path: Routes.aiHistory,
+          name: Routes.aiHistoryName,
+          pageBuilder: (context, state) => buildPageWithTransition(
+            context: context,
+            state: state,
+            child: const AiHistoryScreen(),
+            type: PageTransitionType.slideUp,
+            duration: const Duration(milliseconds: 300),
+          ),
+        ),
+        GoRoute(
+          path: Routes.aiSessionDetail,
+          name: Routes.aiSessionDetailName,
+          builder: (context, state) {
+            final sessionId = state.pathParameters['sessionId']!;
+            return AiSessionDetailScreen(sessionId: sessionId);
+          },
         ),
 
         // Main app routes with bottom navigation

@@ -98,7 +98,7 @@ class SpeechService {
         onResult: _handleResult,
         localeId: _currentLocale,
         listenMode: ListenMode.dictation,
-        pauseFor: const Duration(seconds: 3),
+        pauseFor: const Duration(seconds: 4),
         cancelOnError: false,
         partialResults: true,
       );
@@ -162,14 +162,19 @@ class SpeechService {
   void _handleError(SpeechRecognitionError error) {
     debugPrint('Speech: Error: ${error.errorMsg}');
 
+    // Soft errors: the user was simply silent. Don't surface to the UI —
+    // emit an empty final result so the conversation auto-restarts the
+    // listener instead of stopping mid-flow.
+    if (error.errorMsg == 'error_no_match' ||
+        error.errorMsg == 'error_speech_timeout') {
+      _setState(SpeechState.ready);
+      onListeningStateChange?.call(false);
+      onResult?.call('', true);
+      return;
+    }
+
     String userMessage;
     switch (error.errorMsg) {
-      case 'error_no_match':
-        userMessage = "I didn't catch that. Please try again.";
-        break;
-      case 'error_speech_timeout':
-        userMessage = 'No speech detected. Please try again.';
-        break;
       case 'error_audio':
         userMessage = 'Audio error. Please check your microphone.';
         break;

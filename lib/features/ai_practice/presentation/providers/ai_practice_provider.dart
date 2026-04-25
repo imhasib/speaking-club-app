@@ -290,8 +290,9 @@ class AiPracticeNotifier extends Notifier<AiPracticeState> {
       dev.log('AI Practice: AI finished speaking, auto-starting listening');
       state = state.copyWith(phase: AiPracticePhase.ready);
 
-      // Auto-start listening after a brief delay
-      Future.delayed(const Duration(milliseconds: 300), () {
+      // Auto-start listening after a brief delay — gives the user a moment to
+      // process what the AI just said before the mic reopens.
+      Future.delayed(const Duration(milliseconds: 500), () {
         if (state.isInConversation && !_tts.isSpeaking) {
           startListening();
         }
@@ -474,8 +475,13 @@ class AiPracticeNotifier extends Notifier<AiPracticeState> {
       wordsSpoken: state.wordsSpoken + wordCount,
     );
 
-    // Send to OpenAI
-    _openAI.sendMessage(text);
+    // Small "thinking" delay before AI responds — makes the conversation feel
+    // more natural/human, as if the AI is briefly processing what was said.
+    Future.delayed(const Duration(milliseconds: 500), () {
+      if (state.isInConversation) {
+        _openAI.sendMessage(text);
+      }
+    });
   }
 
   /// Start listening for user speech

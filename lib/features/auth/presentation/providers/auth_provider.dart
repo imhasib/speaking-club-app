@@ -4,6 +4,7 @@ import '../../../../core/errors/app_exception.dart';
 import '../../../../shared/models/auth_tokens.dart';
 import '../../../../shared/models/user.dart';
 import '../../../profile/presentation/providers/profile_provider.dart';
+import '../../../realtime/data/socket_service.dart';
 import '../../data/auth_repository.dart';
 import '../../data/google_auth_service.dart';
 import '../../domain/auth_state.dart';
@@ -184,6 +185,27 @@ class AuthNotifier extends Notifier<AuthState> {
       ref.invalidate(profileDataProvider);
       state = const AuthState.unauthenticated();
     }
+  }
+
+  /// Called when the refresh token is no longer valid (server rejected it
+  /// with 401/403, or no refresh token is stored). Clears local session
+  /// state without calling the server logout endpoint, since the credentials
+  /// we'd send have already been rejected.
+  Future<void> sessionExpired() async {
+    if (state is AuthStateUnauthenticated) return;
+    try {
+      await _googleAuthService.signOut();
+    } catch (_) {
+      // Ignore — we still want to clear local state below.
+    }
+    try {
+      ref.read(socketServiceProvider).disconnect();
+    } catch (_) {
+      // Socket may not be initialized at this point (e.g. cold-start refresh).
+    }
+    await _authRepository.clearTokens();
+    ref.invalidate(profileDataProvider);
+    state = const AuthState.unauthenticated();
   }
 
   /// Clear error state

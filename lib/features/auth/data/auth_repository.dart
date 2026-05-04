@@ -141,7 +141,14 @@ class AuthRepository {
         data: {'refreshToken': refreshToken},
       );
 
-      final tokens = AuthTokens.fromJson(response.data['data']);
+      // user-service returns a flat { accessToken, refreshToken } payload.
+      // Tolerate a wrapped { data: {...} } shape too in case nginx/middleware
+      // ever rewraps it.
+      final raw = response.data as Map<String, dynamic>;
+      final payload = raw['data'] is Map<String, dynamic>
+          ? raw['data'] as Map<String, dynamic>
+          : raw;
+      final tokens = AuthTokens.fromJson(payload);
       await _saveTokens(tokens);
       return tokens;
     } on DioException catch (e) {

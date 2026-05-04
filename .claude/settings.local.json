@@ -33,7 +33,10 @@
       "Bash(grep -E \"\\\\.\\(dart\\)$\")",
       "Bash(cat)",
       "Read(//tmp/**)",
-      "Bash(git stash *)"
+      "Bash(git stash *)",
+      "Bash(git commit *)",
+      "Read(//e/org-karigor/speaking-club/repos/**)",
+      "Read(//e/org-karigor/**)"
     ]
   }
 }

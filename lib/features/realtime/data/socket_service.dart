@@ -159,6 +159,14 @@ class SocketService {
     }
   }
 
+  /// Update the auth token used by the socket so the next handshake
+  /// (typically on reconnect) sends the fresh JWT. The current live
+  /// connection is not interrupted — server-side JWT validation only
+  /// happens at handshake time.
+  void updateAuthToken(String token) {
+    _socket?.auth = {'token': token};
+  }
+
   /// Disconnect from the socket server
   void disconnect() {
     dev.log('🔌 Disconnecting socket...');

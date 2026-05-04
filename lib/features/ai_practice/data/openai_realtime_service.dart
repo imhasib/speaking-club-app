@@ -47,7 +47,7 @@ typedef OnConnectionStateChange = void Function(OpenAIConnectionState state);
 /// Service for connecting to OpenAI Realtime API
 class OpenAIRealtimeService {
   static const String _baseUrl = 'wss://api.openai.com/v1/realtime';
-  static const String _model = 'gpt-4o-realtime-preview';
+  static const String _model = 'gpt-4o-mini-realtime-preview';
 
   final WebSocketChannelFactory _channelFactory;
 

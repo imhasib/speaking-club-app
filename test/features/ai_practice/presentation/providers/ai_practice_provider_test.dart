@@ -353,6 +353,57 @@ void main() {
       // After reconnect failure, session is ended → state resets to idle.
       expect(s.phase, AiPracticePhase.idle);
     });
+
+    test('does NOT attempt a second reconnect after max attempts reached',
+        () async {
+      final (:container, :openAI, :repo, :speech, :tts) = _makeContainer();
+      addTearDown(container.dispose);
+
+      await _startConnectedSession(container, openAI, repo);
+
+      when(() => repo.refreshSessionToken(any()))
+          .thenAnswer((_) async => _fakeToken(key: 'ek-refreshed'));
+      when(() => repo.endSession(any())).thenAnswer((_) async {});
+
+      // First disconnect → triggers reconnect attempt #1
+      openAI.simulateDisconnect();
+      await pumpEventQueue();
+      await Future.delayed(Duration.zero);
+      openAI.simulateConnect(); // reconnect succeeds
+
+      // Second disconnect → max attempts reached → should end session, not reconnect
+      openAI.simulateDisconnect();
+      await pumpEventQueue();
+      await Future.delayed(Duration.zero);
+
+      // refreshSessionToken called only once (first reconnect, not second)
+      verify(() => repo.refreshSessionToken(any())).called(1);
+      expect(container.read(aiPracticeProvider).phase, AiPracticePhase.idle);
+    });
+
+    test('fatal OpenAI error blocks reconnect and sets error phase', () async {
+      final (:container, :openAI, :repo, :speech, :tts) = _makeContainer();
+      addTearDown(container.dispose);
+
+      await _startConnectedSession(container, openAI, repo);
+
+      // Simulate fatal OpenAI error (model mismatch)
+      openAI.simulateError(
+          'Model "gpt-4o-realtime-preview" does not match the realtime token model.');
+      await pumpEventQueue();
+
+      final s = container.read(aiPracticeProvider);
+      expect(s.phase, AiPracticePhase.error);
+      expect(s.error, contains('does not match'));
+
+      // Now disconnect fires — should NOT trigger a reconnect
+      when(() => repo.endSession(any())).thenAnswer((_) async {});
+      openAI.simulateDisconnect();
+      await pumpEventQueue();
+      await Future.delayed(Duration.zero);
+
+      verifyNever(() => repo.refreshSessionToken(any()));
+    });
   });
 
   // ─── OpenAI connection error ───────────────────────────────────────────────

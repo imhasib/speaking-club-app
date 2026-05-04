@@ -69,6 +69,11 @@ class FakeOpenAIRealtimeService extends OpenAIRealtimeService {
     onError?.call(message);
   }
 
+  /// Simulate an application-level OpenAI error (e.g. model mismatch).
+  /// Does NOT change connection state — the WS stays "connected" until the
+  /// server closes it separately.
+  void simulateError(String message) => onError?.call(message);
+
   void simulateTextDelta(String delta) => onTextDelta?.call(delta);
   void simulateTextComplete(String text) => onTextComplete?.call(text);
 

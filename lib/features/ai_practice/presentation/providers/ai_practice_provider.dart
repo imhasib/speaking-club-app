@@ -62,6 +62,11 @@ class AiPracticeNotifier extends Notifier<AiPracticeState> {
   // Whether a reconnect attempt is in progress
   bool _reconnecting = false;
 
+  // Number of reconnect attempts so far; reset on each new session.
+  // Capped at 1 to prevent infinite loops when the error is unrecoverable.
+  int _reconnectAttempts = 0;
+  static const int _maxReconnectAttempts = 1;
+
   // Whether the session timer has been started (only after AI first responds)
   bool _timerStarted = false;
 
@@ -140,10 +145,18 @@ class AiPracticeNotifier extends Notifier<AiPracticeState> {
       _openAI.triggerInitialGreeting();
     } else if (connectionState == OpenAIConnectionState.disconnected &&
         state.isActive &&
-        !_reconnecting) {
+        !_reconnecting &&
+        _reconnectAttempts < _maxReconnectAttempts) {
       // M7: Mid-session disconnect — attempt one reconnect
-      dev.log('AI Practice: WebSocket disconnected mid-session, attempting reconnect');
+      dev.log('AI Practice: WebSocket disconnected mid-session, attempting reconnect (attempt ${_reconnectAttempts + 1}/$_maxReconnectAttempts)');
+      _reconnectAttempts++;
       _attemptReconnect();
+    } else if (connectionState == OpenAIConnectionState.disconnected &&
+        state.isActive &&
+        _reconnectAttempts >= _maxReconnectAttempts) {
+      // Max reconnect attempts reached — end session gracefully
+      dev.log('AI Practice: Max reconnect attempts reached, ending session');
+      endSession();
     } else if (connectionState == OpenAIConnectionState.error) {
       state = state.copyWith(
         phase: AiPracticePhase.error,
@@ -246,8 +259,24 @@ class AiPracticeNotifier extends Notifier<AiPracticeState> {
   }
 
   void _onOpenAIError(String error) {
+    if (_disposed) return;
     dev.log('AI Practice: OpenAI error: $error');
-    state = state.copyWith(error: error);
+    // Fatal errors (model mismatch, invalid key) cannot be recovered by
+    // reconnecting — exhaust the reconnect budget immediately so the
+    // disconnected callback ends the session instead of looping.
+    final isFatal = error.contains('does not match') ||
+        error.contains('invalid_api_key') ||
+        error.contains('invalid_client_secret');
+    if (isFatal) {
+      dev.log('AI Practice: Fatal error — blocking further reconnects');
+      _reconnectAttempts = _maxReconnectAttempts;
+      state = state.copyWith(
+        phase: AiPracticePhase.error,
+        error: error,
+      );
+    } else {
+      state = state.copyWith(error: error);
+    }
   }
 
   // === Speech Callbacks ===
@@ -412,6 +441,7 @@ class AiPracticeNotifier extends Notifier<AiPracticeState> {
 
     _sttFailureCount = 0;
     _reconnecting = false;
+    _reconnectAttempts = 0;
     _timerStarted = false;
     _refreshingKey = false;
 

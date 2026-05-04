@@ -36,7 +36,32 @@
       "Bash(git stash *)",
       "Bash(git commit *)",
       "Read(//e/org-karigor/speaking-club/repos/**)",
-      "Read(//e/org-karigor/**)"
+      "Read(//e/org-karigor/**)",
+      "Bash(cp E:/org-karigor/speaking-club/design/flutter_launcher/android/__TRACKED_VAR__/ic_launcher.png E:/org-karigor/speaking-club/sc-repos/speaking-club-app/android/app/src/main/res/__TRACKED_VAR__/ic_launcher.png)",
+      "Bash(cp E:/org-karigor/speaking-club/design/flutter_launcher/android/mipmap-xxxhdpi/ic_launcher_foreground.png E:/org-karigor/speaking-club/sc-repos/speaking-club-app/android/app/src/main/res/mipmap-xxxhdpi/ic_launcher_foreground.png)",
+      "Bash(cp E:/org-karigor/speaking-club/design/flutter_launcher/android/mipmap-xxxhdpi/ic_launcher_background.png E:/org-karigor/speaking-club/sc-repos/speaking-club-app/android/app/src/main/res/drawable/ic_launcher_background.png)",
+      "Bash(cp E:/org-karigor/speaking-club/design/flutter_launcher/android/drawable/ic_launcher_background.xml E:/org-karigor/speaking-club/sc-repos/speaking-club-app/android/app/src/main/res/drawable/ic_launcher_background.xml)",
+      "Bash(cp E:/org-karigor/speaking-club/design/flutter_launcher/android/mipmap-anydpi-v26/ic_launcher.xml E:/org-karigor/speaking-club/sc-repos/speaking-club-app/android/app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml)",
+      "Bash(mkdir -p \"E:/org-karigor/speaking-club/sc-repos/speaking-club-app/android/app/src/main/res/mipmap-anydpi-v26\")",
+      "Bash(cp \"E:/org-karigor/speaking-club/design/flutter_launcher/android/mipmap-anydpi-v26/ic_launcher.xml\" \"E:/org-karigor/speaking-club/sc-repos/speaking-club-app/android/app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml\")",
+      "Bash(git -C \"E:/org-karigor/speaking-club/sc-repos/speaking-club-app\" status)",
+      "Bash(git -C \"E:/org-karigor/speaking-club/sc-repos/speaking-club-app\" diff --stat)",
+      "Bash(python -c \"from PIL import Image, ImageDraw; print\\('Pillow OK'\\)\")",
+      "Bash(py --version)",
+      "Bash(dart --version)",
+      "Bash(npm list *)",
+      "Bash(dart pub *)",
+      "Bash(where inkscape *)",
+      "Bash(where rsvg-convert *)",
+      "Bash(where magick *)",
+      "Bash(where convert *)",
+      "Bash(where ffmpeg *)",
+      "Bash(magick --version)",
+      "Bash(convert --version)",
+      "Bash(where flutter *)",
+      "Bash(awk '{print $NF}')",
+      "Bash(xargs -I{} basename {})",
+      "Bash(git checkout *)"
     ]
   }
 }

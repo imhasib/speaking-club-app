@@ -5,7 +5,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:Speaking_club/features/ai_practice/data/ai_session_repository.dart';
-import 'package:Speaking_club/features/ai_practice/data/openai_realtime_service.dart';
 import 'package:Speaking_club/features/ai_practice/domain/ai_practice_state.dart';
 import 'package:Speaking_club/features/ai_practice/presentation/providers/ai_practice_provider.dart';
 import 'package:Speaking_club/shared/models/ai_session.dart';
@@ -296,7 +295,7 @@ void main() {
   // ─── Reconnect behaviour ───────────────────────────────────────────────────
 
   group('mid-session disconnect', () {
-    Future<void> _startConnectedSession(
+    Future<void> startConnectedSession(
       ProviderContainer container,
       FakeOpenAIRealtimeService openAI,
       _MockRepository repo,
@@ -323,7 +322,7 @@ void main() {
       final (:container, :openAI, :repo, :speech, :tts) = _makeContainer();
       addTearDown(container.dispose);
 
-      await _startConnectedSession(container, openAI, repo);
+      await startConnectedSession(container, openAI, repo);
 
       when(() => repo.refreshSessionToken(any()))
           .thenAnswer((_) async => _fakeToken(key: 'ek-refreshed'));
@@ -339,7 +338,7 @@ void main() {
       final (:container, :openAI, :repo, :speech, :tts) = _makeContainer();
       addTearDown(container.dispose);
 
-      await _startConnectedSession(container, openAI, repo);
+      await startConnectedSession(container, openAI, repo);
 
       when(() => repo.refreshSessionToken(any()))
           .thenThrow(Exception('No network'));
@@ -359,7 +358,7 @@ void main() {
       final (:container, :openAI, :repo, :speech, :tts) = _makeContainer();
       addTearDown(container.dispose);
 
-      await _startConnectedSession(container, openAI, repo);
+      await startConnectedSession(container, openAI, repo);
 
       when(() => repo.refreshSessionToken(any()))
           .thenAnswer((_) async => _fakeToken(key: 'ek-refreshed'));
@@ -385,7 +384,7 @@ void main() {
       final (:container, :openAI, :repo, :speech, :tts) = _makeContainer();
       addTearDown(container.dispose);
 
-      await _startConnectedSession(container, openAI, repo);
+      await startConnectedSession(container, openAI, repo);
 
       // Simulate fatal OpenAI error (model mismatch)
       openAI.simulateError(

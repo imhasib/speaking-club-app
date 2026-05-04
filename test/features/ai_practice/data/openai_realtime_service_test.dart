@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter_test/flutter_test.dart';
@@ -100,7 +99,7 @@ void main() {
       // We need a channel whose ready future throws.
       final throwingChannel = _ThrowingReadyChannel();
       service = OpenAIRealtimeService(
-        channelFactory: (_, __) => throwingChannel,
+        channelFactory: (_, _) => throwingChannel,
       );
       service.onConnectionStateChange = connectionStates.add;
       service.onError = errors.add;

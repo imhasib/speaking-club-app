@@ -1,6 +1,8 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 
+import '../../../../core/theme/app_colors.dart';
+
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
 
@@ -54,7 +56,7 @@ class _SplashScreenState extends State<SplashScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF14142A),
+      backgroundColor: AppColors.night800,
       body: AnimatedBuilder(
         animation: Listenable.merge([
           _orbController1,
@@ -102,12 +104,7 @@ class _SplashScreenState extends State<SplashScreen>
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
               stops: [0.0, 0.38, 0.76, 1.0],
-              colors: [
-                Color(0xFF14142A),
-                Color(0xFF1A1A2E),
-                Color(0xFF2A2752),
-                Color(0xFF3B3B98),
-              ],
+              colors: AppColors.splashGradient,
             ),
           ),
         ),
@@ -118,7 +115,7 @@ class _SplashScreenState extends State<SplashScreen>
           top: size.height * 0.10 + orb1Dy,
           child: _Orb(
             diameter: size.width * 0.65,
-            color: const Color(0xFF8E44AD),
+            color: AppColors.secondary,
             opacity: 0.55,
           ),
         ),
@@ -129,7 +126,7 @@ class _SplashScreenState extends State<SplashScreen>
           bottom: size.height * 0.05 + orb2Dy,
           child: _Orb(
             diameter: size.width * 0.74,
-            color: const Color(0xFF3B3B98),
+            color: AppColors.primary,
             opacity: 0.55,
           ),
         ),
@@ -286,7 +283,7 @@ class _SplashScreenState extends State<SplashScreen>
   static Widget _subtitleWord(String text) => Text(
         text,
         style: const TextStyle(
-          color: Color(0xFFCDB8FF),
+          color: AppColors.lavender,
           fontSize: 15,
           fontWeight: FontWeight.w400,
           letterSpacing: 2,
@@ -298,7 +295,7 @@ class _SplashScreenState extends State<SplashScreen>
         height: 4,
         margin: const EdgeInsets.symmetric(horizontal: 10),
         decoration: BoxDecoration(
-          color: const Color(0xFFCDB8FF).withValues(alpha: 0.55),
+          color: AppColors.lavender.withValues(alpha: 0.55),
           shape: BoxShape.circle,
         ),
       );
@@ -375,7 +372,7 @@ class _SpeakingClubIcon extends StatelessWidget {
         borderRadius: BorderRadius.circular(radius),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF8E44AD).withValues(alpha: 0.45),
+            color: AppColors.secondary.withValues(alpha: 0.45),
             offset: Offset(0, size * 40 / 360),
             blurRadius: size * 80 / 360,
             spreadRadius: -size * 24 / 360,
@@ -415,7 +412,7 @@ class _IconPainter extends CustomPainter {
         ..shader = const LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [Color(0xFF3B3B98), Color(0xFF8E44AD)],
+          colors: AppColors.brandGradient,
         ).createShader(bounds),
     );
 
@@ -482,7 +479,7 @@ class _IconPainter extends CustomPainter {
     final barShader = const LinearGradient(
       begin: Alignment.topLeft,
       end: Alignment.bottomRight,
-      colors: [Color(0xFF3B3B98), Color(0xFF8E44AD)],
+      colors: AppColors.brandGradient,
     ).createShader(bounds);
 
     const bars = [

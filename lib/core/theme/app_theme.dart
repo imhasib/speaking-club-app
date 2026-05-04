@@ -14,8 +14,13 @@ class AppTheme {
       seedColor: AppColors.primary,
       brightness: Brightness.light,
       primary: AppColors.primary,
+      onPrimary: Colors.white,
       secondary: AppColors.secondary,
+      onSecondary: Colors.white,
       surface: AppColors.surface,
+      onSurface: AppColors.ink,
+      onSurfaceVariant: AppColors.mutedInk,
+      outline: AppColors.line,
       error: AppColors.error,
     );
 
@@ -23,7 +28,7 @@ class AppTheme {
       useMaterial3: true,
       colorScheme: colorScheme,
       brightness: Brightness.light,
-      scaffoldBackgroundColor: AppColors.background,
+      scaffoldBackgroundColor: AppColors.surfaceAlt,
       fontFamily: AppTypography.fontFamily,
       textTheme: _buildTextTheme(colorScheme),
       appBarTheme: _buildAppBarTheme(colorScheme, Brightness.light),
@@ -52,9 +57,14 @@ class AppTheme {
     final colorScheme = ColorScheme.fromSeed(
       seedColor: AppColors.primary,
       brightness: Brightness.dark,
-      primary: AppColors.primaryLight,
+      primary: AppColors.lavender,
+      onPrimary: AppColors.night900,
       secondary: AppColors.secondaryLight,
-      surface: AppColors.surfaceDark,
+      onSecondary: AppColors.night900,
+      surface: AppColors.night800,
+      onSurface: Colors.white,
+      onSurfaceVariant: AppColors.textSecondaryDark,
+      outline: AppColors.night600,
       error: AppColors.error,
     );
 
@@ -62,7 +72,7 @@ class AppTheme {
       useMaterial3: true,
       colorScheme: colorScheme,
       brightness: Brightness.dark,
-      scaffoldBackgroundColor: AppColors.backgroundDark,
+      scaffoldBackgroundColor: AppColors.night900,
       fontFamily: AppTypography.fontFamily,
       textTheme: _buildTextTheme(colorScheme),
       appBarTheme: _buildAppBarTheme(colorScheme, Brightness.dark),

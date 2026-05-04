@@ -60,6 +60,9 @@ class AiPracticeNotifier extends Notifier<AiPracticeState> {
   // Whether a reconnect attempt is in progress
   bool _reconnecting = false;
 
+  // Whether the session timer has been started (only after AI first responds)
+  bool _timerStarted = false;
+
   @override
   AiPracticeState build() {
     _setupCallbacks();
@@ -103,13 +106,12 @@ class AiPracticeNotifier extends Notifier<AiPracticeState> {
 
     if (connectionState == OpenAIConnectionState.connected &&
         state.phase == AiPracticePhase.connecting) {
-      // Connected successfully, start session
+      // Connected and session configured — wait for AI's first response before
+      // starting the timer so the user isn't penalised for initialisation time.
       state = state.copyWith(
         phase: AiPracticePhase.thinking,
-        sessionStartTime: DateTime.now(),
         currentSpeaker: Speaker.none,
       );
-      _startDurationTimer();
       dev.log('AI Practice: Session started, triggering AI greeting');
 
       // M3: Fire POST /session/start after WebSocket + session.update
@@ -177,6 +179,15 @@ class AiPracticeNotifier extends Notifier<AiPracticeState> {
   }
 
   void _onTextDelta(String delta) {
+    // Start the session timer on the very first AI text — the conversation has
+    // genuinely begun only now, so the user isn't penalised for setup latency.
+    if (!_timerStarted) {
+      _timerStarted = true;
+      state = state.copyWith(sessionStartTime: DateTime.now());
+      _startDurationTimer();
+      dev.log('AI Practice: Timer started on first AI response');
+    }
+
     // Accumulate AI response text for streaming display
     state = state.copyWith(
       currentAiText: state.currentAiText + delta,
@@ -374,6 +385,7 @@ class AiPracticeNotifier extends Notifier<AiPracticeState> {
 
     _sttFailureCount = 0;
     _reconnecting = false;
+    _timerStarted = false;
 
     state = state.copyWith(
       phase: AiPracticePhase.initializing,

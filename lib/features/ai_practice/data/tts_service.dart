@@ -18,8 +18,15 @@ enum TtsState {
 
 /// Service for on-device text-to-speech
 class TtsService {
-  final FlutterTts _tts = FlutterTts();
+  // Lazily created so test subclasses that override all methods never
+  // instantiate FlutterTts (which requires the Flutter binding).
+  FlutterTts? _ttsInstance;
+  final FlutterTts? _injectedTts;
+  FlutterTts get _tts => _injectedTts ?? (_ttsInstance ??= FlutterTts());
+
   TtsState _state = TtsState.idle;
+
+  TtsService({FlutterTts? tts}) : _injectedTts = tts;
   bool _isInitialized = false;
 
   // Settings
@@ -230,7 +237,7 @@ class TtsService {
 
   /// Dispose resources
   void dispose() {
-    stop();
+    (_injectedTts ?? _ttsInstance)?.stop();
     onSpeakingStateChange = null;
     onProgress = null;
   }

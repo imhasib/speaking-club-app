@@ -40,10 +40,12 @@ final aiPracticeProvider =
 
 /// AI Practice notifier for session state management
 class AiPracticeNotifier extends Notifier<AiPracticeState> {
-  OpenAIRealtimeService get _openAI => ref.read(openAIServiceProvider);
-  SpeechService get _speech => ref.read(speechServiceProvider);
-  TtsService get _tts => ref.read(ttsServiceProvider);
-  AiSessionRepository get _repository => ref.read(aiSessionRepositoryProvider);
+  // Cached at build() time so they remain accessible in dispose callbacks,
+  // where ref.read() is no longer allowed (Riverpod 3 restriction).
+  late OpenAIRealtimeService _openAI;
+  late SpeechService _speech;
+  late TtsService _tts;
+  late AiSessionRepository _repository;
 
   Timer? _durationTimer;
   Timer? _keyRefreshTimer;
@@ -63,11 +65,23 @@ class AiPracticeNotifier extends Notifier<AiPracticeState> {
   // Whether the session timer has been started (only after AI first responds)
   bool _timerStarted = false;
 
+  // Guard against concurrent ephemeral-key refresh calls
+  bool _refreshingKey = false;
+
+  // Set to true in onDispose; all callbacks check this before touching state.
+  bool _disposed = false;
+
   @override
   AiPracticeState build() {
+    _openAI = ref.read(openAIServiceProvider);
+    _speech = ref.read(speechServiceProvider);
+    _tts = ref.read(ttsServiceProvider);
+    _repository = ref.read(aiSessionRepositoryProvider);
+
     _setupCallbacks();
 
     ref.onDispose(() {
+      _disposed = true;
       _cleanup();
     });
 
@@ -94,6 +108,10 @@ class AiPracticeNotifier extends Notifier<AiPracticeState> {
   void _cleanup() {
     _durationTimer?.cancel();
     _keyRefreshTimer?.cancel();
+    // Disconnect without going through the callback path — the service's own
+    // provider disposes it separately, so calling disconnect() here would fire
+    // _onOpenAIConnectionChange on an already-disposed notifier.
+    _openAI.onConnectionStateChange = null;
     _openAI.disconnect();
     _speech.stopListening();
     _tts.stop();
@@ -102,6 +120,7 @@ class AiPracticeNotifier extends Notifier<AiPracticeState> {
   // === OpenAI Callbacks ===
 
   void _onOpenAIConnectionChange(OpenAIConnectionState connectionState) {
+    if (_disposed) return;
     state = state.copyWith(openAIConnectionState: connectionState);
 
     if (connectionState == OpenAIConnectionState.connected &&
@@ -179,6 +198,7 @@ class AiPracticeNotifier extends Notifier<AiPracticeState> {
   }
 
   void _onTextDelta(String delta) {
+    if (_disposed) return;
     // Start the session timer on the very first AI text — the conversation has
     // genuinely begun only now, so the user isn't penalised for setup latency.
     if (!_timerStarted) {
@@ -197,6 +217,7 @@ class AiPracticeNotifier extends Notifier<AiPracticeState> {
   }
 
   void _onTextComplete(String fullText) {
+    if (_disposed) return;
     // AI response complete — fullText is already cleaned (no marker) by the
     // service layer.  Add to messages and pass to TTS.
     final message = AiMessage(
@@ -232,6 +253,7 @@ class AiPracticeNotifier extends Notifier<AiPracticeState> {
   // === Speech Callbacks ===
 
   void _onSpeechResult(String text, bool isFinal) {
+    if (_disposed) return;
     state = state.copyWith(
       currentUserText: text,
       speechState: _speech.state,
@@ -276,6 +298,7 @@ class AiPracticeNotifier extends Notifier<AiPracticeState> {
   }
 
   void _onListeningStateChange(bool isListening) {
+    if (_disposed) return;
     if (isListening) {
       state = state.copyWith(
         phase: AiPracticePhase.listening,
@@ -291,6 +314,7 @@ class AiPracticeNotifier extends Notifier<AiPracticeState> {
   // === TTS Callbacks ===
 
   void _onTtsSpeakingChange(bool isSpeaking) {
+    if (_disposed) return;
     state = state.copyWith(
       ttsState: _tts.state,
       currentSpeaker: isSpeaking ? Speaker.ai : Speaker.none,
@@ -355,7 +379,8 @@ class AiPracticeNotifier extends Notifier<AiPracticeState> {
   }
 
   Future<void> _refreshKey() async {
-    if (state.sessionId == null) return;
+    if (_refreshingKey || state.sessionId == null) return;
+    _refreshingKey = true;
 
     try {
       dev.log('AI Practice: Refreshing ephemeral key');
@@ -365,6 +390,8 @@ class AiPracticeNotifier extends Notifier<AiPracticeState> {
       dev.log('AI Practice: Key refreshed successfully');
     } catch (e) {
       dev.log('AI Practice: Failed to refresh key: $e');
+    } finally {
+      _refreshingKey = false;
     }
   }
 
@@ -386,6 +413,7 @@ class AiPracticeNotifier extends Notifier<AiPracticeState> {
     _sttFailureCount = 0;
     _reconnecting = false;
     _timerStarted = false;
+    _refreshingKey = false;
 
     state = state.copyWith(
       phase: AiPracticePhase.initializing,
@@ -406,8 +434,10 @@ class AiPracticeNotifier extends Notifier<AiPracticeState> {
     try {
       // M7: Check microphone permission before initialising STT.
       final micStatus = await Permission.microphone.status;
+      if (_disposed) return;
       if (micStatus.isDenied || micStatus.isPermanentlyDenied) {
         final requested = await Permission.microphone.request();
+        if (_disposed) return;
         if (!requested.isGranted) {
           state = state.copyWith(
             phase: AiPracticePhase.error,
@@ -419,15 +449,17 @@ class AiPracticeNotifier extends Notifier<AiPracticeState> {
 
       // Initialize STT
       await _speech.initialize();
+      if (_disposed) return;
 
       // Initialize TTS — M7: gracefully degrade if it fails
       try {
         await _tts.initialize();
+        if (_disposed) return;
         _ttsAvailable = true;
       } catch (e) {
         dev.log('AI Practice: TTS init failed (text-only mode): $e');
         _ttsAvailable = false;
-        state = state.copyWith(ttsAvailable: false);
+        if (!_disposed) state = state.copyWith(ttsAvailable: false);
       }
 
       // Request ephemeral key from backend
@@ -438,6 +470,7 @@ class AiPracticeNotifier extends Notifier<AiPracticeState> {
         topic: topic,
         scenario: scenario,
       );
+      if (_disposed) return;
 
       state = state.copyWith(
         sessionId: tokenResponse.sessionId,
@@ -457,6 +490,7 @@ class AiPracticeNotifier extends Notifier<AiPracticeState> {
         scenario: scenario,
       );
     } catch (e) {
+      if (_disposed) return;
       dev.log('AI Practice: Failed to start session: $e');
       state = state.copyWith(
         phase: AiPracticePhase.error,

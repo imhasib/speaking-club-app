@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/constants/api_endpoints.dart';
@@ -197,6 +198,17 @@ class AiSessionRepository {
       throw e.error ?? e;
     }
   }
+
+  /// Exposed for unit-testing parsing logic without a real Dio or network.
+  @visibleForTesting
+  EphemeralKeyResponse parseEphemeralKeyResponseForTest(
+    dynamic responseBody, {
+    String? fallbackSessionId,
+  }) =>
+      _parseEphemeralKeyResponse(
+        responseBody,
+        fallbackSessionId: fallbackSessionId,
+      );
 
   /// Parse and validate an [EphemeralKeyResponse] from a raw API response map.
   /// Throws a [FormatException] with a clear message instead of a cryptic

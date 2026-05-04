@@ -21,8 +21,16 @@ enum SpeechState {
 
 /// Service for on-device speech-to-text
 class SpeechService {
-  final SpeechToText _speech = SpeechToText();
+  // Lazily created so test subclasses that override all methods never
+  // instantiate SpeechToText (avoids platform-channel issues in headless tests).
+  SpeechToText? _speechInstance;
+  final SpeechToText? _injectedSpeech;
+  SpeechToText get _speech =>
+      _injectedSpeech ?? (_speechInstance ??= SpeechToText());
+
   SpeechState _state = SpeechState.idle;
+
+  SpeechService({SpeechToText? speech}) : _injectedSpeech = speech;
   bool _isInitialized = false;
   String _currentLocale = 'en_US';
 
@@ -215,7 +223,7 @@ class SpeechService {
 
   /// Dispose resources
   void dispose() {
-    _speech.cancel();
+    (_injectedSpeech ?? _speechInstance)?.cancel();
     onResult = null;
     onError = null;
     onListeningStateChange = null;

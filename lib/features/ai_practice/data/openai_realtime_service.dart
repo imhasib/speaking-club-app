@@ -7,6 +7,13 @@ import 'package:web_socket_channel/web_socket_channel.dart';
 import '../../../shared/models/ai_session.dart';
 import 'correction_parser.dart';
 
+/// Factory that creates a [WebSocketChannel] for a given URI and protocols.
+/// Injected so tests can supply a fake channel without hitting the network.
+typedef WebSocketChannelFactory = WebSocketChannel Function(
+  Uri uri,
+  List<String> protocols,
+);
+
 /// OpenAI Realtime API event types
 class OpenAIEventTypes {
   static const String sessionUpdate = 'session.update';
@@ -41,6 +48,13 @@ typedef OnConnectionStateChange = void Function(OpenAIConnectionState state);
 class OpenAIRealtimeService {
   static const String _baseUrl = 'wss://api.openai.com/v1/realtime';
   static const String _model = 'gpt-4o-realtime-preview';
+
+  final WebSocketChannelFactory _channelFactory;
+
+  OpenAIRealtimeService({WebSocketChannelFactory? channelFactory})
+      : _channelFactory = channelFactory ??
+            ((uri, protocols) =>
+                WebSocketChannel.connect(uri, protocols: protocols));
 
   WebSocketChannel? _channel;
   StreamSubscription? _subscription;
@@ -87,10 +101,11 @@ class OpenAIRealtimeService {
     try {
       final uri = Uri.parse('$_baseUrl?model=$_model');
 
-      _channel = WebSocketChannel.connect(
-        uri,
-        protocols: ['realtime', 'openai-insecure-api-key.$ephemeralKey', 'openai-beta.realtime-v1'],
-      );
+      _channel = _channelFactory(uri, [
+        'realtime',
+        'openai-insecure-api-key.$ephemeralKey',
+        'openai-beta.realtime-v1',
+      ]);
 
       // Wait for connection
       await _channel!.ready;
@@ -101,15 +116,16 @@ class OpenAIRealtimeService {
         onDone: _handleDone,
       );
 
-      _setConnectionState(OpenAIConnectionState.connected);
-
-      // Configure session with system prompt
+      // Configure session BEFORE signalling connected so the greeting
+      // response.create is always sent after session.update.
       await _configureSession(
         mode: mode,
         persona: persona,
         topic: topic,
         scenario: scenario,
       );
+
+      _setConnectionState(OpenAIConnectionState.connected);
     } catch (e) {
       debugPrint('OpenAI: Connection error: $e');
       _setConnectionState(OpenAIConnectionState.error);

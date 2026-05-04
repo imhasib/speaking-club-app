@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- android/app/src/main/res/drawable/ic_launcher_background.xml
+     Solid + radial-overlay version of the indigo→purple gradient.
+     Android adaptive backgrounds support drawables; using the PNG
+     in mipmap-xxxhdpi is also fine. -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item>
+        <shape android:shape="rectangle">
+            <gradient
+                android:type="linear"
+                android:angle="135"
+                android:startColor="#3B3B98"
+                android:endColor="#8E44AD"/>
+        </shape>
+    </item>
+</layer-list>

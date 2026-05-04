@@ -8,6 +8,7 @@ import '../../features/ai_practice/presentation/screens/ai_session_screen.dart';
 import '../../features/ai_practice/presentation/screens/ai_summary_screen.dart';
 import '../../features/ai_practice/presentation/screens/mode_selection_screen.dart';
 import '../../features/auth/auth.dart';
+import '../../features/auth/presentation/screens/splash_screen.dart';
 import '../../features/call/call.dart';
 import '../../features/history/presentation/screens/history_screen.dart';
 import '../../features/home/presentation/screens/home_screen.dart';
@@ -333,40 +334,6 @@ class GoRouterRefreshStream extends ChangeNotifier {
   final Ref _ref;
 }
 
-/// Splash screen shown while checking auth status
-class SplashScreen extends ConsumerWidget {
-  const SplashScreen({super.key});
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final colorScheme = Theme.of(context).colorScheme;
-
-    return Scaffold(
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              Icons.record_voice_over_rounded,
-              size: 80,
-              color: colorScheme.primary,
-            ),
-            const SizedBox(height: 24),
-            Text(
-              'Speaking Club',
-              style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
-                    color: colorScheme.primary,
-                  ),
-            ),
-            const SizedBox(height: 48),
-            const CircularProgressIndicator(),
-          ],
-        ),
-      ),
-    );
-  }
-}
 
 /// Placeholder main screen until proper home is implemented
 class PlaceholderMainScreen extends ConsumerWidget {

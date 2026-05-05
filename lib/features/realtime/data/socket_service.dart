@@ -113,8 +113,16 @@ class SocketService {
   SocketConnectionState get currentConnectionState => _connectionState;
   bool get isConnected => _connectionState == SocketConnectionState.connected;
 
+  String? _lastEmittedError;
+
   SocketService({required FlutterSecureStorage secureStorage})
       : _secureStorage = secureStorage;
+
+  void _emitError(String message) {
+    if (message == _lastEmittedError) return;
+    _lastEmittedError = message;
+    _errorController.add(message);
+  }
 
   /// Connect to the socket server with JWT authentication
   Future<void> connect() async {
@@ -132,7 +140,7 @@ class SocketService {
       if (token == null) {
         dev.log('❌ No access token available for socket connection');
         _updateConnectionState(SocketConnectionState.error);
-        _errorController.add('No authentication token available');
+        _emitError('No authentication token available');
         return;
       }
 
@@ -155,7 +163,7 @@ class SocketService {
     } catch (e) {
       dev.log('❌ Socket connection error: $e');
       _updateConnectionState(SocketConnectionState.error);
-      _errorController.add(e.toString());
+      _emitError(e.toString());
     }
   }
 
@@ -174,6 +182,7 @@ class SocketService {
     _socket?.dispose();
     _socket = null;
     _reconnectAttempts = 0;
+    _lastEmittedError = null;
     _updateConnectionState(SocketConnectionState.disconnected);
   }
 
@@ -185,6 +194,7 @@ class SocketService {
     _socket!.onConnect((_) {
       dev.log('✅ Socket connected');
       _reconnectAttempts = 0;
+      _lastEmittedError = null;
       _updateConnectionState(SocketConnectionState.connected);
     });
 
@@ -196,7 +206,7 @@ class SocketService {
     _socket!.onConnectError((error) {
       dev.log('❌ Socket connect error: $error');
       _updateConnectionState(SocketConnectionState.error);
-      _errorController.add('Connection error: $error');
+      _emitError('Connection error: unable to reach server');
     });
 
     // Reconnection handling via custom events
@@ -213,14 +223,14 @@ class SocketService {
     });
 
     _socket!.on('reconnect_error', (error) {
+      // Suppress per-attempt errors — reconnect_failed is shown instead
       dev.log('❌ Socket reconnect error: $error');
-      _errorController.add('Reconnection error: $error');
     });
 
     _socket!.on('reconnect_failed', (_) {
       dev.log('❌ Socket reconnection failed after $_maxReconnectAttempts attempts');
       _updateConnectionState(SocketConnectionState.error);
-      _errorController.add('Failed to reconnect after multiple attempts');
+      _emitError('Could not reconnect to server');
     });
 
     // Presence events
@@ -234,7 +244,7 @@ class SocketService {
         _onlineUsersController.add(users);
       } catch (e) {
         dev.log('❌ Error parsing online users list: $e');
-        _errorController.add('Error parsing online users: $e');
+        _emitError('Error parsing online users: $e');
       }
     });
 
@@ -246,7 +256,7 @@ class SocketService {
         _statusChangedController.add(statusChange);
       } catch (e) {
         dev.log('❌ Error parsing status change: $e');
-        _errorController.add('Error parsing status change: $e');
+        _emitError('Error parsing status change: $e');
       }
     });
 
@@ -254,7 +264,7 @@ class SocketService {
     _socket!.on(SocketEvents.error, (data) {
       dev.log('📥 Received error: $data');
       final message = data is Map ? data['message'] ?? 'Unknown error' : '$data';
-      _errorController.add(message);
+      _emitError(message);
     });
 
     // Matchmaking matched event
@@ -265,7 +275,7 @@ class SocketService {
         _matchmakingMatchedController.add(result);
       } catch (e) {
         dev.log('❌ Error parsing matchmaking result: $e');
-        _errorController.add('Error parsing matchmaking result: $e');
+        _emitError('Error parsing matchmaking result: $e');
       }
     });
 
@@ -277,7 +287,7 @@ class SocketService {
         _incomingCallController.add(incoming);
       } catch (e) {
         dev.log('❌ Error parsing incoming call: $e');
-        _errorController.add('Error parsing incoming call: $e');
+        _emitError('Error parsing incoming call: $e');
       }
     });
 
@@ -288,7 +298,7 @@ class SocketService {
         _callAcceptedController.add(accepted);
       } catch (e) {
         dev.log('❌ Error parsing call accepted: $e');
-        _errorController.add('Error parsing call accepted: $e');
+        _emitError('Error parsing call accepted: $e');
       }
     });
 
@@ -299,7 +309,7 @@ class SocketService {
         _callRejectedController.add(rejected);
       } catch (e) {
         dev.log('❌ Error parsing call rejected: $e');
-        _errorController.add('Error parsing call rejected: $e');
+        _emitError('Error parsing call rejected: $e');
       }
     });
 
@@ -310,7 +320,7 @@ class SocketService {
         _callCancelledController.add(cancelled);
       } catch (e) {
         dev.log('❌ Error parsing call cancelled: $e');
-        _errorController.add('Error parsing call cancelled: $e');
+        _emitError('Error parsing call cancelled: $e');
       }
     });
 
@@ -321,7 +331,7 @@ class SocketService {
         _callEndedController.add(ended);
       } catch (e) {
         dev.log('❌ Error parsing call ended: $e');
-        _errorController.add('Error parsing call ended: $e');
+        _emitError('Error parsing call ended: $e');
       }
     });
 
@@ -333,7 +343,7 @@ class SocketService {
         _callOfferController.add(signal);
       } catch (e) {
         dev.log('❌ Error parsing call offer: $e');
-        _errorController.add('Error parsing call offer: $e');
+        _emitError('Error parsing call offer: $e');
       }
     });
 
@@ -344,7 +354,7 @@ class SocketService {
         _callAnswerController.add(signal);
       } catch (e) {
         dev.log('❌ Error parsing call answer: $e');
-        _errorController.add('Error parsing call answer: $e');
+        _emitError('Error parsing call answer: $e');
       }
     });
 
@@ -355,7 +365,7 @@ class SocketService {
         _iceCandidateController.add(candidate);
       } catch (e) {
         dev.log('❌ Error parsing ICE candidate: $e');
-        _errorController.add('Error parsing ICE candidate: $e');
+        _emitError('Error parsing ICE candidate: $e');
       }
     });
   }

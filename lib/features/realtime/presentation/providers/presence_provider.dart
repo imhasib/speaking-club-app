@@ -4,6 +4,7 @@ import 'dart:developer' as dev;
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../features/auth/data/auth_repository.dart';
 import '../../../../shared/models/online_user.dart';
 import '../../data/socket_service.dart';
 import '../../domain/presence_state.dart';
@@ -124,10 +125,22 @@ class PresenceNotifier extends Notifier<PresenceState> {
     });
   }
 
+  // Socket handshakes don't go through Dio, so TokenRefreshInterceptor never
+  // fires for them — refresh explicitly so the handshake uses a valid JWT.
+  Future<void> _refreshTokenSilently() async {
+    try {
+      await ref.read(authRepositoryProvider).refreshToken();
+      dev.log('🔑 Token refreshed before socket connect');
+    } catch (e) {
+      dev.log('⚠️ Pre-connect token refresh skipped: $e');
+    }
+  }
+
   /// Connect to the socket server
   Future<void> connect() async {
     dev.log('🔌 Connecting to socket server...');
     state = state.copyWith(isLoading: true, error: null);
+    await _refreshTokenSilently();
     await _socketService.connect();
   }
 

@@ -8,7 +8,7 @@ part 'env.g.dart';
 /// API_BASE_URL=http://localhost:3000/api
 /// SOCKET_URL=http://localhost:3000
 /// GOOGLE_CLIENT_ID=your-google-client-id.apps.googleusercontent.com
-@Envied(path: '.env')
+@Envied(path: '.env', obfuscate: true)
 abstract class Env {
   @EnviedField(varName: 'API_BASE_URL', defaultValue: 'http://localhost:3000/api')
   static const String apiBaseUrl = _Env.apiBaseUrl;

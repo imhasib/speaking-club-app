@@ -14,7 +14,7 @@
     <uses-feature android:name="android.hardware.microphone" android:required="false"/>
 
     <application
-        android:label="Speaking_club"
+        android:label="Speaking Club"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

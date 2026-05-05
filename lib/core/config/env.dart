@@ -11,11 +11,11 @@ part 'env.g.dart';
 @Envied(path: '.env', obfuscate: true)
 abstract class Env {
   @EnviedField(varName: 'API_BASE_URL', defaultValue: 'http://localhost:3000/api')
-  static const String apiBaseUrl = _Env.apiBaseUrl;
+  static final String apiBaseUrl = _Env.apiBaseUrl;
 
   @EnviedField(varName: 'SOCKET_URL', defaultValue: 'http://localhost:3000')
-  static const String socketUrl = _Env.socketUrl;
+  static final String socketUrl = _Env.socketUrl;
 
   @EnviedField(varName: 'GOOGLE_CLIENT_ID', defaultValue: '')
-  static const String googleClientId = _Env.googleClientId;
+  static final String googleClientId = _Env.googleClientId;
 }

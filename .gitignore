@@ -45,3 +45,6 @@ app.*.map.json
 /android/app/release
 
 .env
+
+# Generated env file — contains production credentials, must not be committed
+lib/core/config/env.g.dart

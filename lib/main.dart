@@ -1,3 +1,6 @@
+import 'dart:async';
+
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -5,28 +8,51 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'core/router/app_router.dart';
 import 'core/theme/app_theme.dart';
 
+void _reportError(Object error, StackTrace stack) {
+  // TODO(C3): Replace with FirebaseCrashlytics.instance.recordError(error, stack)
+  //           once Firebase is initialised.
+  debugPrint('ERROR: $error\n$stack');
+}
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Set preferred orientations
-  await SystemChrome.setPreferredOrientations([
-    DeviceOrientation.portraitUp,
-    DeviceOrientation.portraitDown,
-  ]);
+  // Flutter framework errors (widget build failures, rendering issues)
+  FlutterError.onError = (FlutterErrorDetails details) {
+    FlutterError.presentError(details);
+    _reportError(details.exception, details.stack ?? StackTrace.empty);
+  };
 
-  // Set system UI overlay style
-  SystemChrome.setSystemUIOverlayStyle(
-    const SystemUiOverlayStyle(
-      statusBarColor: Colors.transparent,
-      statusBarIconBrightness: Brightness.light,
-      statusBarBrightness: Brightness.dark,
-    ),
-  );
+  // Dart async errors that escape all zones (platform channel errors etc.)
+  PlatformDispatcher.instance.onError = (error, stack) {
+    _reportError(error, stack);
+    return true;
+  };
 
-  runApp(
-    const ProviderScope(
-      child: SpeakingClubApp(),
-    ),
+  await runZonedGuarded(
+    () async {
+      // Set preferred orientations
+      await SystemChrome.setPreferredOrientations([
+        DeviceOrientation.portraitUp,
+        DeviceOrientation.portraitDown,
+      ]);
+
+      // Set system UI overlay style
+      SystemChrome.setSystemUIOverlayStyle(
+        const SystemUiOverlayStyle(
+          statusBarColor: Colors.transparent,
+          statusBarIconBrightness: Brightness.light,
+          statusBarBrightness: Brightness.dark,
+        ),
+      );
+
+      runApp(
+        const ProviderScope(
+          child: SpeakingClubApp(),
+        ),
+      );
+    },
+    _reportError,
   );
 }
 

@@ -33,7 +33,7 @@ class AppRouter {
   static GoRouter createRouter(Ref ref) {
     return GoRouter(
       initialLocation: Routes.splash,
-      debugLogDiagnostics: true,
+      debugLogDiagnostics: false,
       refreshListenable: GoRouterRefreshStream(ref),
       redirect: (context, state) async {
         // Read auth state here (not watched, just current value)

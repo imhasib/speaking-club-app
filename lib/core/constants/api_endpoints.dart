@@ -8,10 +8,14 @@ class ApiEndpoints {
   static const String googleAuth = '/auth/google';
   static const String logout = '/auth/logout';
   static const String refreshToken = '/auth/refresh';
+  static const String forgotPassword = '/auth/forgot-password';
+  static String resetPassword(String token) => '/auth/reset-password/$token';
+  static const String changePassword = '/auth/change-password';
 
   // User endpoints
   static const String me = '/account/me';
   static const String onlineUsers = '/users/online';
+  static const String checkUsername = '/users/check-username';
 
   // Image upload
   static const String images = '/images';

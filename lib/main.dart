@@ -14,9 +14,7 @@ void _reportError(Object error, StackTrace stack) {
   debugPrint('ERROR: $error\n$stack');
 }
 
-void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-
+void main() {
   // Flutter framework errors (widget build failures, rendering issues)
   FlutterError.onError = (FlutterErrorDetails details) {
     FlutterError.presentError(details);
@@ -29,8 +27,11 @@ void main() async {
     return true;
   };
 
-  await runZonedGuarded(
+  runZonedGuarded(
     () async {
+      // ensureInitialized must be called in the same zone as runApp
+      WidgetsFlutterBinding.ensureInitialized();
+
       // Set preferred orientations
       await SystemChrome.setPreferredOrientations([
         DeviceOrientation.portraitUp,

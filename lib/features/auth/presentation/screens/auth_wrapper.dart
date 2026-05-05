@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import 'forgot_password_screen.dart';
 import 'login_screen.dart';
 import 'onboarding_screen.dart';
 import 'register_screen.dart';
@@ -96,7 +97,14 @@ class _AuthWrapperState extends State<AuthWrapper> {
         return LoginScreen(
           key: const ValueKey('login'),
           onRegisterTap: () => _navigateTo(_AuthScreen.register),
+          onForgotPasswordTap: () => _navigateTo(_AuthScreen.forgotPassword),
           onSuccess: widget.onAuthSuccess,
+        );
+
+      case _AuthScreen.forgotPassword:
+        return ForgotPasswordScreen(
+          key: const ValueKey('forgot-password'),
+          onBackToLogin: () => _navigateTo(_AuthScreen.login),
         );
 
       case _AuthScreen.register:
@@ -129,4 +137,5 @@ enum _AuthScreen {
   login,
   register,
   registrationSuccess,
+  forgotPassword,
 }

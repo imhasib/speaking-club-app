@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$User {
 
- String get id; String get name; String get email;@JsonKey(name: 'mobile') String? get mobileNumber; String? get profilePicture; DateTime get createdAt; DateTime get updatedAt;
+ String get id; String get name; String get email;@JsonKey(name: 'mobile') String? get mobileNumber; String? get profilePicture; String? get authProvider; DateTime get createdAt; DateTime get updatedAt;
 /// Create a copy of User
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -28,16 +28,16 @@ $UserCopyWith<User> get copyWith => _$UserCopyWithImpl<User>(this as User, _$ide
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is User&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.email, email) || other.email == email)&&(identical(other.mobileNumber, mobileNumber) || other.mobileNumber == mobileNumber)&&(identical(other.profilePicture, profilePicture) || other.profilePicture == profilePicture)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is User&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.email, email) || other.email == email)&&(identical(other.mobileNumber, mobileNumber) || other.mobileNumber == mobileNumber)&&(identical(other.profilePicture, profilePicture) || other.profilePicture == profilePicture)&&(identical(other.authProvider, authProvider) || other.authProvider == authProvider)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,name,email,mobileNumber,profilePicture,createdAt,updatedAt);
+int get hashCode => Object.hash(runtimeType,id,name,email,mobileNumber,profilePicture,authProvider,createdAt,updatedAt);
 
 @override
 String toString() {
-  return 'User(id: $id, name: $name, email: $email, mobileNumber: $mobileNumber, profilePicture: $profilePicture, createdAt: $createdAt, updatedAt: $updatedAt)';
+  return 'User(id: $id, name: $name, email: $email, mobileNumber: $mobileNumber, profilePicture: $profilePicture, authProvider: $authProvider, createdAt: $createdAt, updatedAt: $updatedAt)';
 }
 
 
@@ -48,7 +48,7 @@ abstract mixin class $UserCopyWith<$Res>  {
   factory $UserCopyWith(User value, $Res Function(User) _then) = _$UserCopyWithImpl;
 @useResult
 $Res call({
- String id, String name, String email,@JsonKey(name: 'mobile') String? mobileNumber, String? profilePicture, DateTime createdAt, DateTime updatedAt
+ String id, String name, String email,@JsonKey(name: 'mobile') String? mobileNumber, String? profilePicture, String? authProvider, DateTime createdAt, DateTime updatedAt
 });
 
 
@@ -65,13 +65,14 @@ class _$UserCopyWithImpl<$Res>
 
 /// Create a copy of User
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? name = null,Object? email = null,Object? mobileNumber = freezed,Object? profilePicture = freezed,Object? createdAt = null,Object? updatedAt = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? name = null,Object? email = null,Object? mobileNumber = freezed,Object? profilePicture = freezed,Object? authProvider = freezed,Object? createdAt = null,Object? updatedAt = null,}) {
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
 as String,email: null == email ? _self.email : email // ignore: cast_nullable_to_non_nullable
 as String,mobileNumber: freezed == mobileNumber ? _self.mobileNumber : mobileNumber // ignore: cast_nullable_to_non_nullable
 as String?,profilePicture: freezed == profilePicture ? _self.profilePicture : profilePicture // ignore: cast_nullable_to_non_nullable
+as String?,authProvider: freezed == authProvider ? _self.authProvider : authProvider // ignore: cast_nullable_to_non_nullable
 as String?,createdAt: null == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
 as DateTime,updatedAt: null == updatedAt ? _self.updatedAt : updatedAt // ignore: cast_nullable_to_non_nullable
 as DateTime,
@@ -156,10 +157,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String name,  String email, @JsonKey(name: 'mobile')  String? mobileNumber,  String? profilePicture,  DateTime createdAt,  DateTime updatedAt)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String name,  String email, @JsonKey(name: 'mobile')  String? mobileNumber,  String? profilePicture,  String? authProvider,  DateTime createdAt,  DateTime updatedAt)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _User() when $default != null:
-return $default(_that.id,_that.name,_that.email,_that.mobileNumber,_that.profilePicture,_that.createdAt,_that.updatedAt);case _:
+return $default(_that.id,_that.name,_that.email,_that.mobileNumber,_that.profilePicture,_that.authProvider,_that.createdAt,_that.updatedAt);case _:
   return orElse();
 
 }
@@ -177,10 +178,10 @@ return $default(_that.id,_that.name,_that.email,_that.mobileNumber,_that.profile
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String name,  String email, @JsonKey(name: 'mobile')  String? mobileNumber,  String? profilePicture,  DateTime createdAt,  DateTime updatedAt)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String name,  String email, @JsonKey(name: 'mobile')  String? mobileNumber,  String? profilePicture,  String? authProvider,  DateTime createdAt,  DateTime updatedAt)  $default,) {final _that = this;
 switch (_that) {
 case _User():
-return $default(_that.id,_that.name,_that.email,_that.mobileNumber,_that.profilePicture,_that.createdAt,_that.updatedAt);}
+return $default(_that.id,_that.name,_that.email,_that.mobileNumber,_that.profilePicture,_that.authProvider,_that.createdAt,_that.updatedAt);}
 }
 /// A variant of `when` that fallback to returning `null`
 ///
@@ -194,10 +195,10 @@ return $default(_that.id,_that.name,_that.email,_that.mobileNumber,_that.profile
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String name,  String email, @JsonKey(name: 'mobile')  String? mobileNumber,  String? profilePicture,  DateTime createdAt,  DateTime updatedAt)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String name,  String email, @JsonKey(name: 'mobile')  String? mobileNumber,  String? profilePicture,  String? authProvider,  DateTime createdAt,  DateTime updatedAt)?  $default,) {final _that = this;
 switch (_that) {
 case _User() when $default != null:
-return $default(_that.id,_that.name,_that.email,_that.mobileNumber,_that.profilePicture,_that.createdAt,_that.updatedAt);case _:
+return $default(_that.id,_that.name,_that.email,_that.mobileNumber,_that.profilePicture,_that.authProvider,_that.createdAt,_that.updatedAt);case _:
   return null;
 
 }
@@ -209,7 +210,7 @@ return $default(_that.id,_that.name,_that.email,_that.mobileNumber,_that.profile
 @JsonSerializable()
 
 class _User implements User {
-  const _User({required this.id, required this.name, required this.email, @JsonKey(name: 'mobile') this.mobileNumber, this.profilePicture, required this.createdAt, required this.updatedAt});
+  const _User({required this.id, required this.name, required this.email, @JsonKey(name: 'mobile') this.mobileNumber, this.profilePicture, this.authProvider, required this.createdAt, required this.updatedAt});
   factory _User.fromJson(Map<String, dynamic> json) => _$UserFromJson(json);
 
 @override final  String id;
@@ -217,6 +218,7 @@ class _User implements User {
 @override final  String email;
 @override@JsonKey(name: 'mobile') final  String? mobileNumber;
 @override final  String? profilePicture;
+@override final  String? authProvider;
 @override final  DateTime createdAt;
 @override final  DateTime updatedAt;
 
@@ -233,16 +235,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _User&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.email, email) || other.email == email)&&(identical(other.mobileNumber, mobileNumber) || other.mobileNumber == mobileNumber)&&(identical(other.profilePicture, profilePicture) || other.profilePicture == profilePicture)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _User&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.email, email) || other.email == email)&&(identical(other.mobileNumber, mobileNumber) || other.mobileNumber == mobileNumber)&&(identical(other.profilePicture, profilePicture) || other.profilePicture == profilePicture)&&(identical(other.authProvider, authProvider) || other.authProvider == authProvider)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,name,email,mobileNumber,profilePicture,createdAt,updatedAt);
+int get hashCode => Object.hash(runtimeType,id,name,email,mobileNumber,profilePicture,authProvider,createdAt,updatedAt);
 
 @override
 String toString() {
-  return 'User(id: $id, name: $name, email: $email, mobileNumber: $mobileNumber, profilePicture: $profilePicture, createdAt: $createdAt, updatedAt: $updatedAt)';
+  return 'User(id: $id, name: $name, email: $email, mobileNumber: $mobileNumber, profilePicture: $profilePicture, authProvider: $authProvider, createdAt: $createdAt, updatedAt: $updatedAt)';
 }
 
 
@@ -253,7 +255,7 @@ abstract mixin class _$UserCopyWith<$Res> implements $UserCopyWith<$Res> {
   factory _$UserCopyWith(_User value, $Res Function(_User) _then) = __$UserCopyWithImpl;
 @override @useResult
 $Res call({
- String id, String name, String email,@JsonKey(name: 'mobile') String? mobileNumber, String? profilePicture, DateTime createdAt, DateTime updatedAt
+ String id, String name, String email,@JsonKey(name: 'mobile') String? mobileNumber, String? profilePicture, String? authProvider, DateTime createdAt, DateTime updatedAt
 });
 
 
@@ -270,13 +272,14 @@ class __$UserCopyWithImpl<$Res>
 
 /// Create a copy of User
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? name = null,Object? email = null,Object? mobileNumber = freezed,Object? profilePicture = freezed,Object? createdAt = null,Object? updatedAt = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? name = null,Object? email = null,Object? mobileNumber = freezed,Object? profilePicture = freezed,Object? authProvider = freezed,Object? createdAt = null,Object? updatedAt = null,}) {
   return _then(_User(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
 as String,email: null == email ? _self.email : email // ignore: cast_nullable_to_non_nullable
 as String,mobileNumber: freezed == mobileNumber ? _self.mobileNumber : mobileNumber // ignore: cast_nullable_to_non_nullable
 as String?,profilePicture: freezed == profilePicture ? _self.profilePicture : profilePicture // ignore: cast_nullable_to_non_nullable
+as String?,authProvider: freezed == authProvider ? _self.authProvider : authProvider // ignore: cast_nullable_to_non_nullable
 as String?,createdAt: null == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
 as DateTime,updatedAt: null == updatedAt ? _self.updatedAt : updatedAt // ignore: cast_nullable_to_non_nullable
 as DateTime,

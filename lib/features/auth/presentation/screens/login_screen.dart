@@ -12,11 +12,13 @@ import '../widgets/social_auth_button.dart';
 class LoginScreen extends ConsumerStatefulWidget {
   final VoidCallback onRegisterTap;
   final VoidCallback onSuccess;
+  final VoidCallback? onForgotPasswordTap;
 
   const LoginScreen({
     super.key,
     required this.onRegisterTap,
     required this.onSuccess,
+    this.onForgotPasswordTap,
   });
 
   @override
@@ -161,17 +163,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 Align(
                   alignment: Alignment.centerRight,
                   child: TextButton(
-                    onPressed: isLoading
-                        ? null
-                        : () {
-                            // TODO: Implement forgot password (Phase 2)
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text(
-                                    'Forgot password will be available soon'),
-                              ),
-                            );
-                          },
+                    onPressed: isLoading ? null : widget.onForgotPasswordTap,
                     child: const Text('Forgot password?'),
                   ),
                 ),

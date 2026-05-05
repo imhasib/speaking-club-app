@@ -15,6 +15,16 @@ class Routes {
   static const String register = '/auth/register';
   static const String registerName = 'register';
 
+  static const String resetPassword = '/auth/reset-password/:token';
+  static const String resetPasswordName = 'resetPassword';
+
+  /// Build a concrete reset-password path for a given token.
+  static String resetPasswordPath(String token) =>
+      '/auth/reset-password/$token';
+
+  static const String changePassword = '/change-password';
+  static const String changePasswordName = 'changePassword';
+
   // Main app routes
   static const String home = '/';
   static const String homeName = 'home';
@@ -24,9 +34,6 @@ class Routes {
 
   static const String profile = '/profile';
   static const String profileName = 'profile';
-
-  static const String editProfile = '/profile/edit';
-  static const String editProfileName = 'editProfile';
 
   // Call routes
   static const String call = '/call';
@@ -58,10 +65,4 @@ class Routes {
   static String aiSessionDetailPath(String sessionId) =>
       '/ai-practice/sessions/$sessionId';
 
-  // User routes
-  static const String userProfile = '/user/:userId';
-  static const String userProfileName = 'userProfile';
-
-  /// Get user profile path with ID
-  static String userProfilePath(String userId) => '/user/$userId';
 }

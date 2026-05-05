@@ -12,6 +12,7 @@ sealed class User with _$User {
     required String email,
     @JsonKey(name: 'mobile') String? mobileNumber,
     String? profilePicture,
+    String? authProvider,
     required DateTime createdAt,
     required DateTime updatedAt,
   }) = _User;

@@ -215,6 +215,54 @@ class AuthNotifier extends Notifier<AuthState> {
     }
   }
 
+  /// Send a forgot-password email. Returns the server's success message.
+  /// Throws [AppException] on failure.
+  Future<String> forgotPassword(String email) async {
+    try {
+      return await _authRepository.forgotPassword(email);
+    } on AppException {
+      rethrow;
+    } catch (_) {
+      throw const ApiException(
+        message: 'Failed to send reset email. Please try again.',
+        code: 'UNKNOWN_ERROR',
+      );
+    }
+  }
+
+  /// Reset password using a token received by email. Returns the server's
+  /// success message. Throws [AppException] on failure.
+  Future<String> resetPassword(String token, String newPassword) async {
+    try {
+      return await _authRepository.resetPassword(token, newPassword);
+    } on AppException {
+      rethrow;
+    } catch (_) {
+      throw const ApiException(
+        message: 'Failed to reset password. The link may have expired.',
+        code: 'UNKNOWN_ERROR',
+      );
+    }
+  }
+
+  /// Change password for the authenticated user. Returns the server's success
+  /// message. Throws [AppException] on failure.
+  Future<String> changePassword(
+    String oldPassword,
+    String newPassword,
+  ) async {
+    try {
+      return await _authRepository.changePassword(oldPassword, newPassword);
+    } on AppException {
+      rethrow;
+    } catch (_) {
+      throw const ApiException(
+        message: 'Failed to change password. Please try again.',
+        code: 'UNKNOWN_ERROR',
+      );
+    }
+  }
+
   /// Update user data after profile changes
   void updateUser(AuthUser user) {
     if (state is AuthStateAuthenticated) {

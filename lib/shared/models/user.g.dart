@@ -12,6 +12,7 @@ _User _$UserFromJson(Map<String, dynamic> json) => _User(
   email: json['email'] as String,
   mobileNumber: json['mobile'] as String?,
   profilePicture: json['profilePicture'] as String?,
+  authProvider: json['authProvider'] as String?,
   createdAt: DateTime.parse(json['createdAt'] as String),
   updatedAt: DateTime.parse(json['updatedAt'] as String),
 );
@@ -22,6 +23,7 @@ Map<String, dynamic> _$UserToJson(_User instance) => <String, dynamic>{
   'email': instance.email,
   'mobile': instance.mobileNumber,
   'profilePicture': instance.profilePicture,
+  'authProvider': instance.authProvider,
   'createdAt': instance.createdAt.toIso8601String(),
   'updatedAt': instance.updatedAt.toIso8601String(),
 };

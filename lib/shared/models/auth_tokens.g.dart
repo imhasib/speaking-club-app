@@ -37,6 +37,7 @@ _AuthUser _$AuthUserFromJson(Map<String, dynamic> json) => _AuthUser(
   email: json['email'] as String,
   mobileNumber: json['mobile'] as String?,
   profilePicture: json['profilePicture'] as String?,
+  authProvider: json['authProvider'] as String? ?? 'local',
 );
 
 Map<String, dynamic> _$AuthUserToJson(_AuthUser instance) => <String, dynamic>{
@@ -45,6 +46,7 @@ Map<String, dynamic> _$AuthUserToJson(_AuthUser instance) => <String, dynamic>{
   'email': instance.email,
   'mobile': instance.mobileNumber,
   'profilePicture': instance.profilePicture,
+  'authProvider': instance.authProvider,
 };
 
 _GoogleAuthRequest _$GoogleAuthRequestFromJson(Map<String, dynamic> json) =>

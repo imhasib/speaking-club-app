@@ -8,6 +8,8 @@ import '../../features/ai_practice/presentation/screens/ai_session_screen.dart';
 import '../../features/ai_practice/presentation/screens/ai_summary_screen.dart';
 import '../../features/ai_practice/presentation/screens/mode_selection_screen.dart';
 import '../../features/auth/auth.dart';
+import '../../features/auth/presentation/screens/change_password_screen.dart';
+import '../../features/auth/presentation/screens/reset_password_screen.dart';
 import '../../features/auth/presentation/screens/splash_screen.dart';
 import '../../features/call/call.dart';
 import '../../features/history/presentation/screens/history_screen.dart';
@@ -18,6 +20,20 @@ import '../../shared/widgets/animations/page_transitions.dart';
 import '../constants/app_constants.dart';
 import 'main_scaffold.dart';
 import 'routes.dart';
+
+/// Resolves onboarding/welcome flags once per app session (cached by Riverpod).
+final _initialScreenStatusProvider =
+    FutureProvider.autoDispose<({bool showOnboarding, bool showWelcome})>(
+        (ref) async {
+  final storage = ref.read(secureStorageProvider);
+  final onboarding =
+      await storage.read(key: AppConstants.onboardingCompleteKey);
+  final welcome = await storage.read(key: AppConstants.welcomeSeenKey);
+  return (
+    showOnboarding: onboarding != 'true',
+    showWelcome: welcome != 'true',
+  );
+});
 
 /// App router provider - creates router once and uses refresh for updates
 final appRouterProvider = Provider<GoRouter>((ref) {
@@ -58,10 +74,15 @@ class AppRouter {
             currentPath == Routes.login ||
             currentPath == Routes.register;
 
+        // Deep-link routes that are accessible without authentication
+        final isPublicDeepLink =
+            currentPath.startsWith('/auth/reset-password/');
+
         // Protected routes (require authentication)
         final isProtectedRoute = currentPath == Routes.home ||
             currentPath == Routes.history ||
             currentPath == Routes.profile ||
+            currentPath == Routes.changePassword ||
             currentPath == Routes.waiting ||
             currentPath == Routes.call ||
             currentPath == Routes.incomingCall ||
@@ -86,8 +107,11 @@ class AppRouter {
           return Routes.auth;
         }
 
-        // If not authenticated and not on auth route or protected route, go to auth
-        if (!isAuthenticated && !isAuthRoute && !isProtectedRoute) {
+        // If not authenticated and not on a known route, go to auth
+        if (!isAuthenticated &&
+            !isAuthRoute &&
+            !isProtectedRoute &&
+            !isPublicDeepLink) {
           return Routes.auth;
         }
 
@@ -107,35 +131,44 @@ class AppRouter {
           name: Routes.authName,
           builder: (context, state) => Consumer(
             builder: (context, ref, child) {
-              return FutureBuilder<({bool showOnboarding, bool showWelcome})>(
-                future: _checkInitialScreenStatus(ref),
-                builder: (context, snapshot) {
-                  // Show loading while checking storage
-                  if (!snapshot.hasData) {
-                    return const Scaffold(
-                      body: Center(
-                        child: CircularProgressIndicator(),
-                      ),
-                    );
-                  }
-                  final status = snapshot.data!;
-                  return AuthWrapper(
-                    showOnboarding: status.showOnboarding,
-                    showWelcome: status.showWelcome,
-                    onAuthSuccess: () {
-                      context.go(Routes.home);
-                    },
-                    onOnboardingComplete: () {
-                      _markOnboardingComplete(ref);
-                    },
-                    onWelcomeSeen: () {
-                      _markWelcomeSeen(ref);
-                    },
-                  );
-                },
+              final statusAsync = ref.watch(_initialScreenStatusProvider);
+              return statusAsync.when(
+                loading: () => const Scaffold(
+                  body: Center(child: CircularProgressIndicator()),
+                ),
+                error: (e, s) => const Scaffold(
+                  body: Center(child: CircularProgressIndicator()),
+                ),
+                data: (status) => AuthWrapper(
+                  showOnboarding: status.showOnboarding,
+                  showWelcome: status.showWelcome,
+                  onAuthSuccess: () => context.go(Routes.home),
+                  onOnboardingComplete: () => _markOnboardingComplete(ref),
+                  onWelcomeSeen: () => _markWelcomeSeen(ref),
+                ),
               );
             },
           ),
+        ),
+
+        // Password reset route — opened from an email deep-link (no auth required)
+        GoRoute(
+          path: Routes.resetPassword,
+          name: Routes.resetPasswordName,
+          builder: (context, state) {
+            final token = state.pathParameters['token']!;
+            return ResetPasswordScreen(
+              token: token,
+              onSuccess: () => context.go(Routes.auth),
+            );
+          },
+        ),
+
+        // Change password — requires authentication, pushed on top of profile
+        GoRoute(
+          path: Routes.changePassword,
+          name: Routes.changePasswordName,
+          builder: (context, state) => const ChangePasswordScreen(),
         ),
 
         // Call routes (full-screen, outside bottom navigation)
@@ -282,18 +315,6 @@ class AppRouter {
           ),
         ),
       ),
-    );
-  }
-
-  static Future<({bool showOnboarding, bool showWelcome})>
-      _checkInitialScreenStatus(WidgetRef ref) async {
-    final storage = ref.read(secureStorageProvider);
-    final onboardingComplete =
-        await storage.read(key: AppConstants.onboardingCompleteKey);
-    final welcomeSeen = await storage.read(key: AppConstants.welcomeSeenKey);
-    return (
-      showOnboarding: onboardingComplete != 'true',
-      showWelcome: welcomeSeen != 'true',
     );
   }
 

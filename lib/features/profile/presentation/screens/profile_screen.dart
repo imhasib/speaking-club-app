@@ -1,8 +1,11 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
+import '../../../../core/router/routes.dart';
+import '../../../../core/utils/validators.dart';
 import '../../../../shared/models/auth_tokens.dart';
 import '../../../../shared/models/user.dart';
 import '../../../auth/presentation/providers/auth_provider.dart';
@@ -139,12 +142,10 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     final mobileNumber = _mobileNumberController.text.trim();
     if (mobileNumber.isEmpty) return;
 
-    // Basic validation for mobile number format
-    if (!mobileNumber.startsWith('+')) {
+    final validationError = Validators.validateMobileNumber(mobileNumber);
+    if (validationError != null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Mobile number must start with + and country code'),
-        ),
+        SnackBar(content: Text(validationError)),
       );
       return;
     }
@@ -416,7 +417,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                                 user.mobileNumber ?? 'Not provided',
                                 style: textTheme.titleMedium?.copyWith(
                                   color: user.mobileNumber == null
-                                      ? colorScheme.onSurfaceVariant.withOpacity(0.6)
+                                      ? colorScheme.onSurfaceVariant.withValues(alpha: 0.6)
                                       : null,
                                   fontStyle: user.mobileNumber == null
                                       ? FontStyle.italic
@@ -466,6 +467,28 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 ),
                 const SizedBox(height: 32),
 
+                // Change Password Button — only for local (email/password) auth
+                if (user.authProvider != 'google') ...[
+                  SizedBox(
+                    width: double.infinity,
+                    child: FilledButton.tonal(
+                      onPressed: () => context.push(Routes.changePassword),
+                      style: FilledButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                      ),
+                      child: const Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.lock_reset_outlined),
+                          SizedBox(width: 8),
+                          Text('Change Password'),
+                        ],
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                ],
+
                 // Logout Button
                 SizedBox(
                   width: double.infinity,
@@ -476,12 +499,12 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                       foregroundColor: colorScheme.onErrorContainer,
                       padding: const EdgeInsets.symmetric(vertical: 16),
                     ),
-                    child: Row(
+                    child: const Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const Icon(Icons.logout),
-                        const SizedBox(width: 8),
-                        const Text('Logout'),
+                        Icon(Icons.logout),
+                        SizedBox(width: 8),
+                        Text('Logout'),
                       ],
                     ),
                   ),

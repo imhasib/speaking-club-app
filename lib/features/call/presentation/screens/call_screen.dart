@@ -29,6 +29,8 @@ class _CallScreenState extends ConsumerState<CallScreen> {
   bool _isLocalVideoSmall = true;
   bool _controlsVisible = true;
   Timer? _hideControlsTimer;
+  StreamSubscription<dynamic>? _localStreamSub;
+  StreamSubscription<dynamic>? _remoteStreamSub;
 
   @override
   void initState() {
@@ -54,7 +56,7 @@ class _CallScreenState extends ConsumerState<CallScreen> {
     }
 
     // Listen to stream changes
-    webrtcService.localStream.listen((stream) {
+    _localStreamSub = webrtcService.localStream.listen((stream) {
       if (mounted) {
         setState(() {
           _localRenderer.srcObject = stream;
@@ -62,7 +64,7 @@ class _CallScreenState extends ConsumerState<CallScreen> {
       }
     });
 
-    webrtcService.remoteStream.listen((stream) {
+    _remoteStreamSub = webrtcService.remoteStream.listen((stream) {
       if (mounted) {
         setState(() {
           _remoteRenderer.srcObject = stream;
@@ -102,6 +104,8 @@ class _CallScreenState extends ConsumerState<CallScreen> {
   @override
   void dispose() {
     _hideControlsTimer?.cancel();
+    _localStreamSub?.cancel();
+    _remoteStreamSub?.cancel();
     _localRenderer.dispose();
     _remoteRenderer.dispose();
     _setFullScreen(false);

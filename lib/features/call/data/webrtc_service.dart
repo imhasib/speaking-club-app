@@ -6,6 +6,7 @@ import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 import '../../realtime/data/socket_service.dart';
+import 'turn_credentials_repository.dart';
 
 /// WebRTC connection state
 enum WebRTCConnectionState {
@@ -34,7 +35,11 @@ enum WebRTCConnectionState {
 /// WebRTC service provider
 final webrtcServiceProvider = Provider<WebRTCService>((ref) {
   final socketService = ref.watch(socketServiceProvider);
-  final service = WebRTCService(socketService: socketService);
+  final turnRepo = ref.watch(turnCredentialsRepositoryProvider);
+  final service = WebRTCService(
+    socketService: socketService,
+    turnCredentialsRepository: turnRepo,
+  );
   ref.onDispose(() {
     service.dispose();
   });
@@ -44,6 +49,7 @@ final webrtcServiceProvider = Provider<WebRTCService>((ref) {
 /// WebRTC service for peer connection management
 class WebRTCService {
   final SocketService _socketService;
+  final TurnCredentialsRepository _turnCredentialsRepository;
 
   RTCPeerConnection? _peerConnection;
   MediaStream? _localStream;
@@ -57,17 +63,42 @@ class WebRTCService {
   Map<String, dynamic>? _pendingOffer;
   final List<Map<String, dynamic>> _pendingIceCandidates = [];
 
-  // STUN/TURN servers configuration
-  static const Map<String, dynamic> _configuration = {
-    'iceServers': [
-      {'urls': 'stun:stun.l.google.com:19302'},
-      {'urls': 'stun:stun1.l.google.com:19302'},
-      {'urls': 'stun:stun2.l.google.com:19302'},
-      {'urls': 'stun:stun3.l.google.com:19302'},
-      {'urls': 'stun:stun4.l.google.com:19302'},
-    ],
-    'sdpSemantics': 'unified-plan',
-  };
+  /// STUN-only fallback used when the TURN credentials fetch fails.
+  static const List<Map<String, dynamic>> _stunFallbackServers = [
+    {'urls': 'stun:stun.l.google.com:19302'},
+    {'urls': 'stun:stun1.l.google.com:19302'},
+    {'urls': 'stun:stun2.l.google.com:19302'},
+    {'urls': 'stun:stun3.l.google.com:19302'},
+    {'urls': 'stun:stun4.l.google.com:19302'},
+  ];
+
+  /// Fetches TURN credentials from the backend and merges them with the STUN
+  /// fallback servers. Returns a STUN-only configuration if the fetch fails.
+  Future<Map<String, dynamic>> _buildConfiguration() async {
+    List<Map<String, dynamic>> iceServers = List.of(_stunFallbackServers);
+
+    try {
+      final turnServers =
+          await _turnCredentialsRepository.fetchIceServers();
+      final turnMaps = turnServers.map((s) => s.toWebRtcMap()).toList();
+      // Keep STUN first; append TURN servers after.
+      iceServers = [..._stunFallbackServers, ...turnMaps];
+      dev.log(
+        'WebRTC: Using ${iceServers.length} ICE server(s) '
+        '(STUN + ${turnMaps.length} TURN)',
+      );
+    } catch (e) {
+      dev.log(
+        'WebRTC: Warning — failed to fetch TURN credentials, '
+        'falling back to STUN only. Error: $e',
+      );
+    }
+
+    return {
+      'iceServers': iceServers,
+      'sdpSemantics': 'unified-plan',
+    };
+  }
 
   // Media constraints for video
   static const Map<String, dynamic> _videoConstraints = {
@@ -99,8 +130,11 @@ class WebRTCService {
   String? get currentPeerId => _currentPeerId;
   bool get isInitiator => _isInitiator;
 
-  WebRTCService({required SocketService socketService})
-      : _socketService = socketService;
+  WebRTCService({
+    required SocketService socketService,
+    required TurnCredentialsRepository turnCredentialsRepository,
+  })  : _socketService = socketService,
+        _turnCredentialsRepository = turnCredentialsRepository;
 
   // Safe stream add methods (won't throw if disposed)
   void _safeAddState(WebRTCConnectionState state) {
@@ -187,7 +221,8 @@ class WebRTCService {
     _safeAddState(WebRTCConnectionState.connecting);
 
     try {
-      _peerConnection = await createPeerConnection(_configuration);
+      final configuration = await _buildConfiguration();
+      _peerConnection = await createPeerConnection(configuration);
 
       // Add local stream tracks to peer connection
       if (_localStream != null) {

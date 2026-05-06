@@ -24,6 +24,9 @@ class ApiEndpoints {
   static const String callHistory = '/calls/history';
   static String callDetails(String id) => '/calls/$id';
 
+  // WebRTC endpoints
+  static const String turnCredentials = '/turn-credentials';
+
   // AI Practice endpoints
   static const String aiSessionToken = '/ai/session/token';
   static const String aiSessionStart = '/ai/session/start';

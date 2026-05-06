@@ -27,6 +27,10 @@ samples, guidance on mobile development, and a full API reference.
     flutter pub run build_runner build --delete-conflicting-outputs
  
     flutter build apk --release
+    flutter build appbundle --release
 
     dart run build_runner clean
     dart run build_runner build --delete-conflicting-outputs
+
+
+    keytool -genkey -v -keystore speaking_club.jks -keyalg RSA -keysize 2048 -validity 10000 -alias speaking-club-release

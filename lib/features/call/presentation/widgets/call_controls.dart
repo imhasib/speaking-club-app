@@ -39,6 +39,7 @@ class CallControls extends StatelessWidget {
         children: [
           // Mute audio
           _ControlButton(
+            key: const Key('call_toggle_audio'),
             icon: isAudioMuted ? Icons.mic_off : Icons.mic,
             isActive: !isAudioMuted,
             isMuted: isAudioMuted,
@@ -48,6 +49,7 @@ class CallControls extends StatelessWidget {
 
           // Toggle video
           _ControlButton(
+            key: const Key('call_toggle_video'),
             icon: isVideoEnabled ? Icons.videocam : Icons.videocam_off,
             isActive: isVideoEnabled,
             isMuted: !isVideoEnabled,
@@ -57,6 +59,7 @@ class CallControls extends StatelessWidget {
 
           // Toggle speaker
           _ControlButton(
+            key: const Key('call_toggle_speaker'),
             icon: isSpeakerOn ? Icons.volume_up : Icons.volume_down,
             isActive: isSpeakerOn,
             onPressed: onToggleSpeaker,
@@ -65,6 +68,7 @@ class CallControls extends StatelessWidget {
 
           // Switch camera
           _ControlButton(
+            key: const Key('call_switch_camera'),
             icon: Icons.cameraswitch,
             isActive: true,
             onPressed: onSwitchCamera,
@@ -73,6 +77,7 @@ class CallControls extends StatelessWidget {
 
           // End call
           _ControlButton(
+            key: const Key('call_end'),
             icon: Icons.call_end,
             isEndCall: true,
             onPressed: onEndCall,
@@ -93,6 +98,7 @@ class _ControlButton extends StatelessWidget {
   final String? tooltip;
 
   const _ControlButton({
+    super.key,
     required this.icon,
     this.isActive = true,
     this.isEndCall = false,

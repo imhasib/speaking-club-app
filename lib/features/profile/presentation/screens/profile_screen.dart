@@ -51,13 +51,19 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
         title: const Text('Logout'),
         content: const Text('Are you sure you want to logout?'),
         actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(false),
-            child: const Text('Cancel'),
+          Semantics(
+            identifier: 'logout_cancel',
+            child: TextButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: const Text('Cancel'),
+            ),
           ),
-          FilledButton(
-            onPressed: () => Navigator.of(context).pop(true),
-            child: const Text('Logout'),
+          Semantics(
+            identifier: 'logout_confirm',
+            child: FilledButton(
+              onPressed: () => Navigator.of(context).pop(true),
+              child: const Text('Logout'),
+            ),
           ),
         ],
       ),
@@ -195,7 +201,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
       body: profileState.when(
         data: (user) {
           return SingleChildScrollView(
-            padding: const EdgeInsets.all(24),
+            padding: const EdgeInsets.fromLTRB(24, 24, 24, 300),
             child: Column(
               children: [
                 // Avatar
@@ -260,6 +266,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                             ),
                             if (!_isEditingUsername)
                               IconButton(
+                                tooltip: 'Edit username',
                                 icon: const Icon(Icons.edit, size: 20),
                                 onPressed: () {
                                   setState(() {
@@ -286,6 +293,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                               ),
                               const SizedBox(width: 8),
                               IconButton(
+                                tooltip: 'Discard changes',
                                 icon: const Icon(Icons.close),
                                 onPressed: () {
                                   setState(() {
@@ -294,6 +302,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                                 },
                               ),
                               IconButton(
+                                tooltip: 'Save changes',
                                 icon: const Icon(Icons.check),
                                 onPressed: _handleUpdateUsername,
                               ),
@@ -362,6 +371,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                             ),
                             if (!_isEditingMobileNumber)
                               IconButton(
+                                tooltip: 'Edit mobile number',
                                 icon: const Icon(Icons.edit, size: 20),
                                 onPressed: () {
                                   setState(() {
@@ -391,6 +401,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                               ),
                               const SizedBox(width: 8),
                               IconButton(
+                                tooltip: 'Discard changes',
                                 icon: const Icon(Icons.close),
                                 onPressed: () {
                                   setState(() {
@@ -399,6 +410,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                                 },
                               ),
                               IconButton(
+                                tooltip: 'Save changes',
                                 icon: const Icon(Icons.check),
                                 onPressed: _handleUpdateMobileNumber,
                               ),
@@ -490,22 +502,25 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 ],
 
                 // Logout Button
-                SizedBox(
-                  width: double.infinity,
-                  child: FilledButton.tonal(
-                    onPressed: _handleLogout,
-                    style: FilledButton.styleFrom(
-                      backgroundColor: colorScheme.errorContainer,
-                      foregroundColor: colorScheme.onErrorContainer,
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                    ),
-                    child: const Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(Icons.logout),
-                        SizedBox(width: 8),
-                        Text('Logout'),
-                      ],
+                Semantics(
+                  identifier: 'logout_button',
+                  child: SizedBox(
+                    width: double.infinity,
+                    child: FilledButton.tonal(
+                      onPressed: _handleLogout,
+                      style: FilledButton.styleFrom(
+                        backgroundColor: colorScheme.errorContainer,
+                        foregroundColor: colorScheme.onErrorContainer,
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                      ),
+                      child: const Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.logout),
+                          SizedBox(width: 8),
+                          Text('Logout'),
+                        ],
+                      ),
                     ),
                   ),
                 ),

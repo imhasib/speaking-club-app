@@ -107,6 +107,7 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
                 width: double.infinity,
                 height: 56,
                 child: FilledButton(
+                  key: const Key('welcome_register'),
                   onPressed: isLoading ? null : widget.onRegisterTap,
                   child: const Text('Create Account'),
                 ),
@@ -119,6 +120,7 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
                 width: double.infinity,
                 height: 56,
                 child: OutlinedButton(
+                  key: const Key('welcome_sign_in'),
                   onPressed: isLoading ? null : widget.onLoginTap,
                   child: const Text('Sign In'),
                 ),

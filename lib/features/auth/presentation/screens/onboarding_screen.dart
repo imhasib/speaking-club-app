@@ -75,6 +75,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               child: Padding(
                 padding: const EdgeInsets.all(AppSpacing.md),
                 child: TextButton(
+                  key: const Key('onboarding_skip'),
                   onPressed: widget.onComplete,
                   child: const Text('Skip'),
                 ),
@@ -126,6 +127,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   if (_currentPage > 0)
                     Expanded(
                       child: OutlinedButton(
+                        key: const Key('onboarding_back'),
                         onPressed: () {
                           _pageController.previousPage(
                             duration: const Duration(milliseconds: 300),
@@ -144,6 +146,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   Expanded(
                     flex: 2,
                     child: FilledButton(
+                      key: const Key('onboarding_next'),
                       onPressed: _nextPage,
                       style: FilledButton.styleFrom(
                         minimumSize: const Size(0, 56),

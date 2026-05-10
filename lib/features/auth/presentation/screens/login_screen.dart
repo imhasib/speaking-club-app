@@ -115,6 +115,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
                 // Google Sign In
                 SocialAuthButton.google(
+                  key: const Key('login_google'),
                   onPressed: _googleLogin,
                   isLoading: _isGoogleLoading,
                   enabled: !isLoading,
@@ -126,6 +127,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
                 // Email field
                 AuthTextField(
+                  key: const Key('login_email'),
                   controller: _emailController,
                   label: 'Email',
                   hint: 'Enter your email',
@@ -144,6 +146,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
                 // Password field
                 PasswordTextField(
+                  key: const Key('login_password'),
                   controller: _passwordController,
                   textInputAction: TextInputAction.done,
                   focusNode: _passwordFocusNode,
@@ -163,6 +166,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 Align(
                   alignment: Alignment.centerRight,
                   child: TextButton(
+                    key: const Key('login_forgot_password'),
                     onPressed: isLoading ? null : widget.onForgotPasswordTap,
                     child: const Text('Forgot password?'),
                   ),
@@ -172,6 +176,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
                 // Login button
                 AuthButton(
+                  key: const Key('login_submit'),
                   onPressed: _login,
                   label: 'Sign In',
                   isLoading: isLoading && !_isGoogleLoading,
@@ -191,6 +196,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           ),
                     ),
                     TextButton(
+                      key: const Key('go_to_register'),
                       onPressed: isLoading ? null : widget.onRegisterTap,
                       child: const Text('Sign Up'),
                     ),

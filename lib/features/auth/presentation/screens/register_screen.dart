@@ -127,6 +127,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                 Row(
                   children: [
                     IconButton(
+                      key: const Key('register_back'),
                       onPressed: isLoading ? null : widget.onLoginTap,
                       icon: const Icon(Icons.arrow_back),
                     ),
@@ -163,6 +164,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
 
                 // Username field
                 AuthTextField(
+                  key: const Key('register_username'),
                   controller: _usernameController,
                   label: 'Username',
                   hint: 'Choose a unique username',
@@ -182,6 +184,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
 
                 // Email field
                 AuthTextField(
+                  key: const Key('register_email'),
                   controller: _emailController,
                   label: 'Email',
                   hint: 'Enter your email',
@@ -200,6 +203,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
 
                 // Phone field
                 PhoneInputField(
+                  key: const Key('register_phone'),
                   controller: _phoneController,
                   focusNode: _phoneFocusNode,
                   enabled: !isLoading,
@@ -225,6 +229,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
 
                 // Password field
                 PasswordTextField(
+                  key: const Key('register_password'),
                   controller: _passwordController,
                   textInputAction: TextInputAction.next,
                   focusNode: _passwordFocusNode,
@@ -240,6 +245,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
 
                 // Confirm password field
                 PasswordTextField(
+                  key: const Key('register_confirm_password'),
                   controller: _confirmPasswordController,
                   label: 'Confirm Password',
                   textInputAction: TextInputAction.done,
@@ -256,6 +262,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
 
                 // Register button
                 AuthButton(
+                  key: const Key('register_submit'),
                   onPressed: _register,
                   label: 'Create Account',
                   isLoading: isLoading && !_isGoogleLoading,

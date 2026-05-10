@@ -168,6 +168,7 @@ class _WaitingScreenState extends ConsumerState<WaitingScreen>
               const SizedBox(height: 40),
 
               Text(
+                key: const Key('waiting_status'),
                 isDirectCall
                     ? 'Calling ${callState.peerInfo?.name ?? 'user'}...'
                     : 'Finding someone to talk to...',
@@ -199,6 +200,7 @@ class _WaitingScreenState extends ConsumerState<WaitingScreen>
                       ),
                       const SizedBox(width: 8),
                       Text(
+                        key: const Key('waiting_timer'),
                         matchmakingState.formattedWaitTime,
                         style: Theme.of(context).textTheme.titleMedium?.copyWith(
                               color: AppColors.primary,
@@ -218,6 +220,7 @@ class _WaitingScreenState extends ConsumerState<WaitingScreen>
                   width: double.infinity,
                   height: 56,
                   child: OutlinedButton(
+                    key: const Key('waiting_cancel'),
                     onPressed: _onCancel,
                     style: OutlinedButton.styleFrom(
                       foregroundColor: AppColors.error,

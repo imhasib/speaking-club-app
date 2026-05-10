@@ -228,6 +228,7 @@ class _CallScreenState extends ConsumerState<CallScreen> {
                         PeerInfoCard(peerInfo: callState.peerInfo!),
                       const SizedBox(height: 8),
                       CallTimer(
+                        key: const Key('call_timer'),
                         duration: callState.formattedDuration,
                         isConnecting: callState.isConnecting,
                       ),

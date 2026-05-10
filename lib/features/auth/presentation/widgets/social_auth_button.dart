@@ -19,11 +19,13 @@ class SocialAuthButton extends StatelessWidget {
 
   /// Google sign-in button
   factory SocialAuthButton.google({
+    Key? key,
     required VoidCallback onPressed,
     bool isLoading = false,
     bool enabled = true,
   }) {
     return SocialAuthButton(
+      key: key,
       onPressed: onPressed,
       label: 'Continue with Google',
       icon: Image.network(

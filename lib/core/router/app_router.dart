@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../features/ai_practice/domain/ai_practice_state.dart';
 import '../../features/ai_practice/presentation/screens/ai_history_screen.dart';
+import '../../features/ai_practice/presentation/screens/ai_practice_home_screen.dart';
 import '../../features/ai_practice/presentation/screens/ai_session_detail_screen.dart';
 import '../../features/ai_practice/presentation/screens/ai_session_screen.dart';
 import '../../features/ai_practice/presentation/screens/ai_summary_screen.dart';
@@ -87,6 +89,7 @@ class AppRouter {
             currentPath == Routes.call ||
             currentPath == Routes.incomingCall ||
             currentPath == Routes.aiPractice ||
+            currentPath == Routes.aiPracticeModes ||
             currentPath == Routes.aiSession ||
             currentPath == Routes.aiSummary ||
             currentPath == Routes.aiHistory ||
@@ -213,10 +216,25 @@ class AppRouter {
           pageBuilder: (context, state) => buildPageWithTransition(
             context: context,
             state: state,
-            child: const ModeSelectionScreen(),
+            child: const AiPracticeHomeScreen(),
             type: PageTransitionType.slideUp,
             duration: const Duration(milliseconds: 300),
           ),
+        ),
+        GoRoute(
+          path: Routes.aiPracticeModes,
+          name: Routes.aiPracticeModesName,
+          pageBuilder: (context, state) {
+            final practiceType =
+                (state.extra is PracticeType) ? state.extra as PracticeType : PracticeType.free;
+            return buildPageWithTransition(
+              context: context,
+              state: state,
+              child: ModeSelectionScreen(practiceType: practiceType),
+              type: PageTransitionType.slideUp,
+              duration: const Duration(milliseconds: 300),
+            );
+          },
         ),
         GoRoute(
           path: Routes.aiSession,

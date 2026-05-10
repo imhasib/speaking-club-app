@@ -3,9 +3,13 @@ import 'dart:developer' as dev;
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:uuid/uuid.dart';
 
 import '../../../../shared/models/ai_session.dart';
+import '../../../../shared/providers/core_providers.dart';
 import '../../data/ai_session_repository.dart';
+import '../../data/correction_parser.dart';
+import '../../data/http_ai_service.dart';
 import '../../data/openai_realtime_service.dart';
 import '../../data/speech_service.dart';
 import '../../data/tts_service.dart';
@@ -15,6 +19,14 @@ import 'ai_summary_provider.dart';
 /// OpenAI Realtime Service provider
 final openAIServiceProvider = Provider<OpenAIRealtimeService>((ref) {
   final service = OpenAIRealtimeService();
+  ref.onDispose(() => service.dispose());
+  return service;
+});
+
+/// HTTP AI service provider (free tier).
+final httpAiServiceProvider = Provider<HttpAiService>((ref) {
+  final secureStorage = ref.watch(secureStorageProvider);
+  final service = HttpAiService(secureStorage: secureStorage);
   ref.onDispose(() => service.dispose());
   return service;
 });
@@ -43,9 +55,18 @@ class AiPracticeNotifier extends Notifier<AiPracticeState> {
   // Cached at build() time so they remain accessible in dispose callbacks,
   // where ref.read() is no longer allowed (Riverpod 3 restriction).
   late OpenAIRealtimeService _openAI;
+  late HttpAiService _httpAi;
   late SpeechService _speech;
   late TtsService _tts;
   late AiSessionRepository _repository;
+
+  /// Active SSE subscription for the free tier — cancelled on disconnect.
+  StreamSubscription<AiEvent>? _httpStreamSub;
+
+  /// In-memory free-tier conversation history. Capped at last 20 entries
+  /// before being sent to the server. Distinct from `state.messages` so we
+  /// can reset/replay without disturbing what the UI displays mid-stream.
+  final List<AiMessage> _freeHistory = [];
 
   Timer? _durationTimer;
   Timer? _keyRefreshTimer;
@@ -79,6 +100,7 @@ class AiPracticeNotifier extends Notifier<AiPracticeState> {
   @override
   AiPracticeState build() {
     _openAI = ref.read(openAIServiceProvider);
+    _httpAi = ref.read(httpAiServiceProvider);
     _speech = ref.read(speechServiceProvider);
     _tts = ref.read(ttsServiceProvider);
     _repository = ref.read(aiSessionRepositoryProvider);
@@ -118,9 +140,15 @@ class AiPracticeNotifier extends Notifier<AiPracticeState> {
     // _onOpenAIConnectionChange on an already-disposed notifier.
     _openAI.onConnectionStateChange = null;
     _openAI.disconnect();
+    _httpStreamSub?.cancel();
+    _httpStreamSub = null;
+    _httpAi.stopHeartbeat();
     _speech.stopListening();
     _tts.stop();
   }
+
+  /// Whether the active session uses the premium WebSocket transport.
+  bool get isPremium => state.practiceType.isPremium;
 
   // === OpenAI Callbacks ===
 
@@ -431,30 +459,36 @@ class AiPracticeNotifier extends Notifier<AiPracticeState> {
     required AiSessionMode mode,
     String? topic,
     String? scenario,
+    PracticeType practiceType = PracticeType.free,
   }) async {
     if (state.isActive) {
       dev.log('AI Practice: Session already active');
       return;
     }
 
-    dev.log('AI Practice: Starting session - mode: ${mode.name}');
+    dev.log(
+      'AI Practice: Starting ${practiceType.name} session - mode: ${mode.name}',
+    );
 
     _sttFailureCount = 0;
     _reconnecting = false;
     _reconnectAttempts = 0;
     _timerStarted = false;
     _refreshingKey = false;
+    _freeHistory.clear();
 
     state = state.copyWith(
       phase: AiPracticePhase.initializing,
       mode: mode,
       topic: topic,
       scenario: scenario,
+      practiceType: practiceType,
       messages: [],
       corrections: [],
       currentUserText: '',
       currentAiText: '',
       sessionDurationSeconds: 0,
+      remainingDailySeconds: practiceType.dailyLimitSeconds,
       wordsSpoken: 0,
       ttsAvailable: true,
       sttPersistentError: false,
@@ -492,33 +526,60 @@ class AiPracticeNotifier extends Notifier<AiPracticeState> {
         if (!_disposed) state = state.copyWith(ttsAvailable: false);
       }
 
-      // Request ephemeral key from backend
-      state = state.copyWith(phase: AiPracticePhase.requestingToken);
+      if (practiceType.isPremium) {
+        // Premium: ephemeral key + WebSocket transport.
+        state = state.copyWith(phase: AiPracticePhase.requestingToken);
 
-      final tokenResponse = await _repository.getSessionToken(
-        mode: mode,
-        topic: topic,
-        scenario: scenario,
-      );
-      if (_disposed) return;
+        final tokenResponse = await _repository.getSessionToken(
+          mode: mode,
+          topic: topic,
+          scenario: scenario,
+        );
+        if (_disposed) return;
 
-      state = state.copyWith(
-        sessionId: tokenResponse.sessionId,
-        remainingDailySeconds: tokenResponse.remainingSeconds,
-      );
+        state = state.copyWith(
+          sessionId: tokenResponse.sessionId,
+          remainingDailySeconds: tokenResponse.remainingSeconds,
+        );
 
-      _currentEphemeralKey = tokenResponse.ephemeralKey;
-      _keyExpiresAt = tokenResponse.expiresAt;
+        _currentEphemeralKey = tokenResponse.ephemeralKey;
+        _keyExpiresAt = tokenResponse.expiresAt;
 
-      // Connect to OpenAI Realtime API
-      state = state.copyWith(phase: AiPracticePhase.connecting);
+        state = state.copyWith(phase: AiPracticePhase.connecting);
 
-      await _openAI.connect(
-        ephemeralKey: tokenResponse.ephemeralKey,
-        mode: mode,
-        topic: topic,
-        scenario: scenario,
-      );
+        await _openAI.connect(
+          ephemeralKey: tokenResponse.ephemeralKey,
+          mode: mode,
+          topic: topic,
+          scenario: scenario,
+        );
+      } else {
+        // Free: client generates a session id and immediately enters the
+        // ready phase — the first AI text comes only after the user speaks.
+        final sessionId = _generateSessionId();
+        state = state.copyWith(
+          sessionId: sessionId,
+          phase: AiPracticePhase.ready,
+        );
+
+        // Best-effort persist on the server; never blocks.
+        unawaited(_repository
+            .startSession(SessionStartRequest(
+              sessionId: sessionId,
+              mode: mode,
+              topic: topic,
+              scenario: scenario,
+            ))
+            .catchError((Object e) {
+          dev.log('AI Practice: free /session/start failed (non-fatal): $e');
+        }));
+
+        // Start the duration timer immediately for the free tier — there's no
+        // ephemeral-key handshake to wait through.
+        _timerStarted = true;
+        state = state.copyWith(sessionStartTime: DateTime.now());
+        _startDurationTimer();
+      }
     } catch (e) {
       if (_disposed) return;
       dev.log('AI Practice: Failed to start session: $e');
@@ -551,14 +612,138 @@ class AiPracticeNotifier extends Notifier<AiPracticeState> {
       wordsSpoken: state.wordsSpoken + wordCount,
     );
 
-    // Small "thinking" delay before AI responds — makes the conversation feel
-    // more natural/human, as if the AI is briefly processing what was said.
-    Future.delayed(const Duration(milliseconds: 500), () {
-      if (state.isInConversation) {
-        _openAI.sendMessage(text);
-      }
-    });
+    if (state.practiceType.isPremium) {
+      // Small "thinking" delay before AI responds — makes the conversation
+      // feel more natural, as if the AI is briefly processing.
+      Future.delayed(const Duration(milliseconds: 500), () {
+        if (state.isInConversation) {
+          _openAI.sendMessage(text);
+        }
+      });
+    } else {
+      _freeHistory.add(message);
+      _sendUserMessageHttp(text);
+    }
   }
+
+  /// Free-tier send: stream from /api/ai/chat/stream and surface delta /
+  /// correction / done / error / quota_exhausted events to UI state.
+  void _sendUserMessageHttp(String text) {
+    final sessionId = state.sessionId;
+    if (sessionId == null) return;
+
+    // Take last 20 history entries (10 turns).
+    final history = _freeHistory.length > 20
+        ? _freeHistory.sublist(_freeHistory.length - 20)
+        : List<AiMessage>.from(_freeHistory);
+
+    _httpStreamSub?.cancel();
+
+    final aiBuffer = StringBuffer();
+    var firstDelta = true;
+
+    _httpStreamSub = _httpAi
+        .sendMessage(
+          sessionId: sessionId,
+          message: text,
+          history: history,
+        )
+        .listen(
+      (event) {
+        if (_disposed) return;
+        switch (event) {
+          case DeltaEvent(:final content):
+            // CorrectionParser is anchored to start-of-string, so apply once
+            // we've seen the closing `]` (or just always — it's a no-op when
+            // no marker is present).
+            aiBuffer.write(content);
+            if (firstDelta) {
+              firstDelta = false;
+              state = state.copyWith(
+                phase: AiPracticePhase.aiSpeaking,
+                currentSpeaker: Speaker.ai,
+              );
+            }
+            state = state.copyWith(currentAiText: state.currentAiText + content);
+            break;
+          case CorrectionEvent():
+            _onCorrectionFound(event.toCorrection());
+            break;
+          case DoneEvent():
+            _finishHttpResponse(aiBuffer.toString());
+            break;
+          case ErrorEvent(:final message):
+            dev.log('AI Practice: SSE error: $message');
+            state = state.copyWith(
+              phase: AiPracticePhase.ready,
+              currentSpeaker: Speaker.none,
+              currentAiText: '',
+              error: message,
+            );
+            break;
+          case QuotaExhaustedEvent():
+            dev.log('AI Practice: quota exhausted — ending session');
+            state = state.copyWith(
+              error: 'Daily limit reached. Resets at midnight.',
+            );
+            endSession();
+            break;
+        }
+      },
+      onError: (Object e, StackTrace st) {
+        if (_disposed) return;
+        state = state.copyWith(
+          phase: AiPracticePhase.ready,
+          error: 'Connection error: $e',
+        );
+      },
+    );
+  }
+
+  void _finishHttpResponse(String fullText) {
+    // Strip a leading [CORRECTION: ... ] marker if the server didn't already
+    // split it out (defensive — the server should emit a separate event).
+    final parsed = CorrectionParser.parse(fullText);
+    if (parsed.correction != null) {
+      _onCorrectionFound(parsed.correction!);
+    }
+    final cleaned = parsed.cleanedText.trim();
+
+    if (cleaned.isNotEmpty) {
+      final message = AiMessage(
+        role: 'assistant',
+        content: cleaned,
+        timestamp: DateTime.now().toUtc(),
+      );
+      _freeHistory.add(message);
+      state = state.copyWith(
+        messages: [...state.messages, message],
+        currentAiText: '',
+      );
+
+      if (_ttsAvailable) {
+        _tts.speak(cleaned);
+      } else {
+        // Without TTS the AI-speaking phase has no natural end, so move
+        // straight back to ready and let the user speak again.
+        state = state.copyWith(
+          phase: AiPracticePhase.ready,
+          currentSpeaker: Speaker.none,
+        );
+      }
+    } else {
+      state = state.copyWith(
+        phase: AiPracticePhase.ready,
+        currentSpeaker: Speaker.none,
+        currentAiText: '',
+      );
+    }
+  }
+
+  /// Generate a sessionId for free-tier sessions. The server validator
+  /// requires a strict RFC 4122 v4 UUID (`z.string().uuid()`).
+  static const _uuidGen = Uuid();
+  String _generateSessionId() => _uuidGen.v4();
 
   /// Start listening for user speech
   Future<void> startListening() async {
@@ -591,6 +776,9 @@ class AiPracticeNotifier extends Notifier<AiPracticeState> {
     await _speech.stopListening();
     await _tts.stop();
     await _openAI.disconnect();
+    await _httpStreamSub?.cancel();
+    _httpStreamSub = null;
+    _httpAi.stopHeartbeat();
 
     // M7: Capture summary data before resetting state
     final stats = SessionStats(

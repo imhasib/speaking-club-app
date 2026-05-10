@@ -11,7 +11,12 @@ import '../providers/ai_practice_provider.dart';
 
 /// Screen for selecting AI practice mode
 class ModeSelectionScreen extends ConsumerStatefulWidget {
-  const ModeSelectionScreen({super.key});
+  final PracticeType practiceType;
+
+  const ModeSelectionScreen({
+    super.key,
+    this.practiceType = PracticeType.free,
+  });
 
   @override
   ConsumerState<ModeSelectionScreen> createState() =>
@@ -19,75 +24,85 @@ class ModeSelectionScreen extends ConsumerStatefulWidget {
 }
 
 class _ModeSelectionScreenState extends ConsumerState<ModeSelectionScreen> {
+  bool _isStarting = false;
+
   @override
   void initState() {
     super.initState();
-    // Load data when screen opens
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref.read(modeSelectionProvider.notifier).loadData();
     });
   }
 
-  void _startSession(AiSessionMode mode, {String? topic, String? scenario}) async {
-    // Start the AI session
+  Future<void> _startSession(
+    AiSessionMode mode, {
+    String? topic,
+    String? scenario,
+  }) async {
+    if (_isStarting) return;
+    setState(() => _isStarting = true);
+
     ref.read(aiPracticeProvider.notifier).startSession(
           mode: mode,
           topic: topic,
           scenario: scenario,
+          practiceType: widget.practiceType,
         );
 
-    // Wait for session to either connect successfully or fail
-    // Don't navigate immediately - wait for the result
-    final subscription = ref.listenManual<AiPracticeState>(
-      aiPracticeProvider,
-      (previous, next) {},
-    );
+    if (mounted) {
+      showDialog<void>(
+        context: context,
+        barrierDismissible: false,
+        builder: (_) => const _SessionStartingDialog(),
+      );
+    }
 
     try {
-      // Poll for state change with timeout
-      const maxWaitSeconds = 30;
-      for (var i = 0; i < maxWaitSeconds * 10; i++) {
+      const maxWait = 30 * 10; // 30 s in 100 ms ticks
+      for (var i = 0; i < maxWait; i++) {
         await Future.delayed(const Duration(milliseconds: 100));
+        if (!mounted) return;
 
         final state = ref.read(aiPracticeProvider);
 
-        // Success - session is ready or in conversation
         if (state.isInConversation) {
           if (mounted) {
+            Navigator.of(context, rootNavigator: true).pop();
             context.push(Routes.aiSession);
           }
           return;
         }
 
-        // Error - show message and stay on this screen
         if (state.phase == AiPracticePhase.error) {
           if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(state.error ?? 'Failed to start session'),
-                backgroundColor: Theme.of(context).colorScheme.error,
-                duration: const Duration(seconds: 5),
-              ),
-            );
+            Navigator.of(context, rootNavigator: true).pop();
+            _showErrorToast(state.error ?? 'Failed to start session');
+            ref.read(aiPracticeProvider.notifier).clearError();
           }
-          // Reset the state back to idle
-          ref.read(aiPracticeProvider.notifier).clearError();
           return;
         }
       }
 
-      // Timeout - show error
+      // Timed out
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Connection timeout. Please try again.'),
-            duration: Duration(seconds: 5),
-          ),
-        );
+        Navigator.of(context, rootNavigator: true).pop();
+        _showErrorToast('Connection timed out. Please try again.');
+        ref.read(aiPracticeProvider.notifier).clearError();
       }
     } finally {
-      subscription.close();
+      if (mounted) setState(() => _isStarting = false);
     }
+  }
+
+  void _showErrorToast(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: Theme.of(context).colorScheme.error,
+        behavior: SnackBarBehavior.floating,
+        duration: const Duration(seconds: 4),
+      ),
+    );
   }
 
   void _showTopicPicker() {
@@ -127,6 +142,7 @@ class _ModeSelectionScreenState extends ConsumerState<ModeSelectionScreen> {
     final state = ref.watch(modeSelectionProvider);
 
     return Scaffold(
+      key: const Key('modeSelectionScreen'),
       appBar: AppBar(
         title: const Text('Practice with AI'),
       ),
@@ -173,11 +189,12 @@ class _ModeSelectionScreenState extends ConsumerState<ModeSelectionScreen> {
           StaggeredListItem(
             index: 0,
             child: _ModeCard(
+              semanticsLabel: 'modeCard_freeChat',
               icon: Icons.chat_bubble_outline,
               title: 'Free Chat',
               description: 'Have a casual conversation on any topic',
               color: AppColors.primary,
-              onTap: state.usageInfo?.hasTimeRemaining ?? true
+              onTap: !_isStarting && (state.usageInfo?.hasTimeRemaining ?? true)
                   ? () => _startSession(AiSessionMode.freeChat)
                   : null,
             ),
@@ -188,11 +205,12 @@ class _ModeSelectionScreenState extends ConsumerState<ModeSelectionScreen> {
           StaggeredListItem(
             index: 1,
             child: _ModeCard(
+              semanticsLabel: 'modeCard_topic',
               icon: Icons.topic_outlined,
               title: 'Topic Discussion',
               description: 'Practice vocabulary around specific themes',
               color: AppColors.secondary,
-              onTap: state.usageInfo?.hasTimeRemaining ?? true
+              onTap: !_isStarting && (state.usageInfo?.hasTimeRemaining ?? true)
                   ? _showTopicPicker
                   : null,
             ),
@@ -203,11 +221,12 @@ class _ModeSelectionScreenState extends ConsumerState<ModeSelectionScreen> {
           StaggeredListItem(
             index: 2,
             child: _ModeCard(
+              semanticsLabel: 'modeCard_scenario',
               icon: Icons.theater_comedy_outlined,
               title: 'Scenario Roleplay',
               description: 'Practice real-world situations',
               color: AppColors.info,
-              onTap: state.usageInfo?.hasTimeRemaining ?? true
+              onTap: !_isStarting && (state.usageInfo?.hasTimeRemaining ?? true)
                   ? _showScenarioPicker
                   : null,
             ),
@@ -294,6 +313,7 @@ class _ModeCard extends StatelessWidget {
   final String description;
   final Color color;
   final VoidCallback? onTap;
+  final String? semanticsLabel;
 
   const _ModeCard({
     required this.icon,
@@ -301,6 +321,7 @@ class _ModeCard extends StatelessWidget {
     required this.description,
     required this.color,
     this.onTap,
+    this.semanticsLabel,
   });
 
   @override
@@ -309,51 +330,56 @@ class _ModeCard extends StatelessWidget {
     final textTheme = Theme.of(context).textTheme;
     final isDisabled = onTap == null;
 
-    return Card(
-      clipBehavior: Clip.antiAlias,
-      child: InkWell(
-        onTap: onTap,
-        child: Opacity(
-          opacity: isDisabled ? 0.5 : 1.0,
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Row(
-              children: [
-                Container(
-                  width: 56,
-                  height: 56,
-                  decoration: BoxDecoration(
-                    color: color.withOpacity(0.15),
-                    borderRadius: BorderRadius.circular(12),
+    return Semantics(
+      label: semanticsLabel,
+      button: true,
+      enabled: !isDisabled,
+      child: Card(
+        clipBehavior: Clip.antiAlias,
+        child: InkWell(
+          onTap: onTap,
+          child: Opacity(
+            opacity: isDisabled ? 0.5 : 1.0,
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Row(
+                children: [
+                  Container(
+                    width: 56,
+                    height: 56,
+                    decoration: BoxDecoration(
+                      color: color.withOpacity(0.15),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Icon(icon, color: color, size: 28),
                   ),
-                  child: Icon(icon, color: color, size: 28),
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        title,
-                        style: textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.w600,
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          title,
+                          style: textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        description,
-                        style: textTheme.bodyMedium?.copyWith(
-                          color: colorScheme.onSurfaceVariant,
+                        const SizedBox(height: 4),
+                        Text(
+                          description,
+                          style: textTheme.bodyMedium?.copyWith(
+                            color: colorScheme.onSurfaceVariant,
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
-                Icon(
-                  Icons.chevron_right,
-                  color: colorScheme.onSurfaceVariant,
-                ),
-              ],
+                  Icon(
+                    Icons.chevron_right,
+                    color: colorScheme.onSurfaceVariant,
+                  ),
+                ],
+              ),
             ),
           ),
         ),
@@ -572,6 +598,48 @@ class _ScenarioTile extends StatelessWidget {
       ),
       trailing: const Icon(Icons.arrow_forward_ios, size: 16),
       onTap: onTap,
+    );
+  }
+}
+
+/// Blocking dialog shown while the session is initialising.
+/// Watches [aiPracticeProvider] to surface live status text.
+class _SessionStartingDialog extends ConsumerWidget {
+  const _SessionStartingDialog();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final statusText = ref.watch(
+      aiPracticeProvider.select((s) => s.statusText),
+    );
+
+    return PopScope(
+      canPop: false,
+      child: Semantics(
+        label: 'sessionStartingDialog',
+        child: Dialog(
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 28),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const CircularProgressIndicator(),
+                const SizedBox(height: 20),
+                Semantics(
+                  label: 'sessionStartingStatus',
+                  child: Text(
+                    statusText,
+                    style: Theme.of(context).textTheme.bodyLarge,
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
     );
   }
 }

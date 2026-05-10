@@ -285,11 +285,23 @@ class _AiSessionScreenState extends ConsumerState<AiSessionScreen>
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                'AI Practice',
-                style: textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.bold,
-                ),
+              Row(
+                children: [
+                  Text(
+                    state.practiceType.displayName,
+                    style: textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  if (state.practiceType.isPremium) ...[
+                    const SizedBox(width: 4),
+                    Icon(
+                      Icons.workspace_premium,
+                      size: 16,
+                      color: colorScheme.tertiary,
+                    ),
+                  ],
+                ],
               ),
               Text(
                 state.mode.displayName,

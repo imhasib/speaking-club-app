@@ -46,6 +46,7 @@ sealed class AuthUser with _$AuthUser {
     @JsonKey(name: 'mobile') String? mobileNumber,
     String? profilePicture,
     @Default('local') @JsonKey(name: 'authProvider') String authProvider,
+    @Default('free') String plan,
   }) = _AuthUser;
 
   factory AuthUser.fromJson(Map<String, dynamic> json) =>

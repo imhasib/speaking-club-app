@@ -37,4 +37,6 @@ class ApiEndpoints {
   static const String aiUsage = '/ai/usage';
   static const String aiTopics = '/ai/topics';
   static const String aiScenarios = '/ai/scenarios';
+  static const String aiChatStream = '/ai/chat/stream';
+  static const String aiUsageHeartbeat = '/ai/usage/heartbeat';
 }

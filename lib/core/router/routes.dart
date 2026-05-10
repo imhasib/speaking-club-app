@@ -49,6 +49,9 @@ class Routes {
   static const String aiPractice = '/ai-practice';
   static const String aiPracticeName = 'aiPractice';
 
+  static const String aiPracticeModes = '/ai-practice/modes';
+  static const String aiPracticeModesName = 'aiPracticeModes';
+
   static const String aiSession = '/ai-practice/session';
   static const String aiSessionName = 'aiSession';
 

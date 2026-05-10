@@ -556,7 +556,7 @@ $AuthUserCopyWith<$Res> get user {
 /// @nodoc
 mixin _$AuthUser {
 
- String get id; String get name; String get email;@JsonKey(name: 'mobile') String? get mobileNumber; String? get profilePicture;@JsonKey(name: 'authProvider') String get authProvider;
+ String get id; String get name; String get email;@JsonKey(name: 'mobile') String? get mobileNumber; String? get profilePicture;@JsonKey(name: 'authProvider') String get authProvider; String get plan;
 /// Create a copy of AuthUser
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -569,16 +569,16 @@ $AuthUserCopyWith<AuthUser> get copyWith => _$AuthUserCopyWithImpl<AuthUser>(thi
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is AuthUser&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.email, email) || other.email == email)&&(identical(other.mobileNumber, mobileNumber) || other.mobileNumber == mobileNumber)&&(identical(other.profilePicture, profilePicture) || other.profilePicture == profilePicture)&&(identical(other.authProvider, authProvider) || other.authProvider == authProvider));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is AuthUser&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.email, email) || other.email == email)&&(identical(other.mobileNumber, mobileNumber) || other.mobileNumber == mobileNumber)&&(identical(other.profilePicture, profilePicture) || other.profilePicture == profilePicture)&&(identical(other.authProvider, authProvider) || other.authProvider == authProvider)&&(identical(other.plan, plan) || other.plan == plan));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,name,email,mobileNumber,profilePicture,authProvider);
+int get hashCode => Object.hash(runtimeType,id,name,email,mobileNumber,profilePicture,authProvider,plan);
 
 @override
 String toString() {
-  return 'AuthUser(id: $id, name: $name, email: $email, mobileNumber: $mobileNumber, profilePicture: $profilePicture, authProvider: $authProvider)';
+  return 'AuthUser(id: $id, name: $name, email: $email, mobileNumber: $mobileNumber, profilePicture: $profilePicture, authProvider: $authProvider, plan: $plan)';
 }
 
 
@@ -589,7 +589,7 @@ abstract mixin class $AuthUserCopyWith<$Res>  {
   factory $AuthUserCopyWith(AuthUser value, $Res Function(AuthUser) _then) = _$AuthUserCopyWithImpl;
 @useResult
 $Res call({
- String id, String name, String email,@JsonKey(name: 'mobile') String? mobileNumber, String? profilePicture,@JsonKey(name: 'authProvider') String authProvider
+ String id, String name, String email,@JsonKey(name: 'mobile') String? mobileNumber, String? profilePicture,@JsonKey(name: 'authProvider') String authProvider, String plan
 });
 
 
@@ -606,7 +606,7 @@ class _$AuthUserCopyWithImpl<$Res>
 
 /// Create a copy of AuthUser
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? name = null,Object? email = null,Object? mobileNumber = freezed,Object? profilePicture = freezed,Object? authProvider = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? name = null,Object? email = null,Object? mobileNumber = freezed,Object? profilePicture = freezed,Object? authProvider = null,Object? plan = null,}) {
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
@@ -614,6 +614,7 @@ as String,email: null == email ? _self.email : email // ignore: cast_nullable_to
 as String,mobileNumber: freezed == mobileNumber ? _self.mobileNumber : mobileNumber // ignore: cast_nullable_to_non_nullable
 as String?,profilePicture: freezed == profilePicture ? _self.profilePicture : profilePicture // ignore: cast_nullable_to_non_nullable
 as String?,authProvider: null == authProvider ? _self.authProvider : authProvider // ignore: cast_nullable_to_non_nullable
+as String,plan: null == plan ? _self.plan : plan // ignore: cast_nullable_to_non_nullable
 as String,
   ));
 }
@@ -696,10 +697,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String name,  String email, @JsonKey(name: 'mobile')  String? mobileNumber,  String? profilePicture, @JsonKey(name: 'authProvider')  String authProvider)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String name,  String email, @JsonKey(name: 'mobile')  String? mobileNumber,  String? profilePicture, @JsonKey(name: 'authProvider')  String authProvider,  String plan)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _AuthUser() when $default != null:
-return $default(_that.id,_that.name,_that.email,_that.mobileNumber,_that.profilePicture,_that.authProvider);case _:
+return $default(_that.id,_that.name,_that.email,_that.mobileNumber,_that.profilePicture,_that.authProvider,_that.plan);case _:
   return orElse();
 
 }
@@ -717,10 +718,10 @@ return $default(_that.id,_that.name,_that.email,_that.mobileNumber,_that.profile
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String name,  String email, @JsonKey(name: 'mobile')  String? mobileNumber,  String? profilePicture, @JsonKey(name: 'authProvider')  String authProvider)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String name,  String email, @JsonKey(name: 'mobile')  String? mobileNumber,  String? profilePicture, @JsonKey(name: 'authProvider')  String authProvider,  String plan)  $default,) {final _that = this;
 switch (_that) {
 case _AuthUser():
-return $default(_that.id,_that.name,_that.email,_that.mobileNumber,_that.profilePicture,_that.authProvider);}
+return $default(_that.id,_that.name,_that.email,_that.mobileNumber,_that.profilePicture,_that.authProvider,_that.plan);}
 }
 /// A variant of `when` that fallback to returning `null`
 ///
@@ -734,10 +735,10 @@ return $default(_that.id,_that.name,_that.email,_that.mobileNumber,_that.profile
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String name,  String email, @JsonKey(name: 'mobile')  String? mobileNumber,  String? profilePicture, @JsonKey(name: 'authProvider')  String authProvider)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String name,  String email, @JsonKey(name: 'mobile')  String? mobileNumber,  String? profilePicture, @JsonKey(name: 'authProvider')  String authProvider,  String plan)?  $default,) {final _that = this;
 switch (_that) {
 case _AuthUser() when $default != null:
-return $default(_that.id,_that.name,_that.email,_that.mobileNumber,_that.profilePicture,_that.authProvider);case _:
+return $default(_that.id,_that.name,_that.email,_that.mobileNumber,_that.profilePicture,_that.authProvider,_that.plan);case _:
   return null;
 
 }
@@ -749,7 +750,7 @@ return $default(_that.id,_that.name,_that.email,_that.mobileNumber,_that.profile
 @JsonSerializable()
 
 class _AuthUser implements AuthUser {
-  const _AuthUser({required this.id, required this.name, required this.email, @JsonKey(name: 'mobile') this.mobileNumber, this.profilePicture, @JsonKey(name: 'authProvider') this.authProvider = 'local'});
+  const _AuthUser({required this.id, required this.name, required this.email, @JsonKey(name: 'mobile') this.mobileNumber, this.profilePicture, @JsonKey(name: 'authProvider') this.authProvider = 'local', this.plan = 'free'});
   factory _AuthUser.fromJson(Map<String, dynamic> json) => _$AuthUserFromJson(json);
 
 @override final  String id;
@@ -758,6 +759,7 @@ class _AuthUser implements AuthUser {
 @override@JsonKey(name: 'mobile') final  String? mobileNumber;
 @override final  String? profilePicture;
 @override@JsonKey(name: 'authProvider') final  String authProvider;
+@override@JsonKey() final  String plan;
 
 /// Create a copy of AuthUser
 /// with the given fields replaced by the non-null parameter values.
@@ -772,16 +774,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _AuthUser&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.email, email) || other.email == email)&&(identical(other.mobileNumber, mobileNumber) || other.mobileNumber == mobileNumber)&&(identical(other.profilePicture, profilePicture) || other.profilePicture == profilePicture)&&(identical(other.authProvider, authProvider) || other.authProvider == authProvider));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _AuthUser&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.email, email) || other.email == email)&&(identical(other.mobileNumber, mobileNumber) || other.mobileNumber == mobileNumber)&&(identical(other.profilePicture, profilePicture) || other.profilePicture == profilePicture)&&(identical(other.authProvider, authProvider) || other.authProvider == authProvider)&&(identical(other.plan, plan) || other.plan == plan));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,name,email,mobileNumber,profilePicture,authProvider);
+int get hashCode => Object.hash(runtimeType,id,name,email,mobileNumber,profilePicture,authProvider,plan);
 
 @override
 String toString() {
-  return 'AuthUser(id: $id, name: $name, email: $email, mobileNumber: $mobileNumber, profilePicture: $profilePicture, authProvider: $authProvider)';
+  return 'AuthUser(id: $id, name: $name, email: $email, mobileNumber: $mobileNumber, profilePicture: $profilePicture, authProvider: $authProvider, plan: $plan)';
 }
 
 
@@ -792,7 +794,7 @@ abstract mixin class _$AuthUserCopyWith<$Res> implements $AuthUserCopyWith<$Res>
   factory _$AuthUserCopyWith(_AuthUser value, $Res Function(_AuthUser) _then) = __$AuthUserCopyWithImpl;
 @override @useResult
 $Res call({
- String id, String name, String email,@JsonKey(name: 'mobile') String? mobileNumber, String? profilePicture,@JsonKey(name: 'authProvider') String authProvider
+ String id, String name, String email,@JsonKey(name: 'mobile') String? mobileNumber, String? profilePicture,@JsonKey(name: 'authProvider') String authProvider, String plan
 });
 
 
@@ -809,7 +811,7 @@ class __$AuthUserCopyWithImpl<$Res>
 
 /// Create a copy of AuthUser
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? name = null,Object? email = null,Object? mobileNumber = freezed,Object? profilePicture = freezed,Object? authProvider = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? name = null,Object? email = null,Object? mobileNumber = freezed,Object? profilePicture = freezed,Object? authProvider = null,Object? plan = null,}) {
   return _then(_AuthUser(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
@@ -817,6 +819,7 @@ as String,email: null == email ? _self.email : email // ignore: cast_nullable_to
 as String,mobileNumber: freezed == mobileNumber ? _self.mobileNumber : mobileNumber // ignore: cast_nullable_to_non_nullable
 as String?,profilePicture: freezed == profilePicture ? _self.profilePicture : profilePicture // ignore: cast_nullable_to_non_nullable
 as String?,authProvider: null == authProvider ? _self.authProvider : authProvider // ignore: cast_nullable_to_non_nullable
+as String,plan: null == plan ? _self.plan : plan // ignore: cast_nullable_to_non_nullable
 as String,
   ));
 }

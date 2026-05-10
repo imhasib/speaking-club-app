@@ -184,27 +184,39 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           // AI Practice button
-          FloatingActionButton.extended(
-            heroTag: 'ai_practice',
-            onPressed: () => context.push(Routes.aiPractice),
-            icon: const Icon(Icons.smart_toy_outlined),
-            label: const Text('AI Practice'),
-            backgroundColor: colorScheme.secondaryContainer,
-            foregroundColor: colorScheme.onSecondaryContainer,
+          Semantics(
+            identifier: 'home_ai_practice',
+            child: FloatingActionButton.extended(
+              key: const Key('home_ai_practice'),
+              heroTag: 'ai_practice',
+              onPressed: () => context.push(Routes.aiPractice),
+              icon: const Icon(Icons.smart_toy_outlined),
+              label: const Text('AI Practice'),
+              backgroundColor: colorScheme.secondaryContainer,
+              foregroundColor: colorScheme.onSecondaryContainer,
+            ),
           ),
           const SizedBox(width: 12),
-          // Find Match button
-          FloatingActionButton.extended(
-            heroTag: 'find_match',
-            onPressed: _handleFindMatch,
-            icon: Icon(presenceState.isWaiting ? Icons.close : Icons.shuffle),
-            label: Text(presenceState.isWaiting ? 'Cancel' : 'Find Match'),
-            backgroundColor: presenceState.isWaiting
-                ? colorScheme.errorContainer
-                : colorScheme.primaryContainer,
-            foregroundColor: presenceState.isWaiting
-                ? colorScheme.onErrorContainer
-                : colorScheme.onPrimaryContainer,
+          // Find Match / Cancel button
+          Semantics(
+            identifier: presenceState.isWaiting
+                ? 'home_cancel_match'
+                : 'home_find_match',
+            child: FloatingActionButton.extended(
+              key: presenceState.isWaiting
+                  ? const Key('home_cancel_match')
+                  : const Key('home_find_match'),
+              heroTag: 'find_match',
+              onPressed: _handleFindMatch,
+              icon: Icon(presenceState.isWaiting ? Icons.close : Icons.shuffle),
+              label: Text(presenceState.isWaiting ? 'Cancel' : 'Find Match'),
+              backgroundColor: presenceState.isWaiting
+                  ? colorScheme.errorContainer
+                  : colorScheme.primaryContainer,
+              foregroundColor: presenceState.isWaiting
+                  ? colorScheme.onErrorContainer
+                  : colorScheme.onPrimaryContainer,
+            ),
           ),
         ],
       ),

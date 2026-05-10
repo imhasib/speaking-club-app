@@ -7,6 +7,29 @@ import '../data/tts_service.dart';
 
 part 'ai_practice_state.freezed.dart';
 
+/// Tier of the AI practice session.
+///
+/// `free` uses HTTP + SSE chat completions (gpt-4o-mini), 5 min daily.
+/// `premium` uses the WebSocket Realtime API (gpt-4o-mini-realtime-preview),
+/// 1 hr daily.
+enum PracticeType {
+  free,
+  premium;
+
+  bool get isPremium => this == PracticeType.premium;
+
+  /// Daily quota in seconds — must mirror server `getLimitForPlan`.
+  int get dailyLimitSeconds => switch (this) {
+        PracticeType.free => 300,
+        PracticeType.premium => 3600,
+      };
+
+  String get displayName => switch (this) {
+        PracticeType.free => 'AI Practice',
+        PracticeType.premium => 'AI Practice Pro',
+      };
+}
+
 /// AI practice session phase
 enum AiPracticePhase {
   /// No active session
@@ -73,6 +96,9 @@ sealed class AiPracticeState with _$AiPracticeState {
     @Default('') String currentUserText,
     @Default('') String currentAiText,
     @Default(Speaker.none) Speaker currentSpeaker,
+
+    // Tier — drives transport choice (HTTP/SSE vs WebSocket) and limits.
+    @Default(PracticeType.free) PracticeType practiceType,
 
     // Session timing
     DateTime? sessionStartTime,

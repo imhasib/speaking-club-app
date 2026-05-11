@@ -39,4 +39,18 @@ class ApiEndpoints {
   static const String aiScenarios = '/ai/scenarios';
   static const String aiChatStream = '/ai/chat/stream';
   static const String aiUsageHeartbeat = '/ai/usage/heartbeat';
+
+  // Mistakes endpoints
+  static const String mistakes = '/mistakes';
+  static String mistakeMarkFixed(String id) => '/mistakes/$id/mark-fixed';
+  static String mistakeSaveToVocab(String id) => '/mistakes/$id/save-to-vocab';
+
+  // Vocabulary endpoints
+  static const String vocab = '/vocab';
+  static const String vocabWords = '/vocab/words';
+  static String vocabWordDetail(String word) => '/vocab/words/$word';
+
+  // Streak + user stats endpoints
+  static const String streak = '/users/me/streak';
+  static const String userStats = '/users/me/stats';
 }

@@ -1,46 +1,84 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/theme/app_colors.dart';
 import '../../../../shared/widgets/sc_app_bar.dart';
 import '../../../../shared/widgets/sc_filter_chip_bar.dart';
-import '../../../../shared/widgets/section_header.dart';
+import '../../data/mistake_models.dart';
+import '../providers/mistakes_provider.dart';
 
-class MistakesScreen extends StatefulWidget {
+class MistakesScreen extends ConsumerStatefulWidget {
   const MistakesScreen({super.key});
 
   @override
-  State<MistakesScreen> createState() => _MistakesScreenState();
+  ConsumerState<MistakesScreen> createState() => _MistakesScreenState();
 }
 
-class _MistakesScreenState extends State<MistakesScreen> {
-  int _selectedFilter = 0;
+class _MistakesScreenState extends ConsumerState<MistakesScreen> {
+  final _scrollController = ScrollController();
 
-  static const _chips = [
-    ScFilterChipData(label: 'All', count: '12'),
-    ScFilterChipData(
-      label: 'Grammar',
-      count: '5',
-      accentDot: Color(0xFF7A5AF8),
-    ),
-    ScFilterChipData(
-      label: 'Vocabulary',
-      count: '4',
-      accentDot: AppColors.amber,
-    ),
-    ScFilterChipData(
-      label: 'Fluency',
-      count: '2',
-      accentDot: Color(0xFF2DABD6),
-    ),
-    ScFilterChipData(
-      label: 'Pronunciation',
-      count: '1',
-      accentDot: AppColors.redPrimary,
-    ),
+  @override
+  void initState() {
+    super.initState();
+    _scrollController.addListener(_onScroll);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(mistakesProvider.notifier).load();
+    });
+  }
+
+  @override
+  void dispose() {
+    _scrollController.removeListener(_onScroll);
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  void _onScroll() {
+    if (!_scrollController.hasClients) return;
+    final position = _scrollController.position;
+    if (position.pixels >= position.maxScrollExtent - 300) {
+      ref.read(mistakesProvider.notifier).loadMore();
+    }
+  }
+
+  static const _categoryChoices = [
+    null,
+    MistakeCategory.grammar,
+    MistakeCategory.vocabulary,
+    MistakeCategory.fluency,
+    MistakeCategory.pronunciation,
   ];
+
+  static const _categoryAccents = {
+    MistakeCategory.grammar: Color(0xFF7A5AF8),
+    MistakeCategory.vocabulary: AppColors.amber,
+    MistakeCategory.fluency: Color(0xFF2DABD6),
+    MistakeCategory.pronunciation: AppColors.redPrimary,
+  };
 
   @override
   Widget build(BuildContext context) {
+    final state = ref.watch(mistakesProvider);
+    final notifier = ref.read(mistakesProvider.notifier);
+
+    final selectedIndex =
+        _categoryChoices.indexOf(state.category).clamp(0, _categoryChoices.length - 1);
+
+    final categoryCounts = _countByCategory(state.mistakes);
+
+    final chips = <ScFilterChipData>[
+      ScFilterChipData(
+        label: 'All',
+        count: state.mistakes.length.toString(),
+      ),
+      for (final cat in _categoryChoices.skip(1).cast<MistakeCategory>())
+        ScFilterChipData(
+          label: cat.label,
+          count: (categoryCounts[cat] ?? 0).toString(),
+          accentDot: _categoryAccents[cat],
+        ),
+    ];
+
     return Scaffold(
       backgroundColor: AppColors.background,
       body: Column(
@@ -48,64 +86,115 @@ class _MistakesScreenState extends State<MistakesScreen> {
           ScAppBar(
             title: 'My Mistakes',
             right: IconButton(
-              icon: const Icon(Icons.search, color: AppColors.ink),
-              onPressed: () {},
+              key: const Key('mistakes_refresh_button'),
+              icon: const Icon(Icons.refresh, color: AppColors.ink),
+              onPressed: () => notifier.refresh(),
             ),
           ),
           Expanded(
-            child: ListView(
-              children: [
-                const SizedBox(height: 12),
-                _SummaryStrip(),
-                const SizedBox(height: 16),
-                ScFilterChipBar(
-                  chips: _chips,
-                  selectedIndex: _selectedFilter,
-                  onSelected: (i) => setState(() => _selectedFilter = i),
-                ),
-                const SizedBox(height: 4),
-                const SectionHeader(
-                  label: 'Grammar',
-                  count: '5',
-                  accent: Color(0xFF7A5AF8),
-                ),
-                _MistakeCard(
-                  wrong: 'I am go to the market yesterday.',
-                  right: 'I went to the market yesterday.',
-                  explanation:
-                      "Use past tense (went) with a past time marker like 'yesterday'.",
-                  session: 'Free Chat · May 09 · 3:42 min',
-                ),
-                _MistakeCard(
-                  wrong: "She don't like coffee in morning.",
-                  right: "She doesn't like coffee in the morning.",
-                  explanation:
-                      "Third-person singular needs 'doesn't', and 'morning' takes the article 'the'.",
-                  session: 'Topic Discussion · May 08',
-                ),
-                const SectionHeader(
-                  label: 'Vocabulary',
-                  count: '4',
-                  accent: AppColors.amber,
-                ),
-                _MistakeCard(
-                  wrong: 'I have a big amount of friends.',
-                  right: 'I have a large number of friends.',
-                  explanation:
-                      "'Amount' is for uncountables; use 'number' for countable nouns like friends.",
-                  session: 'Free Chat · May 07',
-                ),
-                const SizedBox(height: 32),
-              ],
+            child: RefreshIndicator(
+              onRefresh: () => notifier.refresh(),
+              child: _buildBody(
+                state: state,
+                chips: chips,
+                selectedIndex: selectedIndex,
+                onChipSelected: (i) =>
+                    notifier.setCategory(_categoryChoices[i]),
+                notifier: notifier,
+              ),
             ),
           ),
         ],
       ),
     );
   }
+
+  Map<MistakeCategory, int> _countByCategory(List<Mistake> list) {
+    final counts = <MistakeCategory, int>{};
+    for (final m in list) {
+      counts[m.category] = (counts[m.category] ?? 0) + 1;
+    }
+    return counts;
+  }
+
+  Widget _buildBody({
+    required MistakesUiState state,
+    required List<ScFilterChipData> chips,
+    required int selectedIndex,
+    required ValueChanged<int> onChipSelected,
+    required MistakesNotifier notifier,
+  }) {
+    if (state.isLoading && state.mistakes.isEmpty) {
+      return const Center(
+        key: Key('mistakes_loading'),
+        child: CircularProgressIndicator(),
+      );
+    }
+
+    if (state.hasError && state.mistakes.isEmpty) {
+      return _ErrorView(
+        message: state.errorMessage ?? 'Could not load mistakes',
+        onRetry: () => notifier.load(),
+      );
+    }
+
+    return CustomScrollView(
+      key: const Key('mistakes_scroll'),
+      controller: _scrollController,
+      physics: const AlwaysScrollableScrollPhysics(),
+      slivers: [
+        SliverToBoxAdapter(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const SizedBox(height: 12),
+              _SummaryStrip(summary: state.summary),
+              const SizedBox(height: 16),
+              ScFilterChipBar(
+                chips: chips,
+                selectedIndex: selectedIndex,
+                onSelected: onChipSelected,
+              ),
+              const SizedBox(height: 8),
+            ],
+          ),
+        ),
+        if (state.mistakes.isEmpty)
+          const SliverFillRemaining(
+            hasScrollBody: false,
+            child: _EmptyMistakes(),
+          )
+        else
+          SliverList.builder(
+            itemCount: state.mistakes.length + (state.isLoadingMore ? 1 : 0),
+            itemBuilder: (context, index) {
+              if (index >= state.mistakes.length) {
+                return const Padding(
+                  padding: EdgeInsets.symmetric(vertical: 24),
+                  child: Center(child: CircularProgressIndicator()),
+                );
+              }
+              final mistake = state.mistakes[index];
+              return _MistakeCard(
+                key: Key('mistake_${mistake.id}'),
+                mistake: mistake,
+                accent: _categoryAccents[mistake.category] ?? AppColors.primary,
+                onMarkFixed: () => notifier.markFixed(mistake.id),
+                onSaveToVocab: () => notifier.saveToVocab(mistake.id),
+              );
+            },
+          ),
+        const SliverToBoxAdapter(child: SizedBox(height: 32)),
+      ],
+    );
+  }
 }
 
 class _SummaryStrip extends StatelessWidget {
+  final MistakesSummary summary;
+
+  const _SummaryStrip({required this.summary});
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -124,8 +213,8 @@ class _SummaryStrip extends StatelessWidget {
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              children: const [
-                Text(
+              children: [
+                const Text(
                   'This week',
                   style: TextStyle(
                     fontSize: 12,
@@ -133,10 +222,10 @@ class _SummaryStrip extends StatelessWidget {
                     color: Color(0xB3FFFFFF),
                   ),
                 ),
-                SizedBox(height: 4),
+                const SizedBox(height: 4),
                 Text(
-                  '12 mistakes · 8 fixed',
-                  style: TextStyle(
+                  '${summary.thisWeek} mistakes · ${summary.fixed} fixed',
+                  style: const TextStyle(
                     fontSize: 17,
                     fontWeight: FontWeight.w700,
                     color: Colors.white,
@@ -145,21 +234,22 @@ class _SummaryStrip extends StatelessWidget {
               ],
             ),
           ),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-            decoration: BoxDecoration(
-              color: AppColors.greenSoft,
-              borderRadius: BorderRadius.circular(99),
-            ),
-            child: const Text(
-              '↓ 23%',
-              style: TextStyle(
-                fontSize: 13,
-                fontWeight: FontWeight.w700,
-                color: AppColors.greenPrimary,
+          if (summary.trend != null && summary.trend!.isNotEmpty)
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+              decoration: BoxDecoration(
+                color: AppColors.greenSoft,
+                borderRadius: BorderRadius.circular(99),
+              ),
+              child: Text(
+                summary.trend!,
+                style: const TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w700,
+                  color: AppColors.greenPrimary,
+                ),
               ),
             ),
-          ),
         ],
       ),
     );
@@ -167,31 +257,73 @@ class _SummaryStrip extends StatelessWidget {
 }
 
 class _MistakeCard extends StatelessWidget {
-  final String wrong;
-  final String right;
-  final String explanation;
-  final String session;
+  final Mistake mistake;
+  final Color accent;
+  final VoidCallback onMarkFixed;
+  final VoidCallback onSaveToVocab;
 
   const _MistakeCard({
-    required this.wrong,
-    required this.right,
-    required this.explanation,
-    required this.session,
+    super.key,
+    required this.mistake,
+    required this.accent,
+    required this.onMarkFixed,
+    required this.onSaveToVocab,
   });
 
   @override
   Widget build(BuildContext context) {
+    final fixed = mistake.isFixed;
     return Container(
       margin: const EdgeInsets.fromLTRB(16, 0, 16, 12),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: AppColors.surface,
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: AppColors.line),
+        border: Border.all(
+          color: fixed ? AppColors.greenSoft : AppColors.line,
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          Row(
+            children: [
+              Container(
+                width: 8,
+                height: 8,
+                decoration: BoxDecoration(color: accent, shape: BoxShape.circle),
+              ),
+              const SizedBox(width: 7),
+              Text(
+                mistake.category.label.toUpperCase(),
+                style: const TextStyle(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w700,
+                  color: AppColors.mutedInk,
+                  letterSpacing: 0.8,
+                ),
+              ),
+              const Spacer(),
+              if (fixed)
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+                  decoration: BoxDecoration(
+                    color: AppColors.greenSoft,
+                    borderRadius: BorderRadius.circular(99),
+                  ),
+                  child: const Text(
+                    'Fixed',
+                    style: TextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.greenPrimary,
+                    ),
+                  ),
+                ),
+            ],
+          ),
+          const SizedBox(height: 10),
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -199,13 +331,14 @@ class _MistakeCard extends StatelessWidget {
               const SizedBox(width: 6),
               Expanded(
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
                   decoration: BoxDecoration(
                     color: AppColors.redSoft,
                     borderRadius: BorderRadius.circular(6),
                   ),
                   child: Text(
-                    wrong,
+                    mistake.wrong,
                     style: const TextStyle(
                       fontSize: 14,
                       color: AppColors.redPrimary,
@@ -225,13 +358,14 @@ class _MistakeCard extends StatelessWidget {
               const SizedBox(width: 6),
               Expanded(
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
                   decoration: BoxDecoration(
                     color: AppColors.greenSoft,
                     borderRadius: BorderRadius.circular(6),
                   ),
                   child: Text(
-                    right,
+                    mistake.right,
                     style: const TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w600,
@@ -242,15 +376,17 @@ class _MistakeCard extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 10),
-          Text(
-            'Why: $explanation',
-            style: const TextStyle(
-              fontSize: 13,
-              color: AppColors.mutedInk,
-              height: 1.4,
+          if (mistake.explanation.isNotEmpty) ...[
+            const SizedBox(height: 10),
+            Text(
+              'Why: ${mistake.explanation}',
+              style: const TextStyle(
+                fontSize: 13,
+                color: AppColors.mutedInk,
+                height: 1.4,
+              ),
             ),
-          ),
+          ],
           const SizedBox(height: 12),
           Row(
             children: [
@@ -258,7 +394,7 @@ class _MistakeCard extends StatelessWidget {
               const SizedBox(width: 4),
               Expanded(
                 child: Text(
-                  session,
+                  mistake.sessionLabel ?? '—',
                   style: const TextStyle(
                     fontSize: 12,
                     color: AppColors.mutedSoft,
@@ -266,14 +402,14 @@ class _MistakeCard extends StatelessWidget {
                 ),
               ),
               _ActionPill(
-                label: 'Save to vocab',
-                onTap: () {},
+                label: mistake.savedToVocab ? 'In vocab' : 'Save to vocab',
+                onTap: mistake.savedToVocab ? null : onSaveToVocab,
               ),
               const SizedBox(width: 6),
               _ActionPill(
-                label: 'Practice again',
-                onTap: () {},
-                primary: true,
+                label: fixed ? 'Unfix' : 'Mark fixed',
+                onTap: onMarkFixed,
+                primary: !fixed,
               ),
             ],
           ),
@@ -285,7 +421,7 @@ class _MistakeCard extends StatelessWidget {
 
 class _ActionPill extends StatelessWidget {
   final String label;
-  final VoidCallback onTap;
+  final VoidCallback? onTap;
   final bool primary;
 
   const _ActionPill({
@@ -296,12 +432,15 @@ class _ActionPill extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final disabled = onTap == null;
     return GestureDetector(
       onTap: onTap,
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
         decoration: BoxDecoration(
-          color: primary ? AppColors.primary : AppColors.lavenderBg,
+          color: disabled
+              ? AppColors.line
+              : (primary ? AppColors.primary : AppColors.lavenderBg),
           borderRadius: BorderRadius.circular(99),
         ),
         child: Text(
@@ -309,8 +448,77 @@ class _ActionPill extends StatelessWidget {
           style: TextStyle(
             fontSize: 11,
             fontWeight: FontWeight.w600,
-            color: primary ? Colors.white : AppColors.lavenderText,
+            color: disabled
+                ? AppColors.mutedInk
+                : (primary ? Colors.white : AppColors.lavenderText),
           ),
+        ),
+      ),
+    );
+  }
+}
+
+class _EmptyMistakes extends StatelessWidget {
+  const _EmptyMistakes();
+
+  @override
+  Widget build(BuildContext context) {
+    return const Padding(
+      key: Key('mistakes_empty'),
+      padding: EdgeInsets.symmetric(horizontal: 24, vertical: 60),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(Icons.celebration_outlined,
+              size: 56, color: AppColors.mutedSoft),
+          SizedBox(height: 12),
+          Text(
+            'No mistakes yet',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w700,
+              color: AppColors.ink,
+            ),
+          ),
+          SizedBox(height: 6),
+          Text(
+            'Keep practising and we\'ll show what to improve here.',
+            textAlign: TextAlign.center,
+            style: TextStyle(fontSize: 13, color: AppColors.mutedInk),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ErrorView extends StatelessWidget {
+  final String message;
+  final VoidCallback onRetry;
+
+  const _ErrorView({required this.message, required this.onRetry});
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      key: const Key('mistakes_error'),
+      child: Padding(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Icon(Icons.error_outline,
+                size: 56, color: AppColors.redPrimary),
+            const SizedBox(height: 12),
+            Text(
+              message,
+              textAlign: TextAlign.center,
+              style: const TextStyle(color: AppColors.mutedInk),
+            ),
+            const SizedBox(height: 16),
+            FilledButton(onPressed: onRetry, child: const Text('Retry')),
+          ],
         ),
       ),
     );

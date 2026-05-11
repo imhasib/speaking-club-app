@@ -160,6 +160,23 @@ class AiSessionRepository {
     }
   }
 
+  /// GET /api/ai/sessions/:id — raw payload for extended fields
+  /// (`mistakes`, `newWords`, `accuracyPct`, `analysisStatus`) that aren't
+  /// part of the strongly-typed [AiSession] model yet.
+  Future<Map<String, dynamic>> getSessionRaw(String id) async {
+    try {
+      final response = await _dio.get(ApiEndpoints.aiSessionDetails(id));
+      final body = response.data;
+      if (body is Map<String, dynamic>) {
+        final data = body['data'];
+        return data is Map<String, dynamic> ? data : body;
+      }
+      return const {};
+    } on DioException catch (e) {
+      throw e.error ?? e;
+    }
+  }
+
   /// Request ephemeral key to start a new AI session
   Future<EphemeralKeyResponse> getSessionToken({
     required AiSessionMode mode,

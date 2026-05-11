@@ -11,6 +11,7 @@ import '../../../../shared/models/user.dart';
 import '../../../../shared/widgets/app_avatar.dart';
 import '../../../../shared/widgets/sc_app_bar.dart';
 import '../../../auth/presentation/providers/auth_provider.dart';
+import '../../../home/presentation/providers/streak_provider.dart';
 import '../providers/profile_provider.dart';
 import '../widgets/avatar_picker.dart';
 
@@ -210,7 +211,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             onAvatarTap: _handleAvatarTap,
           ),
           const SizedBox(height: 14),
-          _StatsRow(),
+          const _StatsRow(),
           const SizedBox(height: 14),
           _AccountSection(
             user: user,
@@ -246,15 +247,22 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   }
 }
 
-class _ProfileHeadCard extends StatelessWidget {
+class _ProfileHeadCard extends ConsumerWidget {
   final User user;
   final VoidCallback onAvatarTap;
 
   const _ProfileHeadCard({required this.user, required this.onAvatarTap});
 
   @override
-  Widget build(BuildContext context) {
-    final since = DateFormat('MMM yyyy').format(user.createdAt);
+  Widget build(BuildContext context, WidgetRef ref) {
+    final statsAsync = ref.watch(userStatsProvider);
+    // Prefer the stats `memberSince` (server-authoritative) over the user
+    // model's createdAt, but fall back gracefully.
+    final memberSince = statsAsync.maybeWhen(
+      data: (s) => s.memberSince ?? user.createdAt,
+      orElse: () => user.createdAt,
+    );
+    final since = DateFormat('MMM yyyy').format(memberSince);
 
     return Container(
       width: double.infinity,
@@ -325,17 +333,53 @@ class _ProfileHeadCard extends StatelessWidget {
   }
 }
 
-class _StatsRow extends StatelessWidget {
+class _StatsRow extends ConsumerWidget {
+  const _StatsRow();
+
   @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: const [
-        _StatCard(value: '23', label: 'Sessions'),
-        SizedBox(width: 10),
-        _StatCard(value: '412', label: 'Words'),
-        SizedBox(width: 10),
-        _StatCard(value: '7d', label: 'Streak'),
-      ],
+  Widget build(BuildContext context, WidgetRef ref) {
+    final statsAsync = ref.watch(userStatsProvider);
+
+    return statsAsync.when(
+      loading: () => Row(
+        children: const [
+          _StatCard(value: '—', label: 'Sessions'),
+          SizedBox(width: 10),
+          _StatCard(value: '—', label: 'Words'),
+          SizedBox(width: 10),
+          _StatCard(value: '—', label: 'Streak'),
+        ],
+      ),
+      error: (_, _) => GestureDetector(
+        onTap: () => ref.invalidate(userStatsProvider),
+        child: Row(
+          children: const [
+            _StatCard(value: '—', label: 'Sessions'),
+            SizedBox(width: 10),
+            _StatCard(value: '—', label: 'Words'),
+            SizedBox(width: 10),
+            _StatCard(value: '—', label: 'Streak'),
+          ],
+        ),
+      ),
+      data: (stats) => Row(
+        children: [
+          _StatCard(
+            value: stats.totalSessions.toString(),
+            label: 'Sessions',
+          ),
+          const SizedBox(width: 10),
+          _StatCard(
+            value: stats.totalWords.toString(),
+            label: 'Words',
+          ),
+          const SizedBox(width: 10),
+          _StatCard(
+            value: '${stats.streakDays}d',
+            label: 'Streak',
+          ),
+        ],
+      ),
     );
   }
 }

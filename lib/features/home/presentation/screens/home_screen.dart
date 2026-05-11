@@ -14,6 +14,7 @@ import '../../../call/call.dart';
 import '../../../realtime/data/socket_service.dart';
 import '../../../realtime/domain/presence_state.dart';
 import '../../../realtime/presentation/providers/presence_provider.dart';
+import '../providers/streak_provider.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -160,9 +161,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   onToggleStatus: _handleStatusToggle,
                 ),
               ),
-              SliverToBoxAdapter(
+              const SliverToBoxAdapter(
                 child: Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 4, 16, 0),
+                  padding: EdgeInsets.fromLTRB(16, 4, 16, 0),
                   child: _StreakCard(),
                 ),
               ),
@@ -374,12 +375,15 @@ class _TopBar extends StatelessWidget {
   }
 }
 
-class _StreakCard extends StatelessWidget {
+class _StreakCard extends ConsumerWidget {
+  const _StreakCard();
+
   static const _days = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
-  static const _activeDays = [true, true, true, true, true, true, false];
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final streakAsync = ref.watch(streakProvider);
+
     return Container(
       padding: const EdgeInsets.fromLTRB(18, 16, 18, 16),
       decoration: BoxDecoration(
@@ -390,71 +394,123 @@ class _StreakCard extends StatelessWidget {
         ),
         borderRadius: BorderRadius.circular(16),
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: const [
-              Text(
-                '🔥 7-day streak',
-                style: TextStyle(
-                  fontSize: 15,
-                  fontWeight: FontWeight.w700,
-                  color: Colors.white,
-                ),
+      child: streakAsync.when(
+        loading: () => const SizedBox(
+          height: 92,
+          child: Center(
+            child: SizedBox(
+              width: 22,
+              height: 22,
+              child: CircularProgressIndicator(
+                strokeWidth: 2,
+                valueColor: AlwaysStoppedAnimation(Colors.white),
               ),
-              Spacer(),
-              Text(
-                'TODAY · 3 / 5 min',
-                style: TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w500,
-                  color: Color(0xB3FFFFFF),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          ClipRRect(
-            borderRadius: BorderRadius.circular(6),
-            child: LinearProgressIndicator(
-              value: 0.6,
-              minHeight: 8,
-              backgroundColor: Colors.white.withValues(alpha: 0.2),
-              valueColor: const AlwaysStoppedAnimation(AppColors.liveMint),
             ),
           ),
-          const SizedBox(height: 12),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: List.generate(_days.length, (i) {
-              final active = _activeDays[i];
-              return Column(
+        ),
+        error: (_, _) => GestureDetector(
+          onTap: () => ref.invalidate(streakProvider),
+          child: const _StreakErrorPlaceholder(),
+        ),
+        data: (streak) {
+          final activeDays = streak.weekDays.length == 7
+              ? streak.weekDays
+              : List<bool>.filled(7, false);
+          final goal = streak.dailyGoalMinutes <= 0
+              ? 5
+              : streak.dailyGoalMinutes;
+          final progress = (streak.todayMinutes / goal).clamp(0.0, 1.0);
+
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
                 children: [
                   Text(
-                    _days[i],
-                    style: TextStyle(
-                      fontSize: 11,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.white.withValues(alpha: active ? 0.9 : 0.4),
+                    '🔥 ${streak.streakDays}-day streak',
+                    style: const TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w700,
+                      color: Colors.white,
                     ),
                   ),
-                  const SizedBox(height: 4),
-                  Container(
-                    width: 10,
-                    height: 10,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: active
-                          ? AppColors.liveMint
-                          : Colors.white.withValues(alpha: 0.2),
+                  const Spacer(),
+                  Text(
+                    'TODAY · ${streak.todayMinutes} / $goal min',
+                    style: const TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w500,
+                      color: Color(0xB3FFFFFF),
                     ),
                   ),
                 ],
-              );
-            }),
+              ),
+              const SizedBox(height: 12),
+              ClipRRect(
+                borderRadius: BorderRadius.circular(6),
+                child: LinearProgressIndicator(
+                  value: progress,
+                  minHeight: 8,
+                  backgroundColor: Colors.white.withValues(alpha: 0.2),
+                  valueColor:
+                      const AlwaysStoppedAnimation(AppColors.liveMint),
+                ),
+              ),
+              const SizedBox(height: 12),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: List.generate(_days.length, (i) {
+                  final active = activeDays[i];
+                  return Column(
+                    children: [
+                      Text(
+                        _days[i],
+                        style: TextStyle(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.white
+                              .withValues(alpha: active ? 0.9 : 0.4),
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Container(
+                        width: 10,
+                        height: 10,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: active
+                              ? AppColors.liveMint
+                              : Colors.white.withValues(alpha: 0.2),
+                        ),
+                      ),
+                    ],
+                  );
+                }),
+              ),
+            ],
+          );
+        },
+      ),
+    );
+  }
+}
+
+class _StreakErrorPlaceholder extends StatelessWidget {
+  const _StreakErrorPlaceholder();
+
+  @override
+  Widget build(BuildContext context) {
+    return const SizedBox(
+      height: 92,
+      child: Center(
+        child: Text(
+          '— Tap to retry —',
+          style: TextStyle(
+            fontSize: 13,
+            fontWeight: FontWeight.w500,
+            color: Color(0xB3FFFFFF),
           ),
-        ],
+        ),
       ),
     );
   }

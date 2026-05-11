@@ -51,15 +51,12 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
         title: const Text('Logout'),
         content: const Text('Are you sure you want to logout?'),
         actions: [
-          Semantics(
-            identifier: 'logout_cancel',
-            child: TextButton(
-              onPressed: () => Navigator.of(context).pop(false),
-              child: const Text('Cancel'),
-            ),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text('Cancel'),
           ),
           Semantics(
-            identifier: 'logout_confirm',
+            label: 'logout_confirm',
             child: FilledButton(
               onPressed: () => Navigator.of(context).pop(true),
               child: const Text('Logout'),
@@ -501,26 +498,23 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                   const SizedBox(height: 16),
                 ],
 
-                // Logout Button
-                Semantics(
-                  identifier: 'logout_button',
-                  child: SizedBox(
-                    width: double.infinity,
-                    child: FilledButton.tonal(
-                      onPressed: _handleLogout,
-                      style: FilledButton.styleFrom(
-                        backgroundColor: colorScheme.errorContainer,
-                        foregroundColor: colorScheme.onErrorContainer,
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                      ),
-                      child: const Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(Icons.logout),
-                          SizedBox(width: 8),
-                          Text('Logout'),
-                        ],
-                      ),
+                // Logout Button — content-desc = "Logout" via button text
+                SizedBox(
+                  width: double.infinity,
+                  child: FilledButton.tonal(
+                    onPressed: _handleLogout,
+                    style: FilledButton.styleFrom(
+                      backgroundColor: colorScheme.errorContainer,
+                      foregroundColor: colorScheme.onErrorContainer,
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                    ),
+                    child: const Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.logout),
+                        SizedBox(width: 8),
+                        Text('Logout'),
+                      ],
                     ),
                   ),
                 ),

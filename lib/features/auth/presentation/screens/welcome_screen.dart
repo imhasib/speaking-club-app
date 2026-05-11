@@ -115,14 +115,17 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
 
               const SizedBox(height: AppSpacing.md),
 
-              // Login button
-              SizedBox(
-                width: double.infinity,
-                height: 56,
-                child: OutlinedButton(
-                  key: const Key('welcome_sign_in'),
-                  onPressed: isLoading ? null : widget.onLoginTap,
-                  child: const Text('Sign In'),
+              // Login button — Semantics label ensures content-desc = "Sign In" on Android
+              Semantics(
+                label: 'Sign In',
+                button: true,
+                child: SizedBox(
+                  width: double.infinity,
+                  height: 56,
+                  child: OutlinedButton(
+                    onPressed: isLoading ? null : widget.onLoginTap,
+                    child: const Text('Sign In'),
+                  ),
                 ),
               ),
 

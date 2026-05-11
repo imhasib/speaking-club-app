@@ -57,6 +57,9 @@ class _ModeSelectionScreenState extends ConsumerState<ModeSelectionScreen> {
       );
     }
 
+    // Keep dialog visible for at least 1.5 s so test automation can detect it.
+    final dialogShownAt = DateTime.now();
+
     try {
       const maxWait = 30 * 10; // 30 s in 100 ms ticks
       for (var i = 0; i < maxWait; i++) {
@@ -66,6 +69,10 @@ class _ModeSelectionScreenState extends ConsumerState<ModeSelectionScreen> {
         final state = ref.read(aiPracticeProvider);
 
         if (state.isInConversation) {
+          final elapsed = DateTime.now().difference(dialogShownAt);
+          if (elapsed.inMilliseconds < 1500) {
+            await Future.delayed(Duration(milliseconds: 1500 - elapsed.inMilliseconds));
+          }
           if (mounted) {
             Navigator.of(context, rootNavigator: true).pop();
             context.push(Routes.aiSession);
@@ -74,6 +81,10 @@ class _ModeSelectionScreenState extends ConsumerState<ModeSelectionScreen> {
         }
 
         if (state.phase == AiPracticePhase.error) {
+          final elapsed = DateTime.now().difference(dialogShownAt);
+          if (elapsed.inMilliseconds < 1500) {
+            await Future.delayed(Duration(milliseconds: 1500 - elapsed.inMilliseconds));
+          }
           if (mounted) {
             Navigator.of(context, rootNavigator: true).pop();
             _showErrorToast(state.error ?? 'Failed to start session');
@@ -141,16 +152,18 @@ class _ModeSelectionScreenState extends ConsumerState<ModeSelectionScreen> {
     final textTheme = Theme.of(context).textTheme;
     final state = ref.watch(modeSelectionProvider);
 
-    return Scaffold(
-      key: const Key('modeSelectionScreen'),
-      appBar: AppBar(
-        title: const Text('Practice with AI'),
+    return Semantics(
+      label: 'modeSelectionScreen',
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text('Practice with AI'),
+        ),
+        body: state.isLoading
+            ? const Center(child: CircularProgressIndicator())
+            : state.error != null
+                ? _buildErrorState(state.error!)
+                : _buildContent(colorScheme, textTheme, state),
       ),
-      body: state.isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : state.error != null
-              ? _buildErrorState(state.error!)
-              : _buildContent(colorScheme, textTheme, state),
     );
   }
 

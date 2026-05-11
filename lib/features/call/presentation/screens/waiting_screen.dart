@@ -167,47 +167,53 @@ class _WaitingScreenState extends ConsumerState<WaitingScreen>
 
               const SizedBox(height: 40),
 
-              Text(
-                key: const Key('waiting_status'),
-                isDirectCall
-                    ? 'Calling ${callState.peerInfo?.name ?? 'user'}...'
-                    : 'Finding someone to talk to...',
-                style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                      fontWeight: FontWeight.w500,
-                    ),
+              Semantics(
+                label: 'waiting_status',
+                readOnly: true,
+                child: Text(
+                  isDirectCall
+                      ? 'Calling ${callState.peerInfo?.name ?? 'user'}...'
+                      : 'Finding someone to talk to...',
+                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                        fontWeight: FontWeight.w500,
+                      ),
+                ),
               ),
 
               const SizedBox(height: 16),
 
               // Waiting time (only for matchmaking)
               if (!isDirectCall)
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 8,
-                  ),
-                  decoration: BoxDecoration(
-                    color: AppColors.primary.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const Icon(
-                        Icons.timer_outlined,
-                        size: 20,
-                        color: AppColors.primary,
-                      ),
-                      const SizedBox(width: 8),
-                      Text(
-                        key: const Key('waiting_timer'),
-                        matchmakingState.formattedWaitTime,
-                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                              color: AppColors.primary,
-                              fontWeight: FontWeight.w600,
-                            ),
-                      ),
-                    ],
+                Semantics(
+                  label: 'waiting_timer',
+                  readOnly: true,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 8,
+                    ),
+                    decoration: BoxDecoration(
+                      color: AppColors.primary.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(
+                          Icons.timer_outlined,
+                          size: 20,
+                          color: AppColors.primary,
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          matchmakingState.formattedWaitTime,
+                          style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                                color: AppColors.primary,
+                                fontWeight: FontWeight.w600,
+                              ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
 
@@ -216,22 +222,37 @@ class _WaitingScreenState extends ConsumerState<WaitingScreen>
               // Cancel button
               Padding(
                 padding: const EdgeInsets.all(24.0),
-                child: SizedBox(
-                  width: double.infinity,
-                  height: 56,
-                  child: OutlinedButton(
-                    key: const Key('waiting_cancel'),
-                    onPressed: _onCancel,
-                    style: OutlinedButton.styleFrom(
-                      foregroundColor: AppColors.error,
-                      side: const BorderSide(color: AppColors.error),
-                    ),
-                    child: const Text('Cancel'),
-                  ),
-                ),
+                child: _WaitCancelButton(onCancel: _onCancel),
               ),
             ],
           ),
+        ),
+      ),
+    );
+  }
+}
+
+class _WaitCancelButton extends StatelessWidget {
+  final VoidCallback onCancel;
+
+  const _WaitCancelButton({required this.onCancel});
+
+  @override
+  Widget build(BuildContext context) {
+    return Semantics(
+      label: 'waiting_cancel',
+      button: true,
+      enabled: true,
+      child: SizedBox(
+        width: double.infinity,
+        height: 56,
+        child: OutlinedButton(
+          onPressed: onCancel,
+          style: OutlinedButton.styleFrom(
+            foregroundColor: AppColors.error,
+            side: const BorderSide(color: AppColors.error),
+          ),
+          child: const Text('Cancel'),
         ),
       ),
     );

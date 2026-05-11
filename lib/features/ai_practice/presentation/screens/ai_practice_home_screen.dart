@@ -108,16 +108,13 @@ class _AiPracticeHomeScreenState extends ConsumerState<AiPracticeHomeScreen> {
 
             // Free tier — hidden entirely for premium users.
             if (!isPremium) ...[
-              Semantics(
-                identifier: 'aiPracticeFreeButton',
-                child: _TierButton(
-                  key: const Key('aiPracticeFreeButton'),
-                  title: 'AI Practice',
-                  subtitle: '5 minutes daily, free',
-                  icon: Icons.smart_toy_outlined,
-                  color: colorScheme.primary,
-                  onTap: () => _openModeSelection(PracticeType.free),
-                ),
+              _TierButton(
+                semanticsLabel: 'aiPracticeFreeButton',
+                title: 'AI Practice',
+                subtitle: '5 minutes daily, free',
+                icon: Icons.smart_toy_outlined,
+                color: colorScheme.primary,
+                onTap: () => _openModeSelection(PracticeType.free),
               ),
               const SizedBox(height: 8),
               _RemainingTimeLabel(
@@ -131,24 +128,21 @@ class _AiPracticeHomeScreenState extends ConsumerState<AiPracticeHomeScreen> {
             ],
 
             // Pro tier — locked for free users, active for premium.
-            Semantics(
-              identifier: 'aiPracticeProButton',
-              child: _TierButton(
-                key: const Key('aiPracticeProButton'),
-                title: 'AI Practice Pro',
-                subtitle: isPremium
-                    ? '1 hour daily, realtime quality'
-                    : 'Upgrade to Premium',
-                icon: Icons.smart_toy,
-                color: isPremium
-                    ? colorScheme.tertiary
-                    : colorScheme.onSurfaceVariant,
-                locked: !isPremium,
-                showCrown: isPremium,
-                onTap: isPremium
-                    ? () => _openModeSelection(PracticeType.premium)
-                    : _showUpsellSnackbar,
-              ),
+            _TierButton(
+              semanticsLabel: 'aiPracticeProButton',
+              title: 'AI Practice Pro',
+              subtitle: isPremium
+                  ? '1 hour daily, realtime quality'
+                  : 'Upgrade to Premium',
+              icon: Icons.smart_toy,
+              color: isPremium
+                  ? colorScheme.tertiary
+                  : colorScheme.onSurfaceVariant,
+              locked: !isPremium,
+              showCrown: isPremium,
+              onTap: isPremium
+                  ? () => _openModeSelection(PracticeType.premium)
+                  : _showUpsellSnackbar,
             ),
             if (isPremium) ...[
               const SizedBox(height: 8),
@@ -175,9 +169,9 @@ class _TierButton extends StatelessWidget {
   final bool locked;
   final bool showCrown;
   final VoidCallback onTap;
+  final String? semanticsLabel;
 
   const _TierButton({
-    super.key,
     required this.title,
     required this.subtitle,
     required this.icon,
@@ -185,6 +179,7 @@ class _TierButton extends StatelessWidget {
     required this.onTap,
     this.locked = false,
     this.showCrown = false,
+    this.semanticsLabel,
   });
 
   @override
@@ -192,9 +187,13 @@ class _TierButton extends StatelessWidget {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
 
-    return Card(
-      clipBehavior: Clip.antiAlias,
-      child: InkWell(
+    return Semantics(
+      label: semanticsLabel,
+      button: true,
+      enabled: !locked,
+      child: Card(
+        clipBehavior: Clip.antiAlias,
+        child: InkWell(
         onTap: onTap,
         child: Opacity(
           opacity: locked ? 0.55 : 1.0,
@@ -248,10 +247,9 @@ class _TierButton extends StatelessWidget {
                 ),
                 if (locked)
                   Semantics(
-                    identifier: 'aiPracticeProLockIcon',
+                    label: 'aiPracticeProLockIcon',
                     child: Icon(
                       Icons.lock_outline,
-                      key: const Key('aiPracticeProLockIcon'),
                       color: colorScheme.onSurfaceVariant,
                     ),
                   )
@@ -265,7 +263,8 @@ class _TierButton extends StatelessWidget {
           ),
         ),
       ),
-    );
+    ),
+  );
   }
 }
 
@@ -305,9 +304,9 @@ class _RemainingTimeLabel extends StatelessWidget {
         ? 'aiPracticeRemainingTime'
         : 'aiPracticeRemainingTimePro';
     return Semantics(
-      identifier: identifier,
+      label: identifier,
+      readOnly: true,
       child: Padding(
-        key: Key(identifier),
         padding: const EdgeInsets.only(left: 12),
         child: Text(
           text,

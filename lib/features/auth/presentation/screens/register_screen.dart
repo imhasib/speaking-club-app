@@ -128,6 +128,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   children: [
                     IconButton(
                       key: const Key('register_back'),
+                      tooltip: 'Back',
                       onPressed: isLoading ? null : widget.onLoginTap,
                       icon: const Icon(Icons.arrow_back),
                     ),

@@ -1,15 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/theme/app_colors.dart';
 import '../../../../shared/models/call.dart';
 import '../../../../shared/widgets/animations/animations.dart';
+import '../../../../shared/widgets/app_avatar.dart';
+import '../../../../shared/widgets/sc_app_bar.dart';
+import '../../../../shared/widgets/sc_filter_chip_bar.dart';
 import '../../../auth/domain/auth_state.dart';
 import '../../../auth/presentation/providers/auth_provider.dart';
 import '../../domain/call_history_state.dart';
 import '../providers/call_history_provider.dart';
-import '../widgets/call_history_item.dart';
 
-/// Call history screen with paginated list and date grouping
 class HistoryScreen extends ConsumerStatefulWidget {
   const HistoryScreen({super.key});
 
@@ -19,12 +21,18 @@ class HistoryScreen extends ConsumerStatefulWidget {
 
 class _HistoryScreenState extends ConsumerState<HistoryScreen> {
   final ScrollController _scrollController = ScrollController();
+  int _selectedFilter = 0;
+
+  static const _chips = [
+    ScFilterChipData(label: 'All'),
+    ScFilterChipData(label: 'AI'),
+    ScFilterChipData(label: 'People'),
+  ];
 
   @override
   void initState() {
     super.initState();
     _scrollController.addListener(_onScroll);
-    // Load initial data
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref.read(callHistoryProvider.notifier).loadCallHistory();
     });
@@ -56,22 +64,19 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    final textTheme = Theme.of(context).textTheme;
     final historyState = ref.watch(callHistoryProvider);
     final authState = ref.watch(authProvider);
     final currentUserId = authState.user?.id ?? '';
 
-    // Listen for errors
     ref.listen<CallHistoryState>(callHistoryProvider, (previous, next) {
       if (next.hasError && next.errorMessage != null) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(next.errorMessage!),
-            backgroundColor: colorScheme.error,
+            backgroundColor: AppColors.redPrimary,
             action: SnackBarAction(
               label: 'Retry',
-              textColor: colorScheme.onError,
+              textColor: Colors.white,
               onPressed: () {
                 ref.read(callHistoryProvider.notifier).loadCallHistory();
               },
@@ -83,43 +88,46 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
     });
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Call History'),
-      ),
-      body: RefreshIndicator(
-        onRefresh: _handleRefresh,
-        child: _buildBody(context, historyState, colorScheme, textTheme, currentUserId),
+      backgroundColor: AppColors.background,
+      body: Column(
+        children: [
+          const ScAppBar(title: 'Call History'),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 10),
+            child: ScFilterChipBar(
+              chips: _chips,
+              selectedIndex: _selectedFilter,
+              onSelected: (i) => setState(() => _selectedFilter = i),
+            ),
+          ),
+          Expanded(
+            child: RefreshIndicator(
+              onRefresh: _handleRefresh,
+              child: _buildBody(historyState, currentUserId),
+            ),
+          ),
+        ],
       ),
     );
   }
 
-  Widget _buildBody(
-    BuildContext context,
-    CallHistoryState state,
-    ColorScheme colorScheme,
-    TextTheme textTheme,
-    String currentUserId,
-  ) {
-    // Initial loading state - show shimmer
+  Widget _buildBody(CallHistoryState state, String currentUserId) {
     if (state.isLoading && state.calls.isEmpty) {
       return const ShimmerCallHistoryList(itemCount: 10);
     }
 
-    // Empty state
     if (!state.isLoading && state.calls.isEmpty && !state.hasError) {
-      return _buildEmptyState(colorScheme, textTheme);
+      return _buildEmptyState();
     }
 
-    // Error state with no data
     if (state.hasError && state.calls.isEmpty) {
-      return _buildErrorState(colorScheme, textTheme);
+      return _buildErrorState();
     }
 
-    // Build grouped list
-    return _buildGroupedList(context, state, currentUserId);
+    return _buildGroupedList(state, currentUserId);
   }
 
-  Widget _buildEmptyState(ColorScheme colorScheme, TextTheme textTheme) {
+  Widget _buildEmptyState() {
     return ListView(
       physics: const AlwaysScrollableScrollPhysics(),
       children: [
@@ -133,7 +141,7 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
     );
   }
 
-  Widget _buildErrorState(ColorScheme colorScheme, TextTheme textTheme) {
+  Widget _buildErrorState() {
     return ListView(
       physics: const AlwaysScrollableScrollPhysics(),
       children: [
@@ -151,23 +159,15 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
     );
   }
 
-  Widget _buildGroupedList(
-    BuildContext context,
-    CallHistoryState state,
-    String currentUserId,
-  ) {
+  Widget _buildGroupedList(CallHistoryState state, String currentUserId) {
     final groupedCalls = state.groupedCalls;
     final groups = groupedCalls.keys.toList();
 
-    // Build list items with headers
     final List<Widget> items = [];
     for (final group in groups) {
-      // Add header
-      items.add(DateGroupHeader(label: group.label));
-
-      // Add calls for this group
+      items.add(_DateGroupHeader(label: group.label));
       for (final call in groupedCalls[group]!) {
-        items.add(CallHistoryItem(
+        items.add(_HistoryCard(
           call: call,
           currentUserId: currentUserId,
           onTap: () => _showCallDetails(call),
@@ -175,27 +175,24 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
       }
     }
 
-    // Add loading indicator at the bottom if loading more
     if (state.isLoadingMore) {
       items.add(const Padding(
-        padding: EdgeInsets.all(16.0),
+        padding: EdgeInsets.all(16),
         child: Center(child: CircularProgressIndicator()),
       ));
     }
 
-    // Add bottom padding for FAB
-    items.add(const SizedBox(height: 80));
+    items.add(const SizedBox(height: 32));
 
     return ListView(
       controller: _scrollController,
       physics: const AlwaysScrollableScrollPhysics(),
+      padding: const EdgeInsets.symmetric(horizontal: 16),
       children: items,
     );
   }
 
   void _showCallDetails(Call call) {
-    final colorScheme = Theme.of(context).colorScheme;
-    final textTheme = Theme.of(context).textTheme;
     final authState = ref.read(authProvider);
     final currentUserId = authState.user?.id ?? '';
     final otherParticipant = call.getOtherParticipant(currentUserId);
@@ -209,18 +206,9 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Header
             Row(
               children: [
-                CircleAvatar(
-                  radius: 28,
-                  backgroundColor: colorScheme.surfaceContainerHighest,
-                  child: Icon(
-                    Icons.person,
-                    size: 28,
-                    color: colorScheme.onSurfaceVariant,
-                  ),
-                ),
+                AppAvatar(name: otherParticipant?.name ?? '?', size: 48),
                 const SizedBox(width: 16),
                 Expanded(
                   child: Column(
@@ -228,13 +216,15 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
                     children: [
                       Text(
                         otherParticipant?.name ?? 'Unknown',
-                        style: textTheme.titleLarge,
+                        style: const TextStyle(
+                          fontSize: 17,
+                          fontWeight: FontWeight.w700,
+                          color: AppColors.ink,
+                        ),
                       ),
                       Text(
                         call.type.isRandom ? 'Random Match' : 'Direct Call',
-                        style: textTheme.bodyMedium?.copyWith(
-                          color: colorScheme.onSurfaceVariant,
-                        ),
+                        style: const TextStyle(color: AppColors.mutedInk),
                       ),
                     ],
                   ),
@@ -245,28 +235,17 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
                 ),
               ],
             ),
-            const SizedBox(height: 24),
-            const Divider(),
             const SizedBox(height: 16),
-            // Details
-            _buildDetailRow(
-              context,
-              icon: _getStatusIcon(call.status),
-              iconColor: _getStatusColor(call.status),
-              label: 'Status',
-              value: _getStatusText(call.status),
-            ),
-            const SizedBox(height: 12),
-            _buildDetailRow(
-              context,
+            const Divider(),
+            const SizedBox(height: 8),
+            _DetailRow(
               icon: Icons.access_time,
-              label: 'Date & Time',
+              label: 'Date',
               value: _formatDateTime(call.startedAt),
             ),
             if (call.status.isCompleted && call.duration != null) ...[
-              const SizedBox(height: 12),
-              _buildDetailRow(
-                context,
+              const SizedBox(height: 8),
+              _DetailRow(
                 icon: Icons.timer_outlined,
                 label: 'Duration',
                 value: call.formattedDuration,
@@ -279,88 +258,168 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
     );
   }
 
-  Widget _buildDetailRow(
-    BuildContext context, {
-    required IconData icon,
-    Color? iconColor,
-    required String label,
-    required String value,
-  }) {
-    final colorScheme = Theme.of(context).colorScheme;
-    final textTheme = Theme.of(context).textTheme;
+  String _formatDateTime(DateTime dt) {
+    const months = [
+      'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
+    ];
+    final h = dt.hour > 12 ? dt.hour - 12 : (dt.hour == 0 ? 12 : dt.hour);
+    final period = dt.hour >= 12 ? 'PM' : 'AM';
+    final min = dt.minute.toString().padLeft(2, '0');
+    return '${months[dt.month - 1]} ${dt.day}, ${dt.year} at $h:$min $period';
+  }
+}
 
+class _DateGroupHeader extends StatelessWidget {
+  final String label;
+
+  const _DateGroupHeader({required this.label});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 16, bottom: 8),
+      child: Text(
+        label.toUpperCase(),
+        style: const TextStyle(
+          fontSize: 11,
+          fontWeight: FontWeight.w700,
+          color: AppColors.mutedInk,
+          letterSpacing: 0.8,
+        ),
+      ),
+    );
+  }
+}
+
+class _HistoryCard extends StatelessWidget {
+  final Call call;
+  final String currentUserId;
+  final VoidCallback onTap;
+
+  const _HistoryCard({
+    required this.call,
+    required this.currentUserId,
+    required this.onTap,
+  });
+
+  bool get _isAiCall => call.type == CallType.direct;
+
+  @override
+  Widget build(BuildContext context) {
+    final other = call.getOtherParticipant(currentUserId);
+    final name = other?.name ?? 'Unknown';
+
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 8),
+        padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
+        decoration: BoxDecoration(
+          color: AppColors.surface,
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(color: AppColors.line),
+        ),
+        child: Row(
+          children: [
+            AppAvatar(name: name, size: 42),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    name,
+                    style: const TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.ink,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    _buildSubtitle(),
+                    style: const TextStyle(
+                      fontSize: 12,
+                      color: AppColors.mutedInk,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(width: 8),
+            _TagPill(isAi: _isAiCall),
+          ],
+        ),
+      ),
+    );
+  }
+
+  String _buildSubtitle() {
+    final parts = <String>[];
+    final dt = call.startedAt;
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    parts.add('${months[dt.month - 1]} ${dt.day}');
+    if (call.status.isCompleted) {
+      parts.add(call.formattedDuration);
+    }
+    return parts.join(' · ');
+  }
+}
+
+class _TagPill extends StatelessWidget {
+  final bool isAi;
+
+  const _TagPill({required this.isAi});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
+      decoration: BoxDecoration(
+        color: isAi ? AppColors.lavenderBg : const Color(0xFFFFE4EE),
+        borderRadius: BorderRadius.circular(99),
+      ),
+      child: Text(
+        isAi ? 'AI' : 'Match',
+        style: TextStyle(
+          fontSize: 11,
+          fontWeight: FontWeight.w600,
+          color: isAi ? AppColors.lavenderText : const Color(0xFFB0375A),
+        ),
+      ),
+    );
+  }
+}
+
+class _DetailRow extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final String value;
+
+  const _DetailRow({
+    required this.icon,
+    required this.label,
+    required this.value,
+  });
+
+  @override
+  Widget build(BuildContext context) {
     return Row(
       children: [
-        Icon(
-          icon,
-          size: 20,
-          color: iconColor ?? colorScheme.onSurfaceVariant,
-        ),
-        const SizedBox(width: 12),
-        Text(
-          label,
-          style: textTheme.bodyMedium?.copyWith(
-            color: colorScheme.onSurfaceVariant,
-          ),
-        ),
+        Icon(icon, size: 18, color: AppColors.mutedInk),
+        const SizedBox(width: 10),
+        Text(label, style: const TextStyle(color: AppColors.mutedInk)),
         const Spacer(),
         Text(
           value,
-          style: textTheme.bodyMedium?.copyWith(
+          style: const TextStyle(
             fontWeight: FontWeight.w500,
+            color: AppColors.ink,
           ),
         ),
       ],
     );
-  }
-
-  IconData _getStatusIcon(CallStatus status) {
-    switch (status) {
-      case CallStatus.completed:
-        return Icons.call_made;
-      case CallStatus.missed:
-        return Icons.call_missed;
-      case CallStatus.cancelled:
-        return Icons.call_end;
-      case CallStatus.rejected:
-        return Icons.call_missed_outgoing;
-    }
-  }
-
-  Color _getStatusColor(CallStatus status) {
-    switch (status) {
-      case CallStatus.completed:
-        return Colors.green;
-      case CallStatus.missed:
-        return Colors.red;
-      case CallStatus.cancelled:
-        return Colors.grey;
-      case CallStatus.rejected:
-        return Colors.orange;
-    }
-  }
-
-  String _getStatusText(CallStatus status) {
-    switch (status) {
-      case CallStatus.completed:
-        return 'Completed';
-      case CallStatus.missed:
-        return 'Missed';
-      case CallStatus.cancelled:
-        return 'Cancelled';
-      case CallStatus.rejected:
-        return 'Rejected';
-    }
-  }
-
-  String _formatDateTime(DateTime dateTime) {
-    final months = [
-      'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
-    ];
-    final hour = dateTime.hour > 12 ? dateTime.hour - 12 : dateTime.hour;
-    final period = dateTime.hour >= 12 ? 'PM' : 'AM';
-    final minute = dateTime.minute.toString().padLeft(2, '0');
-    return '${months[dateTime.month - 1]} ${dateTime.day}, ${dateTime.year} at $hour:$minute $period';
   }
 }

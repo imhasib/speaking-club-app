@@ -68,6 +68,20 @@ class AppColors {
   static const Color networkModerate = warning;
   static const Color networkPoor = error;
 
+  // ── Design palette semantic aliases ───────────────────────────
+  static const Color amber = Color(0xFFC87A15);
+  static const Color amberSoft = Color(0xFFFDF3DF);
+  static const Color greenSoft = Color(0xFFE6F7EC);
+  static const Color greenPrimary = Color(0xFF1F9D55);
+  static const Color redPrimary = Color(0xFFD84545);
+  static const Color redSoft = Color(0xFFFDECEC);
+  static const Color lavenderBg = Color(0xFFE9E4FA);
+  static const Color surfaceSubtle = Color(0xFFF4F1FA);
+  static const Color lineSoft = Color(0xFFF3F0F8);
+  static const Color mutedSoft = Color(0xFF9696A3);
+  static const Color lavenderText = Color(0xFF5A4DBD);
+  static const Color indigoDeep = Color(0xFF2D2D7A);
+
   // ── Brand gradients ────────────────────────────────────────────
   static const List<Color> brandGradient = [primary, secondary];
   static const List<Color> splashGradient = [night800, night700, night600, primary];

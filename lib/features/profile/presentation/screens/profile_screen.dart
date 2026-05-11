@@ -1,18 +1,19 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
 import '../../../../core/router/routes.dart';
+import '../../../../core/theme/app_colors.dart';
 import '../../../../core/utils/validators.dart';
 import '../../../../shared/models/auth_tokens.dart';
 import '../../../../shared/models/user.dart';
+import '../../../../shared/widgets/app_avatar.dart';
+import '../../../../shared/widgets/sc_app_bar.dart';
 import '../../../auth/presentation/providers/auth_provider.dart';
 import '../providers/profile_provider.dart';
 import '../widgets/avatar_picker.dart';
 
-/// Profile screen showing user information
 class ProfileScreen extends ConsumerStatefulWidget {
   const ProfileScreen({super.key});
 
@@ -33,7 +34,6 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     super.dispose();
   }
 
-  /// Convert User to AuthUser for auth state update
   AuthUser _toAuthUser(User user) {
     return AuthUser(
       id: user.id,
@@ -74,38 +74,27 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   Future<void> _handleAvatarTap() async {
     final avatarPicker = AvatarPicker();
     final imagePath = await avatarPicker.pickAndCropAvatar(context);
-
     if (imagePath == null || !mounted) return;
 
-    // Show loading dialog
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (context) => const Center(
-        child: CircularProgressIndicator(),
-      ),
+      builder: (context) => const Center(child: CircularProgressIndicator()),
     );
 
     try {
       final profileActions = ref.read(profileActionsProvider);
       final updatedUser = await profileActions.uploadProfilePicture(imagePath);
-
       if (mounted) {
-        // Close loading dialog
         Navigator.of(context, rootNavigator: true).pop();
-
-        // Update auth state
         ref.read(authProvider.notifier).updateUser(_toAuthUser(updatedUser));
-
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Avatar updated successfully')),
         );
       }
     } catch (e) {
       if (mounted) {
-        // Close loading dialog
         Navigator.of(context, rootNavigator: true).pop();
-
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Failed to upload avatar: $e')),
         );
@@ -116,18 +105,12 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   Future<void> _handleUpdateUsername() async {
     final name = _usernameController.text.trim();
     if (name.isEmpty) return;
-
     try {
       final profileActions = ref.read(profileActionsProvider);
       final updatedUser = await profileActions.updateName(name);
-
-      // Update auth state with new user
       if (mounted) {
         ref.read(authProvider.notifier).updateUser(_toAuthUser(updatedUser));
-        setState(() {
-          _isEditingUsername = false;
-        });
-
+        setState(() => _isEditingUsername = false);
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Username updated successfully')),
         );
@@ -144,7 +127,6 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   Future<void> _handleUpdateMobileNumber() async {
     final mobileNumber = _mobileNumberController.text.trim();
     if (mobileNumber.isEmpty) return;
-
     final validationError = Validators.validateMobileNumber(mobileNumber);
     if (validationError != null) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -152,18 +134,13 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
       );
       return;
     }
-
     try {
       final profileActions = ref.read(profileActionsProvider);
-      final updatedUser = await profileActions.updateMobileNumber(mobileNumber);
-
-      // Update auth state with new user
+      final updatedUser =
+          await profileActions.updateMobileNumber(mobileNumber);
       if (mounted) {
         ref.read(authProvider.notifier).updateUser(_toAuthUser(updatedUser));
-        setState(() {
-          _isEditingMobileNumber = false;
-        });
-
+        setState(() => _isEditingMobileNumber = false);
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Mobile number updated successfully')),
         );
@@ -179,383 +156,600 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    final textTheme = Theme.of(context).textTheme;
     final profileState = ref.watch(profileDataProvider);
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Profile'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.refresh),
-            onPressed: () {
-              ref.invalidate(profileDataProvider);
-            },
+      backgroundColor: AppColors.background,
+      body: Column(
+        children: [
+          ScAppBar(
+            title: 'Profile',
+            right: IconButton(
+              icon: const Icon(Icons.refresh, color: AppColors.ink),
+              onPressed: () => ref.invalidate(profileDataProvider),
+            ),
+          ),
+          Expanded(
+            child: profileState.when(
+              data: (user) => _buildContent(user),
+              loading: () =>
+                  const Center(child: CircularProgressIndicator()),
+              error: (error, _) => Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(Icons.error_outline,
+                        size: 64, color: AppColors.redPrimary),
+                    const SizedBox(height: 16),
+                    Text(error.toString(),
+                        textAlign: TextAlign.center,
+                        style:
+                            const TextStyle(color: AppColors.mutedInk)),
+                    const SizedBox(height: 16),
+                    FilledButton(
+                      onPressed: () => ref.invalidate(profileDataProvider),
+                      child: const Text('Retry'),
+                    ),
+                  ],
+                ),
+              ),
+            ),
           ),
         ],
       ),
-      body: profileState.when(
-        data: (user) {
-          return SingleChildScrollView(
-            padding: const EdgeInsets.fromLTRB(24, 24, 24, 300),
-            child: Column(
+    );
+  }
+
+  Widget _buildContent(User user) {
+    return SingleChildScrollView(
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 40),
+      child: Column(
+        children: [
+          _ProfileHeadCard(
+            user: user,
+            onAvatarTap: _handleAvatarTap,
+          ),
+          const SizedBox(height: 14),
+          _StatsRow(),
+          const SizedBox(height: 14),
+          _AccountSection(
+            user: user,
+            usernameController: _usernameController,
+            mobileController: _mobileNumberController,
+            isEditingUsername: _isEditingUsername,
+            isEditingMobile: _isEditingMobileNumber,
+            onEditUsername: () => setState(() {
+              _isEditingUsername = true;
+              _usernameController.text = user.name;
+            }),
+            onCancelUsername: () =>
+                setState(() => _isEditingUsername = false),
+            onSaveUsername: _handleUpdateUsername,
+            onEditMobile: () => setState(() {
+              _isEditingMobileNumber = true;
+              _mobileNumberController.text = user.mobileNumber ?? '';
+            }),
+            onCancelMobile: () =>
+                setState(() => _isEditingMobileNumber = false),
+            onSaveMobile: _handleUpdateMobileNumber,
+          ),
+          const SizedBox(height: 14),
+          _PreferencesSection(
+            user: user,
+            onChangePassword: () =>
+                context.push(Routes.changePassword),
+            onLogout: _handleLogout,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ProfileHeadCard extends StatelessWidget {
+  final User user;
+  final VoidCallback onAvatarTap;
+
+  const _ProfileHeadCard({required this.user, required this.onAvatarTap});
+
+  @override
+  Widget build(BuildContext context) {
+    final since = DateFormat('MMM yyyy').format(user.createdAt);
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.fromLTRB(20, 20, 20, 20),
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: AppColors.line),
+      ),
+      child: Column(
+        children: [
+          GestureDetector(
+            onTap: onAvatarTap,
+            child: Stack(
               children: [
-                // Avatar
-                GestureDetector(
-                  onTap: _handleAvatarTap,
-                  child: Stack(
-                    children: [
-                      CircleAvatar(
-                        radius: 60,
-                        backgroundColor: colorScheme.primaryContainer,
-                        backgroundImage: user.profilePicture != null
-                            ? CachedNetworkImageProvider(user.profilePicture!)
-                            : null,
-                        child: user.profilePicture == null
-                            ? Icon(
-                                Icons.person,
-                                size: 60,
-                                color: colorScheme.onPrimaryContainer,
-                              )
-                            : null,
-                      ),
-                      Positioned(
-                        right: 0,
-                        bottom: 0,
-                        child: Container(
-                          padding: const EdgeInsets.all(8),
-                          decoration: BoxDecoration(
-                            color: colorScheme.primary,
-                            shape: BoxShape.circle,
-                            border: Border.all(
-                              color: colorScheme.surface,
-                              width: 2,
-                            ),
-                          ),
-                          child: Icon(
-                            Icons.camera_alt,
-                            size: 20,
-                            color: colorScheme.onPrimary,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 32),
-
-                // Username (editable)
-                Card(
-                  child: Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              'Username',
-                              style: textTheme.bodySmall?.copyWith(
-                                color: colorScheme.onSurfaceVariant,
-                              ),
-                            ),
-                            if (!_isEditingUsername)
-                              IconButton(
-                                tooltip: 'Edit username',
-                                icon: const Icon(Icons.edit, size: 20),
-                                onPressed: () {
-                                  setState(() {
-                                    _isEditingUsername = true;
-                                    _usernameController.text = user.name;
-                                  });
-                                },
-                              ),
-                          ],
-                        ),
-                        const SizedBox(height: 8),
-                        if (_isEditingUsername)
-                          Row(
-                            children: [
-                              Expanded(
-                                child: TextField(
-                                  controller: _usernameController,
-                                  decoration: const InputDecoration(
-                                    hintText: 'Enter username',
-                                    border: OutlineInputBorder(),
-                                    isDense: true,
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(width: 8),
-                              IconButton(
-                                tooltip: 'Discard changes',
-                                icon: const Icon(Icons.close),
-                                onPressed: () {
-                                  setState(() {
-                                    _isEditingUsername = false;
-                                  });
-                                },
-                              ),
-                              IconButton(
-                                tooltip: 'Save changes',
-                                icon: const Icon(Icons.check),
-                                onPressed: _handleUpdateUsername,
-                              ),
-                            ],
-                          )
-                        else
-                          Text(
-                            user.name,
-                            style: textTheme.titleMedium,
-                          ),
-                      ],
+                AppAvatar(name: user.name, size: 68),
+                Positioned(
+                  right: 0,
+                  bottom: 0,
+                  child: Container(
+                    width: 22,
+                    height: 22,
+                    decoration: BoxDecoration(
+                      color: AppColors.primary,
+                      shape: BoxShape.circle,
+                      border: Border.all(color: AppColors.surface, width: 1.5),
                     ),
-                  ),
-                ),
-                const SizedBox(height: 16),
-
-                // Email (read-only)
-                Card(
-                  child: Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Email',
-                          style: textTheme.bodySmall?.copyWith(
-                            color: colorScheme.onSurfaceVariant,
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        Row(
-                          children: [
-                            Icon(
-                              Icons.email_outlined,
-                              size: 20,
-                              color: colorScheme.onSurfaceVariant,
-                            ),
-                            const SizedBox(width: 8),
-                            Text(
-                              user.email,
-                              style: textTheme.titleMedium,
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 16),
-
-                // Mobile Number (editable)
-                Card(
-                  child: Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              'Mobile Number',
-                              style: textTheme.bodySmall?.copyWith(
-                                color: colorScheme.onSurfaceVariant,
-                              ),
-                            ),
-                            if (!_isEditingMobileNumber)
-                              IconButton(
-                                tooltip: 'Edit mobile number',
-                                icon: const Icon(Icons.edit, size: 20),
-                                onPressed: () {
-                                  setState(() {
-                                    _isEditingMobileNumber = true;
-                                    _mobileNumberController.text =
-                                        user.mobileNumber ?? '';
-                                  });
-                                },
-                              ),
-                          ],
-                        ),
-                        const SizedBox(height: 8),
-                        if (_isEditingMobileNumber)
-                          Row(
-                            children: [
-                              Expanded(
-                                child: TextField(
-                                  controller: _mobileNumberController,
-                                  decoration: const InputDecoration(
-                                    hintText: '+1234567890',
-                                    helperText: 'Format: +[country code][number]',
-                                    border: OutlineInputBorder(),
-                                    isDense: true,
-                                  ),
-                                  keyboardType: TextInputType.phone,
-                                ),
-                              ),
-                              const SizedBox(width: 8),
-                              IconButton(
-                                tooltip: 'Discard changes',
-                                icon: const Icon(Icons.close),
-                                onPressed: () {
-                                  setState(() {
-                                    _isEditingMobileNumber = false;
-                                  });
-                                },
-                              ),
-                              IconButton(
-                                tooltip: 'Save changes',
-                                icon: const Icon(Icons.check),
-                                onPressed: _handleUpdateMobileNumber,
-                              ),
-                            ],
-                          )
-                        else
-                          Row(
-                            children: [
-                              Icon(
-                                Icons.phone_outlined,
-                                size: 20,
-                                color: colorScheme.onSurfaceVariant,
-                              ),
-                              const SizedBox(width: 8),
-                              Text(
-                                user.mobileNumber ?? 'Not provided',
-                                style: textTheme.titleMedium?.copyWith(
-                                  color: user.mobileNumber == null
-                                      ? colorScheme.onSurfaceVariant.withValues(alpha: 0.6)
-                                      : null,
-                                  fontStyle: user.mobileNumber == null
-                                      ? FontStyle.italic
-                                      : null,
-                                ),
-                              ),
-                            ],
-                          ),
-                      ],
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 16),
-
-                // Member Since
-                Card(
-                  child: Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Member Since',
-                          style: textTheme.bodySmall?.copyWith(
-                            color: colorScheme.onSurfaceVariant,
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        Row(
-                          children: [
-                            Icon(
-                              Icons.calendar_today_outlined,
-                              size: 20,
-                              color: colorScheme.onSurfaceVariant,
-                            ),
-                            const SizedBox(width: 8),
-                            Text(
-                              DateFormat('MMMM dd, yyyy')
-                                  .format(user.createdAt),
-                              style: textTheme.titleMedium,
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 32),
-
-                // Change Password Button — only for local (email/password) auth
-                if (user.authProvider != 'google') ...[
-                  SizedBox(
-                    width: double.infinity,
-                    child: FilledButton.tonal(
-                      onPressed: () => context.push(Routes.changePassword),
-                      style: FilledButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                      ),
-                      child: const Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(Icons.lock_reset_outlined),
-                          SizedBox(width: 8),
-                          Text('Change Password'),
-                        ],
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                ],
-
-                // Logout Button — content-desc = "Logout" via button text
-                SizedBox(
-                  width: double.infinity,
-                  child: FilledButton.tonal(
-                    onPressed: _handleLogout,
-                    style: FilledButton.styleFrom(
-                      backgroundColor: colorScheme.errorContainer,
-                      foregroundColor: colorScheme.onErrorContainer,
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                    ),
-                    child: const Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(Icons.logout),
-                        SizedBox(width: 8),
-                        Text('Logout'),
-                      ],
-                    ),
+                    child: const Icon(Icons.camera_alt,
+                        size: 12, color: Colors.white),
                   ),
                 ),
               ],
             ),
-          );
-        },
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (error, stack) => Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
+          ),
+          const SizedBox(height: 10),
+          Text(
+            user.name,
+            style: const TextStyle(
+              fontSize: 17,
+              fontWeight: FontWeight.w700,
+              color: AppColors.ink,
+            ),
+          ),
+          const SizedBox(height: 2),
+          Text(
+            'Member since $since',
+            style: const TextStyle(fontSize: 13, color: AppColors.mutedInk),
+          ),
+          const SizedBox(height: 10),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
+            decoration: BoxDecoration(
+              color: AppColors.lavenderBg,
+              borderRadius: BorderRadius.circular(99),
+            ),
+            child: const Text(
+              '⚡ Free plan · Upgrade',
+              style: TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w600,
+                color: AppColors.lavenderText,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _StatsRow extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: const [
+        _StatCard(value: '23', label: 'Sessions'),
+        SizedBox(width: 10),
+        _StatCard(value: '412', label: 'Words'),
+        SizedBox(width: 10),
+        _StatCard(value: '7d', label: 'Streak'),
+      ],
+    );
+  }
+}
+
+class _StatCard extends StatelessWidget {
+  final String value;
+  final String label;
+
+  const _StatCard({required this.value, required this.label});
+
+  @override
+  Widget build(BuildContext context) {
+    return Expanded(
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 14),
+        decoration: BoxDecoration(
+          color: AppColors.surface,
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(color: AppColors.line),
+        ),
+        child: Column(
+          children: [
+            Text(
+              value,
+              style: const TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.w800,
+                color: AppColors.primary,
+              ),
+            ),
+            const SizedBox(height: 2),
+            Text(
+              label,
+              style: const TextStyle(
+                fontSize: 11,
+                color: AppColors.mutedInk,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _AccountSection extends StatelessWidget {
+  final User user;
+  final TextEditingController usernameController;
+  final TextEditingController mobileController;
+  final bool isEditingUsername;
+  final bool isEditingMobile;
+  final VoidCallback onEditUsername;
+  final VoidCallback onCancelUsername;
+  final VoidCallback onSaveUsername;
+  final VoidCallback onEditMobile;
+  final VoidCallback onCancelMobile;
+  final VoidCallback onSaveMobile;
+
+  const _AccountSection({
+    required this.user,
+    required this.usernameController,
+    required this.mobileController,
+    required this.isEditingUsername,
+    required this.isEditingMobile,
+    required this.onEditUsername,
+    required this.onCancelUsername,
+    required this.onSaveUsername,
+    required this.onEditMobile,
+    required this.onCancelMobile,
+    required this.onSaveMobile,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: AppColors.line),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _sectionLabel('Account'),
+          _EditableField(
+            label: 'Username',
+            value: user.name,
+            controller: usernameController,
+            isEditing: isEditingUsername,
+            onEdit: onEditUsername,
+            onCancel: onCancelUsername,
+            onSave: onSaveUsername,
+          ),
+          _divider(),
+          _ReadOnlyField(
+            label: 'Email',
+            value: user.email,
+            icon: Icons.email_outlined,
+          ),
+          _divider(),
+          _EditableField(
+            label: 'Mobile Number',
+            value: user.mobileNumber ?? 'Not provided',
+            controller: mobileController,
+            isEditing: isEditingMobile,
+            onEdit: onEditMobile,
+            onCancel: onCancelMobile,
+            onSave: onSaveMobile,
+            keyboardType: TextInputType.phone,
+            hint: '+1234567890',
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _sectionLabel(String label) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
+      child: Text(
+        label.toUpperCase(),
+        style: const TextStyle(
+          fontSize: 11,
+          fontWeight: FontWeight.w700,
+          color: AppColors.mutedInk,
+          letterSpacing: 0.8,
+        ),
+      ),
+    );
+  }
+
+  Widget _divider() {
+    return const Divider(
+      height: 1,
+      indent: 16,
+      endIndent: 16,
+      color: AppColors.lineSoft,
+    );
+  }
+}
+
+class _EditableField extends StatelessWidget {
+  final String label;
+  final String value;
+  final TextEditingController controller;
+  final bool isEditing;
+  final VoidCallback onEdit;
+  final VoidCallback onCancel;
+  final VoidCallback onSave;
+  final TextInputType keyboardType;
+  final String? hint;
+
+  const _EditableField({
+    required this.label,
+    required this.value,
+    required this.controller,
+    required this.isEditing,
+    required this.onEdit,
+    required this.onCancel,
+    required this.onSave,
+    this.keyboardType = TextInputType.text,
+    this.hint,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 10, 12, 10),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            label,
+            style: const TextStyle(fontSize: 11, color: AppColors.mutedSoft),
+          ),
+          const SizedBox(height: 4),
+          if (isEditing)
+            Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    controller: controller,
+                    keyboardType: keyboardType,
+                    decoration: InputDecoration(
+                      hintText: hint,
+                      border: const OutlineInputBorder(),
+                      isDense: true,
+                    ),
+                  ),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.close, size: 20),
+                  onPressed: onCancel,
+                ),
+                IconButton(
+                  icon: const Icon(Icons.check, size: 20,
+                      color: AppColors.greenPrimary),
+                  onPressed: onSave,
+                ),
+              ],
+            )
+          else
+            Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    value,
+                    style: const TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                      color: AppColors.ink,
+                    ),
+                  ),
+                ),
+                GestureDetector(
+                  onTap: onEdit,
+                  child: const Icon(Icons.edit_outlined,
+                      size: 18, color: AppColors.mutedInk),
+                ),
+              ],
+            ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ReadOnlyField extends StatelessWidget {
+  final String label;
+  final String value;
+  final IconData icon;
+
+  const _ReadOnlyField({
+    required this.label,
+    required this.value,
+    required this.icon,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 10, 16, 10),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            label,
+            style:
+                const TextStyle(fontSize: 11, color: AppColors.mutedSoft),
+          ),
+          const SizedBox(height: 4),
+          Row(
             children: [
-              Icon(
-                Icons.error_outline,
-                size: 80,
-                color: colorScheme.error,
-              ),
-              const SizedBox(height: 24),
-              Text(
-                'Failed to load profile',
-                style: textTheme.titleLarge?.copyWith(
-                  color: colorScheme.error,
+              Icon(icon, size: 16, color: AppColors.mutedInk),
+              const SizedBox(width: 6),
+              Expanded(
+                child: Text(
+                  value,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                    color: AppColors.ink,
+                  ),
                 ),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                error.toString(),
-                style: textTheme.bodyMedium?.copyWith(
-                  color: colorScheme.onSurfaceVariant,
-                ),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 24),
-              FilledButton(
-                onPressed: () {
-                  ref.invalidate(profileDataProvider);
-                },
-                child: const Text('Retry'),
               ),
             ],
           ),
+        ],
+      ),
+    );
+  }
+}
+
+class _PreferencesSection extends StatelessWidget {
+  final User user;
+  final VoidCallback onChangePassword;
+  final VoidCallback onLogout;
+
+  const _PreferencesSection({
+    required this.user,
+    required this.onChangePassword,
+    required this.onLogout,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: AppColors.line),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _sectionLabel('Preferences'),
+          _PrefItem(
+            emoji: '🌐',
+            label: 'English level',
+            value: 'B2 · Upper-Inter.',
+            onTap: () {},
+          ),
+          _divider(),
+          _PrefItem(
+            emoji: '🔔',
+            label: 'Notifications',
+            value: 'On',
+            onTap: () {},
+          ),
+          _divider(),
+          _PrefItem(
+            emoji: '🌙',
+            label: 'Theme',
+            value: 'System',
+            onTap: () {},
+          ),
+          if (user.authProvider != 'google') ...[
+            _divider(),
+            _PrefItem(
+              icon: Icons.lock_reset_outlined,
+              label: 'Change Password',
+              onTap: onChangePassword,
+            ),
+          ],
+          _divider(),
+          _PrefItem(
+            icon: Icons.logout,
+            label: 'Sign out',
+            labelColor: AppColors.redPrimary,
+            onTap: onLogout,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _sectionLabel(String label) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
+      child: Text(
+        label.toUpperCase(),
+        style: const TextStyle(
+          fontSize: 11,
+          fontWeight: FontWeight.w700,
+          color: AppColors.mutedInk,
+          letterSpacing: 0.8,
+        ),
+      ),
+    );
+  }
+
+  Widget _divider() {
+    return const Divider(
+      height: 1,
+      indent: 16,
+      endIndent: 16,
+      color: AppColors.lineSoft,
+    );
+  }
+}
+
+class _PrefItem extends StatelessWidget {
+  final String? emoji;
+  final IconData? icon;
+  final String label;
+  final String? value;
+  final Color labelColor;
+  final VoidCallback onTap;
+
+  const _PrefItem({
+    this.emoji,
+    this.icon,
+    required this.label,
+    this.value,
+    this.labelColor = AppColors.ink,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(16, 13, 16, 13),
+        child: Row(
+          children: [
+            if (emoji != null)
+              Text(emoji!, style: const TextStyle(fontSize: 16))
+            else if (icon != null)
+              Icon(icon, size: 18, color: labelColor),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Text(
+                label,
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                  color: labelColor,
+                ),
+              ),
+            ),
+            if (value != null) ...[
+              Text(
+                value!,
+                style: const TextStyle(
+                  fontSize: 13,
+                  color: AppColors.mutedInk,
+                ),
+              ),
+              const SizedBox(width: 4),
+            ],
+            const Icon(Icons.chevron_right,
+                size: 18, color: AppColors.mutedSoft),
+          ],
         ),
       ),
     );

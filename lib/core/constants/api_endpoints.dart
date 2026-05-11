@@ -51,6 +51,6 @@ class ApiEndpoints {
   static String vocabWordDetail(String word) => '/vocab/words/$word';
 
   // Streak + user stats endpoints
-  static const String streak = '/users/me/streak';
-  static const String userStats = '/users/me/stats';
+  static const String streak = '/profile/me/streak';
+  static const String userStats = '/profile/me/stats';
 }

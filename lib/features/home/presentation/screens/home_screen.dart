@@ -385,6 +385,7 @@ class _StreakCard extends ConsumerWidget {
     final streakAsync = ref.watch(streakProvider);
 
     return Container(
+      key: const Key('home_streak_card'),
       padding: const EdgeInsets.fromLTRB(18, 16, 18, 16),
       decoration: BoxDecoration(
         gradient: const LinearGradient(
@@ -427,6 +428,7 @@ class _StreakCard extends ConsumerWidget {
               Row(
                 children: [
                   Text(
+                    key: const Key('home_streak_days'),
                     '🔥 ${streak.streakDays}-day streak',
                     style: const TextStyle(
                       fontSize: 15,
@@ -436,12 +438,18 @@ class _StreakCard extends ConsumerWidget {
                   ),
                   const Spacer(),
                   Text(
+                    key: const Key('home_streak_today_minutes'),
                     'TODAY · ${streak.todayMinutes} / $goal min',
                     style: const TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w500,
                       color: Color(0xB3FFFFFF),
                     ),
+                  ),
+                  Semantics(
+                    label: 'home_streak_goal_minutes',
+                    value: '$goal',
+                    child: const SizedBox.shrink(),
                   ),
                 ],
               ),
@@ -618,6 +626,7 @@ class _QuickActionsRow extends StatelessWidget {
                 ],
               ),
             ),
+          ),
           ),
         ),
       ],

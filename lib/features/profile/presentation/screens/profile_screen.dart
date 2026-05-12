@@ -308,6 +308,7 @@ class _ProfileHeadCard extends ConsumerWidget {
           ),
           const SizedBox(height: 2),
           Text(
+            key: const Key('profile_member_since'),
             'Member since $since',
             style: const TextStyle(fontSize: 13, color: AppColors.mutedInk),
           ),
@@ -342,39 +343,69 @@ class _StatsRow extends ConsumerWidget {
 
     return statsAsync.when(
       loading: () => Row(
+        key: const Key('profile_stats_row'),
         children: const [
-          _StatCard(value: '—', label: 'Sessions'),
+          _StatCard(
+            key: Key('profile_stat_sessions'),
+            value: '—',
+            label: 'Sessions',
+          ),
           SizedBox(width: 10),
-          _StatCard(value: '—', label: 'Words'),
+          _StatCard(
+            key: Key('profile_stat_words'),
+            value: '—',
+            label: 'Words',
+          ),
           SizedBox(width: 10),
-          _StatCard(value: '—', label: 'Streak'),
+          _StatCard(
+            key: Key('profile_stat_streak'),
+            value: '—',
+            label: 'Streak',
+          ),
         ],
       ),
       error: (_, _) => GestureDetector(
         onTap: () => ref.invalidate(userStatsProvider),
         child: Row(
+          key: const Key('profile_stats_row'),
           children: const [
-            _StatCard(value: '—', label: 'Sessions'),
+            _StatCard(
+              key: Key('profile_stat_sessions'),
+              value: '—',
+              label: 'Sessions',
+            ),
             SizedBox(width: 10),
-            _StatCard(value: '—', label: 'Words'),
+            _StatCard(
+              key: Key('profile_stat_words'),
+              value: '—',
+              label: 'Words',
+            ),
             SizedBox(width: 10),
-            _StatCard(value: '—', label: 'Streak'),
+            _StatCard(
+              key: Key('profile_stat_streak'),
+              value: '—',
+              label: 'Streak',
+            ),
           ],
         ),
       ),
       data: (stats) => Row(
+        key: const Key('profile_stats_row'),
         children: [
           _StatCard(
+            key: const Key('profile_stat_sessions'),
             value: stats.totalSessions.toString(),
             label: 'Sessions',
           ),
           const SizedBox(width: 10),
           _StatCard(
+            key: const Key('profile_stat_words'),
             value: stats.totalWords.toString(),
             label: 'Words',
           ),
           const SizedBox(width: 10),
           _StatCard(
+            key: const Key('profile_stat_streak'),
             value: '${stats.streakDays}d',
             label: 'Streak',
           ),
@@ -388,7 +419,7 @@ class _StatCard extends StatelessWidget {
   final String value;
   final String label;
 
-  const _StatCard({required this.value, required this.label});
+  const _StatCard({super.key, required this.value, required this.label});
 
   @override
   Widget build(BuildContext context) {

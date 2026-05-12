@@ -68,6 +68,7 @@ class AiSummaryScreen extends ConsumerWidget {
 
             // Action buttons
             FilledButton.icon(
+              key: const Key('summary_practice_again'),
               onPressed: () {
                 context.go(Routes.aiPractice);
               },
@@ -76,6 +77,7 @@ class AiSummaryScreen extends ConsumerWidget {
             ),
             const SizedBox(height: 12),
             OutlinedButton.icon(
+              key: const Key('summary_back_home'),
               onPressed: () {
                 context.go(Routes.home);
               },
@@ -146,6 +148,7 @@ class AiSummaryScreen extends ConsumerWidget {
         if (accuracyPct != null) ...[
           const Divider(),
           _StatRow(
+            key: const Key('summary_accuracy'),
             label: 'Accuracy',
             value: '$accuracyPct%',
           ),
@@ -294,6 +297,7 @@ class _AnalysisSection extends StatelessWidget {
           children: [
             if (summary.mistakes.isNotEmpty)
               _SummaryCard(
+                key: const Key('summary_mistakes_section'),
                 icon: Icons.warning_amber_outlined,
                 title: 'Mistakes',
                 content: _MistakesList(items: summary.mistakes),
@@ -302,6 +306,7 @@ class _AnalysisSection extends StatelessWidget {
               const SizedBox(height: 16),
             if (summary.newWords.isNotEmpty)
               _SummaryCard(
+                key: const Key('summary_newwords_section'),
                 icon: Icons.auto_awesome_outlined,
                 title: 'New words',
                 content: _NewWordsBadges(words: summary.newWords),
@@ -411,6 +416,7 @@ class _SummaryCard extends StatelessWidget {
   final Widget content;
 
   const _SummaryCard({
+    super.key,
     required this.icon,
     required this.title,
     required this.content,
@@ -453,6 +459,7 @@ class _StatRow extends StatelessWidget {
   final String value;
 
   const _StatRow({
+    super.key,
     required this.label,
     required this.value,
   });

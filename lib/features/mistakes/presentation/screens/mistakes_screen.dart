@@ -70,12 +70,14 @@ class _MistakesScreenState extends ConsumerState<MistakesScreen> {
       ScFilterChipData(
         label: 'All',
         count: state.mistakes.length.toString(),
+        semanticsLabel: 'mistakes_filter_all',
       ),
       for (final cat in _categoryChoices.skip(1).cast<MistakeCategory>())
         ScFilterChipData(
           label: cat.label,
           count: (categoryCounts[cat] ?? 0).toString(),
           accentDot: _categoryAccents[cat],
+          semanticsLabel: _semanticsLabelFor(cat),
         ),
     ];
 
@@ -107,6 +109,19 @@ class _MistakesScreenState extends ConsumerState<MistakesScreen> {
         ],
       ),
     );
+  }
+
+  String _semanticsLabelFor(MistakeCategory cat) {
+    switch (cat) {
+      case MistakeCategory.grammar:
+        return 'mistakes_filter_grammar';
+      case MistakeCategory.vocabulary:
+        return 'mistakes_filter_vocabulary';
+      case MistakeCategory.fluency:
+        return 'mistakes_filter_fluency';
+      case MistakeCategory.pronunciation:
+        return 'mistakes_filter_pronunciation';
+    }
   }
 
   Map<MistakeCategory, int> _countByCategory(List<Mistake> list) {
@@ -223,13 +238,47 @@ class _SummaryStrip extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 4),
-                Text(
-                  '${summary.thisWeek} mistakes · ${summary.fixed} fixed',
-                  style: const TextStyle(
-                    fontSize: 17,
-                    fontWeight: FontWeight.w700,
-                    color: Colors.white,
-                  ),
+                Row(
+                  children: [
+                    Semantics(
+                      label: 'mistakes_summary_thisweek',
+                      child: Text(
+                        '${summary.thisWeek}',
+                        style: const TextStyle(
+                          fontSize: 17,
+                          fontWeight: FontWeight.w700,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                    const Text(
+                      ' mistakes · ',
+                      style: TextStyle(
+                        fontSize: 17,
+                        fontWeight: FontWeight.w700,
+                        color: Colors.white,
+                      ),
+                    ),
+                    Semantics(
+                      label: 'mistakes_summary_fixed',
+                      child: Text(
+                        '${summary.fixed}',
+                        style: const TextStyle(
+                          fontSize: 17,
+                          fontWeight: FontWeight.w700,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                    const Text(
+                      ' fixed',
+                      style: TextStyle(
+                        fontSize: 17,
+                        fontWeight: FontWeight.w700,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
@@ -402,11 +451,13 @@ class _MistakeCard extends StatelessWidget {
                 ),
               ),
               _ActionPill(
+                key: Key('mistake_save_to_vocab_${mistake.id}'),
                 label: mistake.savedToVocab ? 'In vocab' : 'Save to vocab',
                 onTap: mistake.savedToVocab ? null : onSaveToVocab,
               ),
               const SizedBox(width: 6),
               _ActionPill(
+                key: Key('mistake_mark_fixed_${mistake.id}'),
                 label: fixed ? 'Unfix' : 'Mark fixed',
                 onTap: onMarkFixed,
                 primary: !fixed,
@@ -425,6 +476,7 @@ class _ActionPill extends StatelessWidget {
   final bool primary;
 
   const _ActionPill({
+    super.key,
     required this.label,
     required this.onTap,
     this.primary = false,

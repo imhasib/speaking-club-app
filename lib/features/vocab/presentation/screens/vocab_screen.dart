@@ -51,6 +51,7 @@ class _VocabScreenState extends ConsumerState<VocabScreen> {
     final wordsNotifier = ref.read(vocabWordsProvider.notifier);
 
     return Scaffold(
+      key: const Key('vocab_screen'),
       backgroundColor: AppColors.background,
       body: Column(
         children: [
@@ -86,15 +87,22 @@ class _VocabScreenState extends ConsumerState<VocabScreen> {
                             _StatsGrid(stats: summary.stats),
                             const SizedBox(height: 20),
                             if (summary.rarelyUsed.isNotEmpty) ...[
-                              _RarelyUsedSection(words: summary.rarelyUsed),
+                              _RarelyUsedSection(
+                                key: const Key('vocab_section_most_used'),
+                                words: summary.rarelyUsed,
+                              ),
                               const SizedBox(height: 20),
                             ],
                             if (summary.needsImprovement.isNotEmpty) ...[
                               _NeedsImprovementSection(
-                                  items: summary.needsImprovement),
+                                key: const Key(
+                                    'vocab_section_needs_improvement'),
+                                items: summary.needsImprovement,
+                              ),
                               const SizedBox(height: 20),
                             ],
                             _BrowseHeader(
+                              key: const Key('vocab_section_browse_all'),
                               total: summary.stats.uniqueWords,
                               controller: _searchController,
                               search: wordsState.search,
@@ -158,11 +166,14 @@ class _VocabScreenState extends ConsumerState<VocabScreen> {
     }
 
     if (state.words.isEmpty) {
-      return const SliverToBoxAdapter(
+      return SliverToBoxAdapter(
         child: Padding(
-          key: Key('vocab_words_empty'),
-          padding: EdgeInsets.symmetric(horizontal: 24, vertical: 40),
-          child: Column(
+          key: const Key('vocab_words_empty'),
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 40),
+          child: Semantics(
+            container: true,
+            label: 'vocab_empty',
+            child: Column(
             children: [
               Icon(Icons.search_off, size: 48, color: AppColors.mutedSoft),
               SizedBox(height: 8),
@@ -175,6 +186,7 @@ class _VocabScreenState extends ConsumerState<VocabScreen> {
                 ),
               ),
             ],
+          ),
           ),
         ),
       );
@@ -204,7 +216,11 @@ class _VocabScreenState extends ConsumerState<VocabScreen> {
                   _expandedWord = expanded ? null : entry.word;
                 }),
               ),
-              if (expanded) _ExpandedExamples(word: entry.word),
+              if (expanded)
+                _ExpandedExamples(
+                  key: Key('vocab_word_detail_${entry.word}'),
+                  word: entry.word,
+                ),
               if (!isLast)
                 const Divider(
                   height: 1,
@@ -233,18 +249,24 @@ class _StatsGrid extends StatelessWidget {
         label: 'Unique words',
         sub: '+${stats.weeklyNewWords} this week',
         subColor: AppColors.greenPrimary,
+        valueSemLabel: 'vocab_stat_unique_words',
+        subSemLabel: 'vocab_stat_weekly_new',
       ),
       _StatCardData(
         value: '${stats.correctUsagePct}%',
         label: 'Correct usage',
         sub: stats.usageTrend ?? '—',
         subColor: AppColors.greenPrimary,
+        valueSemLabel: 'vocab_stat_correct_pct',
+        subSemLabel: 'vocab_stat_trend',
       ),
       _StatCardData(
         value: stats.sessions.toString(),
         label: 'Sessions',
         sub: '${stats.totalHours.toStringAsFixed(1)} hrs',
         subColor: AppColors.primary,
+        valueSemLabel: 'vocab_stat_sessions',
+        subSemLabel: 'vocab_stat_hours',
       ),
     ];
 
@@ -264,11 +286,15 @@ class _StatCardData {
   final String label;
   final String sub;
   final Color subColor;
+  final String? valueSemLabel;
+  final String? subSemLabel;
   const _StatCardData({
     required this.value,
     required this.label,
     required this.sub,
     required this.subColor,
+    this.valueSemLabel,
+    this.subSemLabel,
   });
 }
 
@@ -289,12 +315,15 @@ class _StatCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              data.value,
-              style: const TextStyle(
-                fontSize: 22,
-                fontWeight: FontWeight.w800,
-                color: AppColors.ink,
+            Semantics(
+              label: data.valueSemLabel,
+              child: Text(
+                data.value,
+                style: const TextStyle(
+                  fontSize: 22,
+                  fontWeight: FontWeight.w800,
+                  color: AppColors.ink,
+                ),
               ),
             ),
             const SizedBox(height: 1),
@@ -307,12 +336,15 @@ class _StatCard extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 4),
-            Text(
-              data.sub,
-              style: TextStyle(
-                fontSize: 11,
-                fontWeight: FontWeight.w600,
-                color: data.subColor,
+            Semantics(
+              label: data.subSemLabel,
+              child: Text(
+                data.sub,
+                style: TextStyle(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w600,
+                  color: data.subColor,
+                ),
               ),
             ),
           ],
@@ -324,7 +356,7 @@ class _StatCard extends StatelessWidget {
 
 class _RarelyUsedSection extends StatelessWidget {
   final List<RarelyUsedWord> words;
-  const _RarelyUsedSection({required this.words});
+  const _RarelyUsedSection({super.key, required this.words});
 
   @override
   Widget build(BuildContext context) {
@@ -385,7 +417,7 @@ class _RarelyUsedSection extends StatelessWidget {
 
 class _NeedsImprovementSection extends StatelessWidget {
   final List<NeedsImprovementWord> items;
-  const _NeedsImprovementSection({required this.items});
+  const _NeedsImprovementSection({super.key, required this.items});
 
   @override
   Widget build(BuildContext context) {
@@ -516,6 +548,7 @@ class _BrowseHeader extends StatelessWidget {
   final ValueChanged<WordFilter> onFilterChanged;
 
   const _BrowseHeader({
+    super.key,
     required this.total,
     required this.controller,
     required this.search,
@@ -578,6 +611,16 @@ class _BrowseHeader extends StatelessWidget {
                 values: WordSort.values,
                 selected: sort,
                 labelOf: (v) => v.label,
+                semanticsLabelOf: (v) {
+                  switch (v) {
+                    case WordSort.count:
+                      return 'vocab_sort_count';
+                    case WordSort.recent:
+                      return 'vocab_sort_recent';
+                    case WordSort.az:
+                      return 'vocab_sort_az';
+                  }
+                },
                 onChanged: onSortChanged,
               ),
             ),
@@ -587,6 +630,16 @@ class _BrowseHeader extends StatelessWidget {
                 values: WordFilter.values,
                 selected: filter,
                 labelOf: (v) => v.label,
+                semanticsLabelOf: (v) {
+                  switch (v) {
+                    case WordFilter.all:
+                      return 'vocab_filter_all';
+                    case WordFilter.correct:
+                      return 'vocab_filter_correct';
+                    case WordFilter.errors:
+                      return 'vocab_filter_errors';
+                  }
+                },
                 onChanged: onFilterChanged,
               ),
             ),
@@ -612,6 +665,7 @@ class _Segmented<T> extends StatelessWidget {
   final List<T> values;
   final T selected;
   final String Function(T) labelOf;
+  final String Function(T)? semanticsLabelOf;
   final ValueChanged<T> onChanged;
 
   const _Segmented({
@@ -619,6 +673,7 @@ class _Segmented<T> extends StatelessWidget {
     required this.selected,
     required this.labelOf,
     required this.onChanged,
+    this.semanticsLabelOf,
   });
 
   @override
@@ -633,7 +688,11 @@ class _Segmented<T> extends StatelessWidget {
         children: [
           for (final v in values)
             Expanded(
-              child: GestureDetector(
+              child: Semantics(
+                label: semanticsLabelOf?.call(v),
+                button: true,
+                selected: v == selected,
+                child: GestureDetector(
                 onTap: () => onChanged(v),
                 child: AnimatedContainer(
                   duration: const Duration(milliseconds: 160),
@@ -654,6 +713,7 @@ class _Segmented<T> extends StatelessWidget {
                     ),
                   ),
                 ),
+              ),
               ),
             ),
         ],
@@ -745,7 +805,7 @@ class _WordRow extends StatelessWidget {
 
 class _ExpandedExamples extends ConsumerWidget {
   final String word;
-  const _ExpandedExamples({required this.word});
+  const _ExpandedExamples({super.key, required this.word});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -878,6 +938,7 @@ class _ErrorView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
+      key: const Key('vocab_error'),
       padding: const EdgeInsets.symmetric(vertical: 40),
       child: Column(
         children: [

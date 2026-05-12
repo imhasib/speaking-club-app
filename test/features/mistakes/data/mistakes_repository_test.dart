@@ -42,7 +42,7 @@ Map<String, dynamic> _page({
       'summary': {
         'thisWeek': thisWeek,
         'fixed': fixed,
-        'trend': '↓ 23%',
+        'trend': -23,
       },
       'nextCursor': cursor,
     };

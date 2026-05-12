@@ -6,11 +6,13 @@ class ScFilterChipData {
   final String label;
   final String? count;
   final Color? accentDot;
+  final String? semanticsLabel;
 
   const ScFilterChipData({
     required this.label,
     this.count,
     this.accentDot,
+    this.semanticsLabel,
   });
 }
 
@@ -37,7 +39,11 @@ class ScFilterChipBar extends StatelessWidget {
           final isActive = i == selectedIndex;
           return Padding(
             padding: const EdgeInsets.only(right: 8),
-            child: GestureDetector(
+            child: Semantics(
+              label: chip.semanticsLabel,
+              button: true,
+              selected: isActive,
+              child: GestureDetector(
               onTap: () => onSelected(i),
               child: AnimatedContainer(
                 duration: const Duration(milliseconds: 160),
@@ -99,6 +105,7 @@ class ScFilterChipBar extends StatelessWidget {
                   ],
                 ),
               ),
+            ),
             ),
           );
         }),

@@ -1,7 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:Speaking_club/features/ai_practice/data/ai_session_repository.dart';
+import 'package:speaking_club/features/ai_practice/data/ai_session_repository.dart';
 
 class _MockDio extends Mock implements Dio {}
 

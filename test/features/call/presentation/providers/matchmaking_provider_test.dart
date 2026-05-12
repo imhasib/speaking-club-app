@@ -1,9 +1,9 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:Speaking_club/features/call/domain/matchmaking_state.dart';
-import 'package:Speaking_club/features/call/presentation/providers/matchmaking_provider.dart';
-import 'package:Speaking_club/features/realtime/data/socket_service.dart';
+import 'package:speaking_club/features/call/domain/matchmaking_state.dart';
+import 'package:speaking_club/features/call/presentation/providers/matchmaking_provider.dart';
+import 'package:speaking_club/features/realtime/data/socket_service.dart';
 
 import '../../../../helpers/fake_socket_service.dart';
 

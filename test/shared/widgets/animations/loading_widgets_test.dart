@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:Speaking_club/shared/widgets/animations/shimmer_loading.dart';
-import 'package:Speaking_club/shared/widgets/animations/loading_overlay.dart';
+import 'package:speaking_club/shared/widgets/animations/shimmer_loading.dart';
+import 'package:speaking_club/shared/widgets/animations/loading_overlay.dart';
 
 void main() {
   group('Shimmer', () {

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:Speaking_club/features/auth/presentation/widgets/auth_text_field.dart';
+import 'package:speaking_club/features/auth/presentation/widgets/auth_text_field.dart';
 
 void main() {
   group('AuthTextField', () {

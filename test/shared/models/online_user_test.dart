@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:Speaking_club/shared/models/online_user.dart';
+import 'package:speaking_club/shared/models/online_user.dart';
 
 void main() {
   group('OnlineUser', () {

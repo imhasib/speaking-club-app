@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:Speaking_club/shared/models/auth_tokens.dart';
+import 'package:speaking_club/shared/models/auth_tokens.dart';
 
 void main() {
   group('AuthTokens', () {

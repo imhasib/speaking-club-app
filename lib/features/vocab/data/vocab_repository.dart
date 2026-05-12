@@ -21,7 +21,14 @@ class VocabRepository {
   Future<VocabSummary> fetchSummary() async {
     try {
       final response = await _dio.get(ApiEndpoints.vocab);
-      return VocabSummary.fromJson(response.data as Map<String, dynamic>);
+      final raw = Map<String, dynamic>.from(
+        response.data as Map<String, dynamic>,
+      );
+      // Guard against server returning {} instead of [] for list fields.
+      for (final key in ['rarelyUsed', 'needsImprovement', 'allWords']) {
+        if (raw[key] is! List) raw[key] = const [];
+      }
+      return VocabSummary.fromJson(raw);
     } on DioException catch (e) {
       throw e.error ?? e;
     }

@@ -68,4 +68,9 @@ class Routes {
   static String aiSessionDetailPath(String sessionId) =>
       '/ai-practice/sessions/$sessionId';
 
+  static const String mistakes = '/mistakes';
+  static const String mistakesName = 'mistakes';
+
+  static const String vocab = '/vocab';
+  static const String vocabName = 'vocab';
 }

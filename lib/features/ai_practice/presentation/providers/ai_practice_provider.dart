@@ -800,8 +800,11 @@ class AiPracticeNotifier extends Notifier<AiPracticeState> {
           )
         : null;
 
-    // M2: Populate summary provider so summary screen has real data.
+    // M2: Populate summary provider so summary screen has real data.  Pass
+    // the sessionId so it can poll `/ai/sessions/:id` for the async analysis
+    // (mistakes / newWords / accuracyPct).
     ref.read(aiSummaryProvider.notifier).set(
+          sessionId: state.sessionId,
           durationSeconds: durationCopy,
           stats: stats,
           corrections: correctionsCopy,

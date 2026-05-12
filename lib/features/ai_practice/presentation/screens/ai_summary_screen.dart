@@ -40,20 +40,35 @@ class AiSummaryScreen extends ConsumerWidget {
             _SummaryCard(
               icon: Icons.mic_outlined,
               title: 'Speaking Stats',
-              content: _buildStatsContent(context, summary.stats),
+              content: _buildStatsContent(
+                context,
+                summary.stats,
+                summary.accuracyPct,
+              ),
             ),
             const SizedBox(height: 16),
 
-            // Corrections card
-            _SummaryCard(
-              icon: Icons.edit_outlined,
-              title: 'Corrections',
-              content: _buildCorrectionsContent(context, summary.corrections),
-            ),
-            const SizedBox(height: 32),
+            // Analysis section — pending spinner, mistakes, new words, or
+            // a failure fallback handled by [_AnalysisSection].
+            _AnalysisSection(summary: summary),
+            const SizedBox(height: 16),
+
+            // Corrections card (in-session live corrections — distinct from
+            // server-side mistakes analysis).
+            if (summary.corrections.isNotEmpty) ...[
+              _SummaryCard(
+                icon: Icons.edit_outlined,
+                title: 'Corrections',
+                content: _buildCorrectionsContent(context, summary.corrections),
+              ),
+              const SizedBox(height: 16),
+            ],
+
+            const SizedBox(height: 16),
 
             // Action buttons
             FilledButton.icon(
+              key: const Key('summary_practice_again'),
               onPressed: () {
                 context.go(Routes.aiPractice);
               },
@@ -62,6 +77,7 @@ class AiSummaryScreen extends ConsumerWidget {
             ),
             const SizedBox(height: 12),
             OutlinedButton.icon(
+              key: const Key('summary_back_home'),
               onPressed: () {
                 context.go(Routes.home);
               },
@@ -104,7 +120,11 @@ class AiSummaryScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildStatsContent(BuildContext context, SessionStats? stats) {
+  Widget _buildStatsContent(
+    BuildContext context,
+    SessionStats? stats,
+    int? accuracyPct,
+  ) {
     final wordsSpoken = stats?.wordsSpoken ?? 0;
     final avgSentenceLength = stats?.averageSentenceLength ?? 0;
     final speakingTimePercent = stats?.speakingTimePercent ?? 0;
@@ -125,6 +145,14 @@ class AiSummaryScreen extends ConsumerWidget {
           label: 'Speaking time',
           value: '$speakingTimePercent%',
         ),
+        if (accuracyPct != null) ...[
+          const Divider(),
+          _StatRow(
+            key: const Key('summary_accuracy'),
+            label: 'Accuracy',
+            value: '$accuracyPct%',
+          ),
+        ],
       ],
     );
   }
@@ -229,12 +257,166 @@ class AiSummaryScreen extends ConsumerWidget {
   }
 }
 
+class _AnalysisSection extends StatelessWidget {
+  final AiSummaryState summary;
+  const _AnalysisSection({required this.summary});
+
+  @override
+  Widget build(BuildContext context) {
+    switch (summary.analysisStatus) {
+      case AnalysisStatus.pending:
+        return const Card(
+          key: Key('summary_analysis_pending'),
+          child: Padding(
+            padding: EdgeInsets.all(16),
+            child: Row(
+              children: [
+                SizedBox(
+                  width: 18,
+                  height: 18,
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                ),
+                SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    'Analysing your session…',
+                    style: TextStyle(fontWeight: FontWeight.w500),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      case AnalysisStatus.failed:
+      case AnalysisStatus.none:
+        return const SizedBox.shrink();
+      case AnalysisStatus.completed:
+        return Column(
+          key: const Key('summary_analysis_completed'),
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            if (summary.mistakes.isNotEmpty)
+              _SummaryCard(
+                key: const Key('summary_mistakes_section'),
+                icon: Icons.warning_amber_outlined,
+                title: 'Mistakes',
+                content: _MistakesList(items: summary.mistakes),
+              ),
+            if (summary.mistakes.isNotEmpty && summary.newWords.isNotEmpty)
+              const SizedBox(height: 16),
+            if (summary.newWords.isNotEmpty)
+              _SummaryCard(
+                key: const Key('summary_newwords_section'),
+                icon: Icons.auto_awesome_outlined,
+                title: 'New words',
+                content: _NewWordsBadges(words: summary.newWords),
+              ),
+          ],
+        );
+    }
+  }
+}
+
+class _MistakesList extends StatelessWidget {
+  final List<Correction> items;
+  const _MistakesList({required this.items});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        for (var i = 0; i < items.length; i++) ...[
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 6),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Icon(Icons.close,
+                        size: 16, color: AppColors.redPrimary),
+                    const SizedBox(width: 6),
+                    Expanded(
+                      child: Text(
+                        items[i].original,
+                        style: const TextStyle(
+                          fontSize: 13,
+                          color: AppColors.redPrimary,
+                          decoration: TextDecoration.lineThrough,
+                          decorationColor: AppColors.redPrimary,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 4),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Icon(Icons.check,
+                        size: 16, color: AppColors.greenPrimary),
+                    const SizedBox(width: 6),
+                    Expanded(
+                      child: Text(
+                        items[i].corrected,
+                        style: const TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.greenPrimary,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          if (i < items.length - 1) const Divider(height: 8),
+        ],
+      ],
+    );
+  }
+}
+
+class _NewWordsBadges extends StatelessWidget {
+  final List<String> words;
+  const _NewWordsBadges({required this.words});
+
+  @override
+  Widget build(BuildContext context) {
+    return Wrap(
+      spacing: 8,
+      runSpacing: 8,
+      children: [
+        for (final word in words)
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+            decoration: BoxDecoration(
+              color: AppColors.lavenderBg,
+              borderRadius: BorderRadius.circular(99),
+            ),
+            child: Text(
+              word,
+              style: const TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+                color: AppColors.lavenderText,
+              ),
+            ),
+          ),
+      ],
+    );
+  }
+}
+
 class _SummaryCard extends StatelessWidget {
   final IconData icon;
   final String title;
   final Widget content;
 
   const _SummaryCard({
+    super.key,
     required this.icon,
     required this.title,
     required this.content,
@@ -277,6 +459,7 @@ class _StatRow extends StatelessWidget {
   final String value;
 
   const _StatRow({
+    super.key,
     required this.label,
     required this.value,
   });

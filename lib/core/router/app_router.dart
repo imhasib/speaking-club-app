@@ -16,7 +16,9 @@ import '../../features/auth/presentation/screens/splash_screen.dart';
 import '../../features/call/call.dart';
 import '../../features/history/presentation/screens/history_screen.dart';
 import '../../features/home/presentation/screens/home_screen.dart';
+import '../../features/mistakes/presentation/screens/mistakes_screen.dart';
 import '../../features/profile/presentation/screens/profile_screen.dart';
+import '../../features/vocab/presentation/screens/vocab_screen.dart';
 import '../../shared/providers/core_providers.dart';
 import '../../shared/widgets/animations/page_transitions.dart';
 import '../constants/app_constants.dart';
@@ -84,6 +86,8 @@ class AppRouter {
         final isProtectedRoute = currentPath == Routes.home ||
             currentPath == Routes.history ||
             currentPath == Routes.profile ||
+            currentPath == Routes.mistakes ||
+            currentPath == Routes.vocab ||
             currentPath == Routes.changePassword ||
             currentPath == Routes.waiting ||
             currentPath == Routes.call ||
@@ -295,6 +299,26 @@ class AppRouter {
                   path: Routes.history,
                   name: Routes.historyName,
                   builder: (context, state) => const HistoryScreen(),
+                ),
+              ],
+            ),
+            // Mistakes branch
+            StatefulShellBranch(
+              routes: [
+                GoRoute(
+                  path: Routes.mistakes,
+                  name: Routes.mistakesName,
+                  builder: (context, state) => const MistakesScreen(),
+                ),
+              ],
+            ),
+            // Vocab branch
+            StatefulShellBranch(
+              routes: [
+                GoRoute(
+                  path: Routes.vocab,
+                  name: Routes.vocabName,
+                  builder: (context, state) => const VocabScreen(),
                 ),
               ],
             ),

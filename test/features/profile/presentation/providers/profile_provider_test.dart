@@ -1,9 +1,9 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:Speaking_club/features/profile/data/user_repository.dart';
-import 'package:Speaking_club/features/profile/presentation/providers/profile_provider.dart';
-import 'package:Speaking_club/shared/models/user.dart';
+import 'package:speaking_club/features/profile/data/user_repository.dart';
+import 'package:speaking_club/features/profile/presentation/providers/profile_provider.dart';
+import 'package:speaking_club/shared/models/user.dart';
 
 class _MockUserRepository extends Mock implements UserRepository {}
 

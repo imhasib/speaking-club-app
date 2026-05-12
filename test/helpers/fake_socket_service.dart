@@ -1,8 +1,8 @@
 import 'dart:async';
 
-import 'package:Speaking_club/features/realtime/data/socket_service.dart';
-import 'package:Speaking_club/shared/models/call.dart';
-import 'package:Speaking_club/shared/models/online_user.dart';
+import 'package:speaking_club/features/realtime/data/socket_service.dart';
+import 'package:speaking_club/shared/models/call.dart';
+import 'package:speaking_club/shared/models/online_user.dart';
 
 /// Controllable fake [SocketService] for use in unit tests.
 ///

@@ -1,8 +1,8 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:Speaking_club/features/history/data/call_history_repository.dart';
-import 'package:Speaking_club/shared/models/call.dart';
+import 'package:speaking_club/features/history/data/call_history_repository.dart';
+import 'package:speaking_club/shared/models/call.dart';
 
 class _MockDio extends Mock implements Dio {}
 

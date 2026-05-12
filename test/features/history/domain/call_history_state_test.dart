@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:Speaking_club/features/history/domain/call_history_state.dart';
-import 'package:Speaking_club/shared/models/call.dart';
+import 'package:speaking_club/features/history/domain/call_history_state.dart';
+import 'package:speaking_club/shared/models/call.dart';
 
 // ── Test fixtures ──────────────────────────────────────────────────────────
 

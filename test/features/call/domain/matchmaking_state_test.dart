@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:Speaking_club/features/call/domain/matchmaking_state.dart';
+import 'package:speaking_club/features/call/domain/matchmaking_state.dart';
 
 void main() {
   // ── computed boolean properties ────────────────────────────────────────────

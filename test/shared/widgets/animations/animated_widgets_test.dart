@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:Speaking_club/shared/widgets/animations/animated_widgets.dart';
+import 'package:speaking_club/shared/widgets/animations/animated_widgets.dart';
 
 void main() {
   group('AnimatedEmptyState', () {

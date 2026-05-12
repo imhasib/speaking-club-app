@@ -1,10 +1,10 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:Speaking_club/features/history/data/call_history_repository.dart';
-import 'package:Speaking_club/features/history/domain/call_history_state.dart';
-import 'package:Speaking_club/features/history/presentation/providers/call_history_provider.dart';
-import 'package:Speaking_club/shared/models/call.dart';
+import 'package:speaking_club/features/history/data/call_history_repository.dart';
+import 'package:speaking_club/features/history/domain/call_history_state.dart';
+import 'package:speaking_club/features/history/presentation/providers/call_history_provider.dart';
+import 'package:speaking_club/shared/models/call.dart';
 
 class _MockCallHistoryRepository extends Mock implements CallHistoryRepository {}
 

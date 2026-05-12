@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:Speaking_club/shared/widgets/error/error_widgets.dart';
-import 'package:Speaking_club/core/errors/app_exception.dart';
-import 'package:Speaking_club/core/errors/failures.dart';
+import 'package:speaking_club/shared/widgets/error/error_widgets.dart';
+import 'package:speaking_club/core/errors/app_exception.dart';
+import 'package:speaking_club/core/errors/failures.dart';
 
 void main() {
   group('NetworkErrorWidget', () {

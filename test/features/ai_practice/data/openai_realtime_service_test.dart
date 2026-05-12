@@ -1,8 +1,8 @@
 import 'dart:convert';
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:Speaking_club/features/ai_practice/data/openai_realtime_service.dart';
-import 'package:Speaking_club/shared/models/ai_session.dart';
+import 'package:speaking_club/features/ai_practice/data/openai_realtime_service.dart';
+import 'package:speaking_club/shared/models/ai_session.dart';
 
 import '../helpers/fake_web_socket_channel.dart';
 

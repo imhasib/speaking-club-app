@@ -2,10 +2,10 @@ import 'package:dio/dio.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:Speaking_club/core/constants/app_constants.dart';
-import 'package:Speaking_club/core/errors/app_exception.dart';
-import 'package:Speaking_club/features/auth/data/auth_repository.dart';
-import 'package:Speaking_club/shared/models/user.dart';
+import 'package:speaking_club/core/constants/app_constants.dart';
+import 'package:speaking_club/core/errors/app_exception.dart';
+import 'package:speaking_club/features/auth/data/auth_repository.dart';
+import 'package:speaking_club/shared/models/user.dart';
 
 class _MockDio extends Mock implements Dio {}
 

@@ -100,6 +100,7 @@ class HttpAiService {
     required String sessionId,
     required String message,
     required List<AiMessage> history,
+    bool isInitial = false,
   }) {
     final controller = StreamController<AiEvent>();
 
@@ -121,17 +122,23 @@ class HttpAiService {
       }
 
       final uri = Uri.parse('$_baseUrl${ApiEndpoints.aiChatStream}');
+      final body = <String, dynamic>{
+        'sessionId': sessionId,
+        'message': message,
+        'history': history
+            .map((m) => {'role': m.role, 'content': m.content})
+            .toList(),
+      };
+      // Only include isInitial when true to keep the payload clean; server
+      // injects the synthetic opening prompt and does not require `message`.
+      if (isInitial) {
+        body['isInitial'] = true;
+      }
       final request = http.Request('POST', uri)
         ..headers['Authorization'] = 'Bearer $token'
         ..headers['Content-Type'] = 'application/json'
         ..headers['Accept'] = 'text/event-stream'
-        ..body = jsonEncode({
-          'sessionId': sessionId,
-          'message': message,
-          'history': history
-              .map((m) => {'role': m.role, 'content': m.content})
-              .toList(),
-        });
+        ..body = jsonEncode(body);
 
       // Use a per-request client so dispose() can abort just this request.
       final perRequestClient = http.Client();

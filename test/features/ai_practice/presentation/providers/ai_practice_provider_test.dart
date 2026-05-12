@@ -4,10 +4,10 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:Speaking_club/features/ai_practice/data/ai_session_repository.dart';
-import 'package:Speaking_club/features/ai_practice/domain/ai_practice_state.dart';
-import 'package:Speaking_club/features/ai_practice/presentation/providers/ai_practice_provider.dart';
-import 'package:Speaking_club/shared/models/ai_session.dart';
+import 'package:speaking_club/features/ai_practice/data/ai_session_repository.dart';
+import 'package:speaking_club/features/ai_practice/domain/ai_practice_state.dart';
+import 'package:speaking_club/features/ai_practice/presentation/providers/ai_practice_provider.dart';
+import 'package:speaking_club/shared/models/ai_session.dart';
 
 import '../../helpers/fake_ai_services.dart';
 

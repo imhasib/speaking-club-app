@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:Speaking_club/core/errors/failures.dart';
+import 'package:speaking_club/core/errors/failures.dart';
 
 void main() {
   group('Failure', () {

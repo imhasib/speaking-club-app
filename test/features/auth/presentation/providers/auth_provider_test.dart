@@ -2,15 +2,15 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:Speaking_club/core/errors/app_exception.dart';
-import 'package:Speaking_club/features/auth/data/auth_repository.dart';
-import 'package:Speaking_club/features/auth/data/google_auth_service.dart';
-import 'package:Speaking_club/features/auth/domain/auth_state.dart';
-import 'package:Speaking_club/features/auth/presentation/providers/auth_provider.dart';
-import 'package:Speaking_club/features/profile/presentation/providers/profile_provider.dart';
-import 'package:Speaking_club/features/realtime/data/socket_service.dart';
-import 'package:Speaking_club/shared/models/auth_tokens.dart';
-import 'package:Speaking_club/shared/models/user.dart';
+import 'package:speaking_club/core/errors/app_exception.dart';
+import 'package:speaking_club/features/auth/data/auth_repository.dart';
+import 'package:speaking_club/features/auth/data/google_auth_service.dart';
+import 'package:speaking_club/features/auth/domain/auth_state.dart';
+import 'package:speaking_club/features/auth/presentation/providers/auth_provider.dart';
+import 'package:speaking_club/features/profile/presentation/providers/profile_provider.dart';
+import 'package:speaking_club/features/realtime/data/socket_service.dart';
+import 'package:speaking_club/shared/models/auth_tokens.dart';
+import 'package:speaking_club/shared/models/user.dart';
 
 import '../../../../helpers/fake_socket_service.dart';
 

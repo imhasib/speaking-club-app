@@ -1,9 +1,9 @@
 import 'dart:async';
 
-import 'package:Speaking_club/features/ai_practice/data/openai_realtime_service.dart';
-import 'package:Speaking_club/features/ai_practice/data/speech_service.dart';
-import 'package:Speaking_club/features/ai_practice/data/tts_service.dart';
-import 'package:Speaking_club/shared/models/ai_session.dart';
+import 'package:speaking_club/features/ai_practice/data/openai_realtime_service.dart';
+import 'package:speaking_club/features/ai_practice/data/speech_service.dart';
+import 'package:speaking_club/features/ai_practice/data/tts_service.dart';
+import 'package:speaking_club/shared/models/ai_session.dart';
 
 // ─── OpenAI service fake ──────────────────────────────────────────────────────
 

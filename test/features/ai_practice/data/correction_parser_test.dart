@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:Speaking_club/features/ai_practice/data/correction_parser.dart';
+import 'package:speaking_club/features/ai_practice/data/correction_parser.dart';
 
 void main() {
   group('CorrectionParser.parse', () {

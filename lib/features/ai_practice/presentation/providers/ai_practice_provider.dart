@@ -554,12 +554,14 @@ class AiPracticeNotifier extends Notifier<AiPracticeState> {
           scenario: scenario,
         );
       } else {
-        // Free: client generates a session id and immediately enters the
-        // ready phase — the first AI text comes only after the user speaks.
+        // Free: client generates a session id. Enter the aiSpeaking phase so
+        // the mic stays disabled while the AI streams its opening greeting —
+        // the user shouldn't have to tap anything to begin the conversation.
         final sessionId = _generateSessionId();
         state = state.copyWith(
           sessionId: sessionId,
-          phase: AiPracticePhase.ready,
+          phase: AiPracticePhase.aiSpeaking,
+          currentSpeaker: Speaker.ai,
         );
 
         // Best-effort persist on the server; never blocks.
@@ -579,6 +581,9 @@ class AiPracticeNotifier extends Notifier<AiPracticeState> {
         _timerStarted = true;
         state = state.copyWith(sessionStartTime: DateTime.now());
         _startDurationTimer();
+
+        // Kick off the AI-initiated opening greeting via SSE.
+        _requestInitialGreeting();
       }
     } catch (e) {
       if (_disposed) return;
@@ -694,6 +699,73 @@ class AiPracticeNotifier extends Notifier<AiPracticeState> {
         if (_disposed) return;
         state = state.copyWith(
           phase: AiPracticePhase.ready,
+          error: 'Connection error: $e',
+        );
+      },
+    );
+  }
+
+  /// Free-tier: ask the server to stream the AI's opening greeting. Sends
+  /// `{ sessionId, isInitial: true }` — server injects a synthetic user
+  /// prompt internally and never echoes it back, so we never add anything to
+  /// the local transcript or `_freeHistory` for this call.
+  void _requestInitialGreeting() {
+    final sessionId = state.sessionId;
+    if (sessionId == null) return;
+
+    _httpStreamSub?.cancel();
+
+    final aiBuffer = StringBuffer();
+
+    _httpStreamSub = _httpAi
+        .sendMessage(
+          sessionId: sessionId,
+          message: '',
+          history: const [],
+          isInitial: true,
+        )
+        .listen(
+      (event) {
+        if (_disposed) return;
+        switch (event) {
+          case DeltaEvent(:final content):
+            aiBuffer.write(content);
+            state = state.copyWith(
+              currentAiText: state.currentAiText + content,
+            );
+            break;
+          case CorrectionEvent():
+            // Defensive — no user input means no correction is expected, but
+            // forward it if the server emits one.
+            _onCorrectionFound(event.toCorrection());
+            break;
+          case DoneEvent():
+            _finishHttpResponse(aiBuffer.toString());
+            break;
+          case ErrorEvent(:final message):
+            dev.log('AI Practice: initial-greeting SSE error: $message');
+            // Fall back to the manual flow so the user can still start talking.
+            state = state.copyWith(
+              phase: AiPracticePhase.ready,
+              currentSpeaker: Speaker.none,
+              currentAiText: '',
+              error: message,
+            );
+            break;
+          case QuotaExhaustedEvent():
+            dev.log('AI Practice: quota exhausted on initial greeting');
+            state = state.copyWith(
+              error: 'Daily limit reached. Resets at midnight.',
+            );
+            endSession();
+            break;
+        }
+      },
+      onError: (Object e, StackTrace st) {
+        if (_disposed) return;
+        state = state.copyWith(
+          phase: AiPracticePhase.ready,
+          currentSpeaker: Speaker.none,
           error: 'Connection error: $e',
         );
       },

@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../shared/models/ai_session.dart';
+import '../../../home/presentation/providers/streak_provider.dart';
 import '../../data/ai_session_repository.dart';
 
 /// Lifecycle status of the post-session analysis.
@@ -178,7 +179,8 @@ class AiSummaryNotifier extends Notifier<AiSummaryState> {
     final accuracy =
         raw['accuracyPct'] is num ? (raw['accuracyPct'] as num).toInt() : null;
     final newWords = (raw['newWords'] as List<dynamic>? ?? const [])
-        .map((e) => e.toString())
+        .map((e) => e is Map ? (e['word'] ?? '').toString() : e.toString())
+        .where((w) => w.isNotEmpty)
         .toList();
     final mistakesRaw = (raw['mistakes'] as List<dynamic>? ?? const [])
         .whereType<Map<String, dynamic>>()
@@ -199,12 +201,24 @@ class AiSummaryNotifier extends Notifier<AiSummaryState> {
             : state.analysisStatus)
         : analysisStatus;
 
+    final priorStatus = state.analysisStatus;
     state = state.copyWith(
       mistakes: mistakesRaw.isEmpty ? state.mistakes : mistakesRaw,
       newWords: newWords.isEmpty ? state.newWords : newWords,
       accuracyPct: accuracy,
       analysisStatus: resolvedStatus,
     );
+
+    // When the server-side post-session analysis flips to "completed", the
+    // streak / activity / lifetime-stats writes have all landed (recordActivity
+    // runs before analysisStatus = 'completed' on the server). Invalidate the
+    // Home/Profile providers so the next read reflects the new numbers
+    // instead of the cached zero-streak from before the session started.
+    if (resolvedStatus == AnalysisStatus.completed &&
+        priorStatus != AnalysisStatus.completed) {
+      ref.invalidate(streakProvider);
+      ref.invalidate(userStatsProvider);
+    }
   }
 }
 

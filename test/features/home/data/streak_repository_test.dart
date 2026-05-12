@@ -39,22 +39,6 @@ void main() {
       expect(s.weekDays.last, isFalse);
     });
 
-    test('tolerates {data: {...}} envelope', () async {
-      when(() => dio.get(any())).thenAnswer(
-        (_) async => _ok({
-          'data': {
-            'streakDays': 2,
-            'todayMinutes': 0,
-            'dailyGoalMinutes': 5,
-            'weekDays': [false, false, false, false, false, false, false],
-          }
-        }),
-      );
-
-      final s = await repo.fetchStreak();
-      expect(s.streakDays, 2);
-    });
-
     test('surfaces DioException inner error', () async {
       final inner = Exception('boom');
       when(() => dio.get(any())).thenThrow(DioException(

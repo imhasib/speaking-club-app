@@ -85,11 +85,9 @@ class MistakesPage {
     this.cursor,
   });
 
-  factory MistakesPage.fromApiResponse(Map<String, dynamic> response) {
-    final raw = response['data'] is Map<String, dynamic>
-        ? response['data'] as Map<String, dynamic>
-        : response;
-    final mistakes = (raw['mistakes'] as List<dynamic>? ?? const [])
+  factory MistakesPage.fromApiResponse(Map<String, dynamic> raw) {
+    // Server returns the flat payload directly: { items, nextCursor, summary }.
+    final mistakes = (raw['items'] as List<dynamic>? ?? const [])
         .map((e) => Mistake.fromJson(e as Map<String, dynamic>))
         .toList();
     final summaryJson = raw['summary'];

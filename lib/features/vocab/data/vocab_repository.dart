@@ -21,11 +21,7 @@ class VocabRepository {
   Future<VocabSummary> fetchSummary() async {
     try {
       final response = await _dio.get(ApiEndpoints.vocab);
-      final raw = response.data;
-      final data = raw is Map<String, dynamic> && raw['data'] is Map<String, dynamic>
-          ? raw['data'] as Map<String, dynamic>
-          : raw as Map<String, dynamic>;
-      return VocabSummary.fromJson(data);
+      return VocabSummary.fromJson(response.data as Map<String, dynamic>);
     } on DioException catch (e) {
       throw e.error ?? e;
     }
@@ -64,11 +60,7 @@ class VocabRepository {
   Future<UserWord> fetchWordDetail(String word) async {
     try {
       final response = await _dio.get(ApiEndpoints.vocabWordDetail(word));
-      final raw = response.data;
-      final data = raw is Map<String, dynamic> && raw['data'] is Map<String, dynamic>
-          ? raw['data'] as Map<String, dynamic>
-          : raw as Map<String, dynamic>;
-      return UserWord.fromJson(data);
+      return UserWord.fromJson(response.data as Map<String, dynamic>);
     } on DioException catch (e) {
       throw e.error ?? e;
     }

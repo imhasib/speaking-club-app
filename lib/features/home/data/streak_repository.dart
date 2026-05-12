@@ -20,7 +20,7 @@ class StreakRepository {
   Future<Streak> fetchStreak() async {
     try {
       final response = await _dio.get(ApiEndpoints.streak);
-      return Streak.fromJson(_unwrap(response.data));
+      return Streak.fromJson(response.data as Map<String, dynamic>);
     } on DioException catch (e) {
       throw e.error ?? e;
     }
@@ -29,16 +29,9 @@ class StreakRepository {
   Future<UserStats> fetchStats() async {
     try {
       final response = await _dio.get(ApiEndpoints.userStats);
-      return UserStats.fromJson(_unwrap(response.data));
+      return UserStats.fromJson(response.data as Map<String, dynamic>);
     } on DioException catch (e) {
       throw e.error ?? e;
     }
-  }
-
-  /// Tolerate both `{ data: {...} }` envelopes and flat payloads.
-  Map<String, dynamic> _unwrap(dynamic raw) {
-    final map = raw as Map<String, dynamic>;
-    final inner = map['data'];
-    return inner is Map<String, dynamic> ? inner : map;
   }
 }

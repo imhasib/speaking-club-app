@@ -98,11 +98,9 @@ class WordsPage {
 
   const WordsPage({required this.words, this.cursor});
 
-  factory WordsPage.fromApiResponse(Map<String, dynamic> response) {
-    final raw = response['data'] is Map<String, dynamic>
-        ? response['data'] as Map<String, dynamic>
-        : response;
-    final words = (raw['words'] as List<dynamic>? ?? const [])
+  factory WordsPage.fromApiResponse(Map<String, dynamic> raw) {
+    // Server returns the flat payload directly: { items, nextCursor }.
+    final words = (raw['items'] as List<dynamic>? ?? const [])
         .map((e) => UserWord.fromJson(e as Map<String, dynamic>))
         .toList();
     return WordsPage(

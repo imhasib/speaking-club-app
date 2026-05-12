@@ -44,7 +44,7 @@ Map<String, dynamic> _summaryJson() => {
     };
 
 Map<String, dynamic> _wordsPageJson({String? cursor}) => {
-      'words': [
+      'items': [
         {
           'word': 'because',
           'count': 24,
@@ -95,13 +95,6 @@ void main() {
       expect(s.rarelyUsed, hasLength(1));
       expect(s.needsImprovement.first.word, 'amount');
       expect(s.allWords.first.word, 'because');
-    });
-
-    test('tolerates {data: {...}} envelope', () async {
-      when(() => dio.get(any()))
-          .thenAnswer((_) async => _ok({'data': _summaryJson()}));
-      final s = await repo.fetchSummary();
-      expect(s.stats.uniqueWords, 412);
     });
 
     test('throws inner DioException error on failure', () async {
@@ -181,12 +174,5 @@ void main() {
       expect(w.examples.first.correction, 'large number');
     });
 
-    test('tolerates {data: {...}} envelope', () async {
-      when(() => dio.get(any())).thenAnswer(
-        (_) async => _ok({'data': _wordJson('borrow')}),
-      );
-      final w = await repo.fetchWordDetail('borrow');
-      expect(w.word, 'borrow');
-    });
   });
 }

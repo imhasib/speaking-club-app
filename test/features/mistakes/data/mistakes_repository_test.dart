@@ -38,7 +38,7 @@ Map<String, dynamic> _page({
   int fixed = 8,
 }) =>
     {
-      'mistakes': mistakes ?? [_mistakeJson()],
+      'items': mistakes ?? [_mistakeJson()],
       'summary': {
         'thisWeek': thisWeek,
         'fixed': fixed,
@@ -69,12 +69,6 @@ void main() {
       expect(result.summary.thisWeek, 12);
       expect(result.summary.fixed, 8);
       expect(result.cursor, 'next-1');
-    });
-
-    test('tolerates a {data: {...}} envelope', () {
-      final wrapped = {'data': _page()};
-      final result = MistakesPage.fromApiResponse(wrapped);
-      expect(result.mistakes, hasLength(1));
     });
 
     test('handles empty list + null cursor', () {

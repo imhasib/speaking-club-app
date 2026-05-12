@@ -66,7 +66,7 @@ sealed class MistakesSummary with _$MistakesSummary {
   const factory MistakesSummary({
     @Default(0) int thisWeek,
     @Default(0) int fixed,
-    String? trend,
+    int? trend,
   }) = _MistakesSummary;
 
   factory MistakesSummary.fromJson(Map<String, dynamic> json) =>

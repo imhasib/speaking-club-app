@@ -234,7 +234,7 @@ class _SummaryStrip extends StatelessWidget {
               ],
             ),
           ),
-          if (summary.trend != null && summary.trend!.isNotEmpty)
+          if (summary.trend != null && summary.trend != 0)
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
               decoration: BoxDecoration(
@@ -242,7 +242,7 @@ class _SummaryStrip extends StatelessWidget {
                 borderRadius: BorderRadius.circular(99),
               ),
               child: Text(
-                summary.trend!,
+                '${summary.trend! > 0 ? '+' : ''}${summary.trend}',
                 style: const TextStyle(
                   fontSize: 13,
                   fontWeight: FontWeight.w700,

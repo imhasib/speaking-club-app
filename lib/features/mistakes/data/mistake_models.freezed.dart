@@ -299,7 +299,7 @@ as bool,
 /// @nodoc
 mixin _$MistakesSummary {
 
- int get thisWeek; int get fixed; String? get trend;
+ int get thisWeek; int get fixed; int? get trend;
 /// Create a copy of MistakesSummary
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -332,7 +332,7 @@ abstract mixin class $MistakesSummaryCopyWith<$Res>  {
   factory $MistakesSummaryCopyWith(MistakesSummary value, $Res Function(MistakesSummary) _then) = _$MistakesSummaryCopyWithImpl;
 @useResult
 $Res call({
- int thisWeek, int fixed, String? trend
+ int thisWeek, int fixed, int? trend
 });
 
 
@@ -354,7 +354,7 @@ class _$MistakesSummaryCopyWithImpl<$Res>
 thisWeek: null == thisWeek ? _self.thisWeek : thisWeek // ignore: cast_nullable_to_non_nullable
 as int,fixed: null == fixed ? _self.fixed : fixed // ignore: cast_nullable_to_non_nullable
 as int,trend: freezed == trend ? _self.trend : trend // ignore: cast_nullable_to_non_nullable
-as String?,
+as int?,
   ));
 }
 
@@ -436,7 +436,7 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int thisWeek,  int fixed,  String? trend)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int thisWeek,  int fixed,  int? trend)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _MistakesSummary() when $default != null:
 return $default(_that.thisWeek,_that.fixed,_that.trend);case _:
@@ -457,7 +457,7 @@ return $default(_that.thisWeek,_that.fixed,_that.trend);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int thisWeek,  int fixed,  String? trend)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int thisWeek,  int fixed,  int? trend)  $default,) {final _that = this;
 switch (_that) {
 case _MistakesSummary():
 return $default(_that.thisWeek,_that.fixed,_that.trend);}
@@ -474,7 +474,7 @@ return $default(_that.thisWeek,_that.fixed,_that.trend);}
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int thisWeek,  int fixed,  String? trend)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int thisWeek,  int fixed,  int? trend)?  $default,) {final _that = this;
 switch (_that) {
 case _MistakesSummary() when $default != null:
 return $default(_that.thisWeek,_that.fixed,_that.trend);case _:
@@ -494,7 +494,7 @@ class _MistakesSummary implements MistakesSummary {
 
 @override@JsonKey() final  int thisWeek;
 @override@JsonKey() final  int fixed;
-@override final  String? trend;
+@override final  int? trend;
 
 /// Create a copy of MistakesSummary
 /// with the given fields replaced by the non-null parameter values.
@@ -529,7 +529,7 @@ abstract mixin class _$MistakesSummaryCopyWith<$Res> implements $MistakesSummary
   factory _$MistakesSummaryCopyWith(_MistakesSummary value, $Res Function(_MistakesSummary) _then) = __$MistakesSummaryCopyWithImpl;
 @override @useResult
 $Res call({
- int thisWeek, int fixed, String? trend
+ int thisWeek, int fixed, int? trend
 });
 
 
@@ -551,7 +551,7 @@ class __$MistakesSummaryCopyWithImpl<$Res>
 thisWeek: null == thisWeek ? _self.thisWeek : thisWeek // ignore: cast_nullable_to_non_nullable
 as int,fixed: null == fixed ? _self.fixed : fixed // ignore: cast_nullable_to_non_nullable
 as int,trend: freezed == trend ? _self.trend : trend // ignore: cast_nullable_to_non_nullable
-as String?,
+as int?,
   ));
 }
 

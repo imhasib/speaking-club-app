@@ -43,7 +43,7 @@ _MistakesSummary _$MistakesSummaryFromJson(Map<String, dynamic> json) =>
     _MistakesSummary(
       thisWeek: (json['thisWeek'] as num?)?.toInt() ?? 0,
       fixed: (json['fixed'] as num?)?.toInt() ?? 0,
-      trend: json['trend'] as String?,
+      trend: (json['trend'] as num?)?.toInt(),
     );
 
 Map<String, dynamic> _$MistakesSummaryToJson(_MistakesSummary instance) =>

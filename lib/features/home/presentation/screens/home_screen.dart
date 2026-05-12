@@ -535,40 +535,47 @@ class _QuickActionsRow extends StatelessWidget {
     return Row(
       children: [
         Expanded(
-          child: GestureDetector(
-            onTap: onAiPractice,
-            child: Container(
-              padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),
-              decoration: BoxDecoration(
-                color: AppColors.primary,
-                borderRadius: BorderRadius.circular(14),
-              ),
-              child: Row(
-                children: const [
-                  Icon(
-                    Icons.smart_toy_outlined,
-                    color: Colors.white,
-                    size: 22,
-                  ),
-                  SizedBox(width: 10),
-                  Text(
-                    'AI Practice',
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w700,
+          child: Semantics(
+            label: 'home_ai_practice',
+            button: true,
+            child: GestureDetector(
+              onTap: onAiPractice,
+              child: Container(
+                padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),
+                decoration: BoxDecoration(
+                  color: AppColors.primary,
+                  borderRadius: BorderRadius.circular(14),
+                ),
+                child: Row(
+                  children: const [
+                    Icon(
+                      Icons.smart_toy_outlined,
                       color: Colors.white,
+                      size: 22,
                     ),
-                  ),
-                ],
+                    SizedBox(width: 10),
+                    Text(
+                      'AI Practice',
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w700,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
         ),
         const SizedBox(width: 10),
         Expanded(
-          child: GestureDetector(
-            onTap: onFindMatch,
-            child: Container(
+          child: Semantics(
+            label: isWaiting ? 'home_cancel_match' : 'home_find_match',
+            button: true,
+            child: GestureDetector(
+              onTap: onFindMatch,
+              child: Container(
               padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),
               decoration: BoxDecoration(
                 color: AppColors.surface,

@@ -472,6 +472,9 @@ class _AccountSection extends StatelessWidget {
             onEdit: onEditUsername,
             onCancel: onCancelUsername,
             onSave: onSaveUsername,
+            editSemLabel: 'profile_edit_username',
+            saveSemLabel: 'profile_save_field',
+            cancelSemLabel: 'profile_cancel_field',
           ),
           _divider(),
           _ReadOnlyField(
@@ -490,6 +493,9 @@ class _AccountSection extends StatelessWidget {
             onSave: onSaveMobile,
             keyboardType: TextInputType.phone,
             hint: '+1234567890',
+            editSemLabel: 'profile_edit_mobile',
+            saveSemLabel: 'profile_save_field',
+            cancelSemLabel: 'profile_cancel_field',
           ),
         ],
       ),
@@ -531,6 +537,9 @@ class _EditableField extends StatelessWidget {
   final VoidCallback onSave;
   final TextInputType keyboardType;
   final String? hint;
+  final String? editSemLabel;
+  final String? saveSemLabel;
+  final String? cancelSemLabel;
 
   const _EditableField({
     required this.label,
@@ -542,6 +551,9 @@ class _EditableField extends StatelessWidget {
     required this.onSave,
     this.keyboardType = TextInputType.text,
     this.hint,
+    this.editSemLabel,
+    this.saveSemLabel,
+    this.cancelSemLabel,
   });
 
   @override
@@ -571,10 +583,12 @@ class _EditableField extends StatelessWidget {
                   ),
                 ),
                 IconButton(
+                  tooltip: cancelSemLabel,
                   icon: const Icon(Icons.close, size: 20),
                   onPressed: onCancel,
                 ),
                 IconButton(
+                  tooltip: saveSemLabel,
                   icon: const Icon(Icons.check, size: 20,
                       color: AppColors.greenPrimary),
                   onPressed: onSave,
@@ -594,10 +608,14 @@ class _EditableField extends StatelessWidget {
                     ),
                   ),
                 ),
-                GestureDetector(
-                  onTap: onEdit,
-                  child: const Icon(Icons.edit_outlined,
-                      size: 18, color: AppColors.mutedInk),
+                Semantics(
+                  label: editSemLabel,
+                  button: true,
+                  child: GestureDetector(
+                    onTap: onEdit,
+                    child: const Icon(Icons.edit_outlined,
+                        size: 18, color: AppColors.mutedInk),
+                  ),
                 ),
               ],
             ),
@@ -709,6 +727,7 @@ class _PreferencesSection extends StatelessWidget {
             icon: Icons.logout,
             label: 'Sign out',
             labelColor: AppColors.redPrimary,
+            semanticLabel: 'profile_logout',
             onTap: onLogout,
           ),
         ],
@@ -748,6 +767,7 @@ class _PrefItem extends StatelessWidget {
   final String? value;
   final Color labelColor;
   final VoidCallback onTap;
+  final String? semanticLabel;
 
   const _PrefItem({
     this.emoji,
@@ -756,11 +776,15 @@ class _PrefItem extends StatelessWidget {
     this.value,
     this.labelColor = AppColors.ink,
     required this.onTap,
+    this.semanticLabel,
   });
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
+    return Semantics(
+      label: semanticLabel,
+      button: semanticLabel != null,
+      child: InkWell(
       onTap: onTap,
       child: Padding(
         padding: const EdgeInsets.fromLTRB(16, 13, 16, 13),
@@ -796,6 +820,7 @@ class _PrefItem extends StatelessWidget {
           ],
         ),
       ),
+    ),
     );
   }
 }

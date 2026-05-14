@@ -61,7 +61,12 @@
       "Bash(where flutter *)",
       "Bash(awk '{print $NF}')",
       "Bash(xargs -I{} basename {})",
-      "Bash(git checkout *)"
+      "Bash(git checkout *)",
+      "Bash(git rebase *)",
+      "Bash(git push *)",
+      "Bash(gh issue *)",
+      "Bash(xargs sed *)",
+      "Bash(gh pr create --title 'fix\\(tests\\): correct package import casing \\(Speaking_club -> speaking_club\\)' --body ' *)"
     ]
   }
 }
